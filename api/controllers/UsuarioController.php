@@ -11,6 +11,10 @@ class usuario
         $response->toJSON($result);
     }
 
+
+
+    // Prueba http://localhost:81/proyecto/api/usuario/login
+
     public function login()
     {
         $request = new Request();
