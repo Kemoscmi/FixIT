@@ -21,12 +21,14 @@ require_once "middleware/AuthMiddleware.php";
 /***--- Agregar todos los modelos*/
 require_once "models/UsuarioModel.php";
 require_once "models/TicketModel.php";
+require_once "models/AsignacionModel.php";
 require_once "models/TecnicoModel.php";
 require_once "models/CategoriaModel.php";
 
 // Controladores
 require_once "controllers/UsuarioController.php";
 require_once "controllers/TicketController.php";
+require_once "controllers/AsignacionController.php";
 require_once "controllers/TecnicoController.php";
 require_once "controllers/CategoriaController.php";
 
