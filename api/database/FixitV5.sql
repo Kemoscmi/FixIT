@@ -39,7 +39,7 @@ CREATE TABLE `asignaciones` (
   CONSTRAINT `fk_asig_regla` FOREIGN KEY (`regla_aplicada_id`) REFERENCES `reglas_autotriage` (`id`),
   CONSTRAINT `fk_asig_tecnico_usuario` FOREIGN KEY (`tecnico_id`) REFERENCES `usuarios` (`id`),
   CONSTRAINT `fk_asig_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,6 +48,7 @@ CREATE TABLE `asignaciones` (
 
 LOCK TABLES `asignaciones` WRITE;
 /*!40000 ALTER TABLE `asignaciones` DISABLE KEYS */;
+INSERT INTO `asignaciones` VALUES (11,1,NULL,2,'2025-10-13 09:00:00','Automatica',NULL,NULL,1),(12,2,NULL,2,'2025-10-13 15:00:00','Manual',NULL,NULL,1),(13,3,NULL,2,'2025-10-14 10:30:00','Automatica',NULL,NULL,1),(14,4,NULL,2,'2025-10-15 14:00:00','Manual',NULL,NULL,1),(15,8,NULL,2,'2025-10-16 08:30:00','Automatica',NULL,NULL,1),(17,10,NULL,3,'2025-10-15 00:46:52','Manual',NULL,NULL,1);
 /*!40000 ALTER TABLE `asignaciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -480,7 +481,7 @@ CREATE TABLE `tickets` (
   CONSTRAINT `fk_ticket_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados_ticket` (`id`),
   CONSTRAINT `fk_ticket_prioridad` FOREIGN KEY (`prioridad_id`) REFERENCES `prioridades` (`id`),
   CONSTRAINT `fk_ticket_usuario` FOREIGN KEY (`usuario_solicitante_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -489,7 +490,7 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (1,'Error al abrir ERP','El ERP lanza excepción al iniciar','2025-10-09 16:02:53',3,1,4,1,NULL,'2025-10-09 18:02:53','2025-10-10 16:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(2,'Laptop no enciende','Equipo sin respuesta, posible falla de energía','2025-10-09 16:02:53',2,1,4,2,NULL,'2025-10-09 19:02:53','2025-10-11 16:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(3,'VPN caída','Usuarios no logran conectar a la VPN','2025-10-09 16:02:53',3,1,4,3,NULL,'2025-10-09 17:02:53','2025-10-10 04:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(4,'Alerta de phishing','Correo sospechoso reportado por varios usuarios','2025-10-09 16:02:53',2,1,4,4,NULL,'2025-10-09 17:02:53','2025-10-10 00:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-09 16:02:53');
+INSERT INTO `tickets` VALUES (1,'Error al abrir ERP','El ERP lanza excepción al iniciar','2025-10-09 16:02:53',3,1,4,1,NULL,'2025-10-09 18:02:53','2025-10-10 16:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(2,'Laptop no enciende','Equipo sin respuesta, posible falla de energía','2025-10-09 16:02:53',2,2,4,2,NULL,'2025-10-09 19:02:53','2025-10-11 16:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(3,'VPN caída','Usuarios no logran conectar a la VPN','2025-10-09 16:02:53',3,3,4,3,NULL,'2025-10-09 17:02:53','2025-10-10 04:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(4,'Alerta de phishing','Correo sospechoso reportado por varios usuarios','2025-10-09 16:02:53',2,4,4,4,NULL,'2025-10-09 17:02:53','2025-10-10 00:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(5,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:30:27',2,5,4,1,NULL,'2025-10-15 02:30:27','2025-10-16 00:30:27',NULL,NULL,NULL,'2025-10-15 00:30:27','2025-10-15 00:30:27'),(6,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:34:27',2,5,4,1,NULL,'2025-10-15 02:34:27','2025-10-16 00:34:27',NULL,NULL,NULL,'2025-10-15 00:34:27','2025-10-15 00:34:27'),(7,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:35:53',2,5,4,1,NULL,'2025-10-15 02:35:53','2025-10-16 00:35:53',NULL,NULL,NULL,'2025-10-15 00:35:53','2025-10-15 00:35:53'),(8,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:38:34',2,5,4,1,NULL,'2025-10-15 02:38:34','2025-10-16 00:38:34',NULL,NULL,NULL,'2025-10-15 00:38:34','2025-10-15 00:38:34'),(9,'Ticket de otro cliente','Caso 403 para cliente 1','2025-10-15 00:42:30',2,1,5,1,NULL,'2025-10-15 02:42:30','2025-10-16 00:42:30',NULL,NULL,NULL,'2025-10-15 00:42:30','2025-10-15 00:42:30'),(10,'Ticket de otro cliente','Caso 403 para cliente 1','2025-10-15 00:46:52',2,1,5,1,NULL,'2025-10-15 02:46:52','2025-10-16 00:46:52',NULL,NULL,NULL,'2025-10-15 00:46:52','2025-10-15 00:46:52');
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -519,7 +520,7 @@ CREATE TABLE `usuarios` (
   UNIQUE KEY `correo` (`correo`),
   KEY `fk_usuarios_rol` (`rol_id`),
   CONSTRAINT `fk_usuarios_rol` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -528,7 +529,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'admin@fixit.cr','$2y$10$hashdemo','Admin','FixIT',NULL,1,NULL,NULL,NULL,NULL,1,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(2,'jesibajaca@est.utn.ac.cr','$2y$10$hashdemo','Jesús Darián','Sibaja Cascante','84086025',2,'Disponible','Técnico líder',NULL,NULL,1,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(3,'kemoscosomi@est.utn.ac.cr','$2y$10$hashdemo','Keity Paola','Moscoso Miranda','63299589',2,'Disponible','Soporte N2',NULL,NULL,1,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(4,'cliente1@fixit.cr','$2y$10$hashdemo','Usuario','Cliente',NULL,3,NULL,NULL,NULL,NULL,1,'2025-10-09 16:02:53','2025-10-09 16:02:53');
+INSERT INTO `usuarios` VALUES (1,'admin@fixit.cr','1234','Admin','FixIT',NULL,1,NULL,NULL,NULL,NULL,1,'2025-10-09 16:02:53','2025-10-15 11:46:33'),(2,'jesibajaca@est.utn.ac.cr','1234','Jesús Darián','Sibaja Cascante','84086025',2,'Disponible','Técnico líder',NULL,NULL,1,'2025-10-09 16:02:53','2025-10-15 11:46:33'),(3,'kemoscosomi@est.utn.ac.cr','1234','Keity Paola','Moscoso Miranda','63299589',2,'Disponible','Soporte N2',NULL,NULL,1,'2025-10-09 16:02:53','2025-10-15 11:46:33'),(4,'cliente1@fixit.cr','1234','Usuario','Cliente',NULL,3,NULL,NULL,NULL,NULL,1,'2025-10-09 16:02:53','2025-10-15 11:46:33'),(5,'cliente2@fixit.cr','1234','Cliente','Dos',NULL,3,NULL,NULL,NULL,NULL,1,'2025-10-15 00:42:30','2025-10-15 11:46:33');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -638,4 +639,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-13 22:40:47
+-- Dump completed on 2025-10-15 13:26:57
