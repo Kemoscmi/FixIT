@@ -20,23 +20,36 @@ class TecnicoModel
     }
 
 
-    /* Obtener un técnico por ID */
-    public function get($id)
-    {
-        // Consulta SQL
-        $vSql = "SELECT id, nombre, apellido, correo, telefono, disponibilidad, observaciones, carga_trabajo
+   /* Obtener un técnico por ID */
+public function get($id)
+{
+    // Consulta SQL para obtener la información básica del técnico
+    $vSql = "SELECT id, nombre, apellido, correo, telefono, disponibilidad, observaciones, carga_trabajo
              FROM usuarios
              WHERE rol_id = 2 AND id = $id AND activo = 1";  // Filtramos por técnico activo
 
-        // Ejecutamos la consulta
-        $vResultado = $this->enlace->ExecuteSQL($vSql);
+    // Ejecutamos la consulta
+    $vResultado = $this->enlace->ExecuteSQL($vSql);
 
-        // Si no se encuentra ningún técnico, retornamos null
-        if (empty($vResultado)) {
-            return null;
-        }
-
-        // Si se encuentra el técnico, retornamos el primer resultado
-        return $vResultado[0];
+    // Si no se encuentra ningún técnico, retornamos null
+    if (empty($vResultado)) {
+        return null;
     }
+
+    // Convertir el objeto stdClass a un array
+    $vResultado = (array) $vResultado[0];
+
+    // Obtener las especialidades del técnico
+    $vSqlEspecialidades = "SELECT e.nombre 
+                           FROM especialidades e
+                           JOIN tecnico_especialidad te ON e.id = te.especialidad_id
+                           WHERE te.usuario_id = $id";
+    $especialidades = $this->enlace->ExecuteSQL($vSqlEspecialidades);
+
+    // Añadimos las especialidades a la información del técnico
+    $vResultado['especialidades'] = $especialidades;
+
+    // Si se encuentra el técnico, retornamos el primer resultado con las especialidades
+    return $vResultado;
+}
 }

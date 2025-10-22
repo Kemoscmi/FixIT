@@ -16,6 +16,7 @@ import {
   ChevronDown,
   User,
   Home,
+  Users2,
 } from "lucide-react";
 
 import {
@@ -39,6 +40,7 @@ const mantItems = [
   { title: "Tickets", href: "/tickets/table", icon: <Wrench className="h-4 w-4" /> },
   { title: "Usuarios", href: "/usuarios", icon: <Users className="h-4 w-4" /> },
   { title: "Categorías", href: "/categorias", icon: <Layers className="h-4 w-4" /> },
+  { title: "Técnicos", href: "/tecnicos", icon: <Users2 className="h-4 w-4" /> },
 ];
 
 const userItems = [
