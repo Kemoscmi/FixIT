@@ -1,50 +1,55 @@
 <?php
 class UsuarioModel
 {
-    private $db;
+    public $enlace;
 
     public function __construct()
     {
-        $this->db = new MySqlConnect();
+        $this->enlace = new MySqlConnect();  // Conexión a la base de datos
     }
 
+    /* Listar todos los usuarios activos */
     public function all()
     {
-        $sql = "SELECT u.id, u.nombre, u.correo, u.rol_id, r.nombre AS rol
-                FROM usuarios u
-                INNER JOIN roles r ON u.rol_id = r.id
-                WHERE u.activo = 1;";
-        return $this->db->executeSQL($sql);
+        $vSql = "SELECT u.id, u.nombre, u.apellido, u.correo, u.telefono, u.rol_id, r.nombre AS rol
+                 FROM usuarios u
+                 INNER JOIN roles r ON u.rol_id = r.id
+                 WHERE u.activo = 1";
+        return $this->enlace->ExecuteSQL($vSql);
     }
 
-    public function get($id)
-    {
-        $sql = "SELECT id, nombre, correo, telefono, rol_id
-                FROM usuarios WHERE id = $id;";
-        $result = $this->db->executeSQL($sql);
-        return $result ? $result[0] : null;
+    /* Buscar usuario por correo (para login) */
+   public function login($correo)
+{
+    $vSql = "SELECT u.*, r.nombre AS rol
+             FROM usuarios u
+             INNER JOIN roles r ON u.rol_id = r.id
+             WHERE u.correo = '$correo' AND u.activo = 1";
+
+    $vResultado = $this->enlace->ExecuteSQL($vSql);
+
+    // Forzamos a devolver un array, aunque venga vacío o como stdClass
+    if (is_object($vResultado)) {
+        $vResultado = [$vResultado];
+    } elseif (!is_array($vResultado)) {
+        $vResultado = [];
     }
 
+    return $vResultado;
+}
+
+    /* Crear un nuevo usuario */
     public function create($data)
     {
         $nombre = $data->nombre;
+        $apellido = $data->apellido;
         $correo = $data->correo;
-        $telefono = $data->telefono;
+        $telefono = $data->telefono ?? null;
+        $rol_id = $data->rol_id ?? 3;
         $password = password_hash($data->contrasena, PASSWORD_BCRYPT);
-        $rol_id = $data->rol_id;
 
-        $sql = "INSERT INTO usuarios (nombre, correo, telefono, contrasena_hash, rol_id, activo)
-                VALUES ('$nombre', '$correo', '$telefono', '$password', $rol_id, 1);";
-
-        return $this->db->executeSQL_DML_last($sql);
-    }
-
-    public function login($correo)
-    {
-        $sql = "SELECT u.*, r.nombre AS rol 
-                FROM usuarios u 
-                INNER JOIN roles r ON u.rol_id = r.id 
-                WHERE correo = '$correo' AND activo = 1;";
-        return $this->db->executeSQL($sql);
+        $vSql = "INSERT INTO usuarios (nombre, apellido, correo, telefono, contrasena_hash, rol_id, activo)
+                 VALUES ('$nombre', '$apellido', '$correo', '$telefono', '$password', $rol_id, 1)";
+        return $this->enlace->ExecuteSQL_DML_last($vSql);
     }
 }
