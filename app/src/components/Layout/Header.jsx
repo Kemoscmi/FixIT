@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Layers,
   Wrench,
@@ -27,109 +27,108 @@ import {
   MenubarItem,
 } from "@/components/ui/menubar";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-
-const userData = { email: "demo@utn.ac.cr" };
-
-const navItems = [
-  { title: "Inicio", href: "/", icon: <Home className="h-4 w-4" /> },
-  { title: "Mis Tickets", href: "/tickets", icon: <Ticket className="h-4 w-4" /> },
-  { title: "Asignaciones", href: "/asignaciones", icon: <ClipboardList className="h-4 w-4" /> },
-];
-
-const mantItems = [
-  { title: "Tickets", href: "/tickets/table", icon: <Wrench className="h-4 w-4" /> },
-  { title: "Usuarios", href: "/usuarios", icon: <Users className="h-4 w-4" /> },
-  { title: "Categorías", href: "/categorias", icon: <Layers className="h-4 w-4" /> },
-  { title: "Técnicos", href: "/tecnicos", icon: <Users2 className="h-4 w-4" /> },
-];
-
-const userItems = [
-  { title: "Iniciar Sesión", href: "/user/login", icon: <LogIn className="h-4 w-4" /> },
-  { title: "Registrarse", href: "/user/create", icon: <UserPlus className="h-4 w-4" /> },
-  { title: "Cerrar Sesión", href: "/user/logout", icon: <LogOut className="h-4 w-4" /> },
-];
+import useAuth from "../../auth/store/auth.store"; //   store global de autenticación
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const navItems = [
+    { title: "Inicio", href: "/", icon: <Home className="h-4 w-4" /> },
+    { title: "Mis Tickets", href: "/tickets", icon: <Ticket className="h-4 w-4" /> },
+    { title: "Asignaciones", href: "/asignaciones", icon: <ClipboardList className="h-4 w-4" /> },
+  ];
+
+  const mantItems = [
+    { title: "Tickets", href: "/tickets/table", icon: <Wrench className="h-4 w-4" /> },
+    { title: "Usuarios", href: "/usuarios", icon: <Users className="h-4 w-4" /> },
+    { title: "Categorías", href: "/categorias", icon: <Layers className="h-4 w-4" /> },
+    { title: "Técnicos", href: "/tecnicos", icon: <Users2 className="h-4 w-4" /> },
+  ];
+
+  const guestItems = [
+    { title: "Iniciar Sesión", href: "/login", icon: <LogIn className="h-4 w-4" /> },
+    { title: "Registrarse", href: "/user/create", icon: <UserPlus className="h-4 w-4" /> },
+  ];
+
+  const userName = user?.nombre || user?.correo || "Invitado";
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-full bg-gradient-to-r from-[#1a56db] to-[#2563eb] backdrop-blur-md border-b border-white/10 shadow-lg transition-all duration-300">
+    <header className="fixed top-0 left-0 z-50 w-full bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md border-b border-white/10 shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between px-6 py-3 max-w-[1280px] mx-auto text-white">
-        {/* -------- Logo / Nombre -------- */}
+        {/* -------- LOGO -------- */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-lg md:text-xl font-semibold tracking-wide hover:opacity-90 transition"
+          className="flex items-center gap-2 text-lg md:text-xl font-extrabold tracking-wide hover:opacity-90 transition"
         >
-          <Ticket className="h-6 w-6" />
-          <span className="hidden sm:inline">FixIT</span>
+          <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-sm shadow-sm">
+            <Ticket className="h-6 w-6 text-yellow-300" />
+          </div>
+          <span className="hidden sm:inline font-extrabold tracking-tight">
+            <span className="text-yellow-300">Fix</span>IT
+          </span>
         </Link>
 
-        {/* -------- Menú escritorio -------- */}
+        {/* -------- NAV ESCRITORIO -------- */}
         <div className="hidden md:flex flex-1 justify-center">
           <Menubar className="w-auto bg-transparent border-none shadow-none space-x-8">
-            {/* Navegación */}
-            <MenubarMenu>
-              <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-yellow-300 transition">
-                <ClipboardList className="h-4 w-4" /> Navegación
-                <ChevronDown className="h-3 w-3" />
-              </MenubarTrigger>
-              <MenubarContent className="bg-blue-800/90 backdrop-blur-md border border-white/10 rounded-md shadow-xl">
-                {navItems.map((item) => (
-                  <MenubarItem key={item.href} asChild>
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-white hover:bg-white/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
-              </MenubarContent>
-            </MenubarMenu>
+            {/* --- Navegación --- */}
+            <DropdownMenu
+              title="Navegación"
+              icon={<ClipboardList className="h-4 w-4" />}
+              items={navItems}
+            />
 
-            {/* Administración */}
-            <MenubarMenu>
-              <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-yellow-300 transition">
-                <Wrench className="h-4 w-4" /> Administración
-                <ChevronDown className="h-3 w-3" />
-              </MenubarTrigger>
-              <MenubarContent className="bg-blue-800/90 backdrop-blur-md border border-white/10 rounded-md shadow-xl">
-                {mantItems.map((item) => (
-                  <MenubarItem key={item.href} asChild>
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-white hover:bg-white/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
-              </MenubarContent>
-            </MenubarMenu>
+            {/* --- Administración --- */}
+            <DropdownMenu
+              title="Administración"
+              icon={<Wrench className="h-4 w-4" />}
+              items={mantItems}
+            />
 
-            {/* Usuario */}
+            {/* --- Usuario --- */}
             <MenubarMenu>
               <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-yellow-300 transition">
-                <User className="h-4 w-4" /> {userData.email}
+                <User className="h-4 w-4" /> {userName}
                 <ChevronDown className="h-3 w-3" />
               </MenubarTrigger>
-              <MenubarContent className="bg-blue-800/90 backdrop-blur-md border border-white/10 rounded-md shadow-xl">
-                {userItems.map((item) => (
-                  <MenubarItem key={item.href} asChild>
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-white hover:bg-white/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
+              <MenubarContent className="bg-gradient-to-b from-blue-800 to-blue-950/90 backdrop-blur-md border border-white/10 rounded-md shadow-xl">
+                {isAuthenticated ? (
+                  <>
+                    <MenubarItem asChild>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 py-2 px-4 text-sm text-white hover:bg-white/10 transition"
+                      >
+                        <LogOut className="h-4 w-4" /> Cerrar Sesión
+                      </button>
+                    </MenubarItem>
+                  </>
+                ) : (
+                  guestItems.map((item) => (
+                    <MenubarItem key={item.href} asChild>
+                      <Link
+                        to={item.href}
+                        className="flex items-center gap-2 py-2 px-4 text-sm text-white hover:bg-white/10 transition"
+                      >
+                        {item.icon} {item.title}
+                      </Link>
+                    </MenubarItem>
+                  ))
+                )}
               </MenubarContent>
             </MenubarMenu>
           </Menubar>
         </div>
 
-        {/* -------- Menú móvil -------- */}
+        {/* -------- NAV MÓVIL -------- */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
             <button className="md:hidden inline-flex items-center justify-center p-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
@@ -139,18 +138,32 @@ export default function Header() {
 
           <SheetContent
             side="left"
-            className="bg-blue-900/95 text-white backdrop-blur-lg w-72 p-6 animate-slideIn"
+            className="bg-gradient-to-b from-blue-900 via-blue-950 to-black/90 text-white backdrop-blur-lg w-72 p-6 border-r border-white/10"
           >
             <nav className="space-y-6">
-              <div>
-                <Link to="/" className="flex items-center gap-2 text-lg font-semibold mb-4">
-                  <Ticket /> FixIT
-                </Link>
+              <div className="flex items-center gap-2 text-lg font-semibold mb-4">
+                <Ticket className="text-yellow-300" />
+                <span>FixIT</span>
               </div>
 
               <NavSection title="Navegación" items={navItems} setMobileOpen={setMobileOpen} />
               <NavSection title="Administración" items={mantItems} setMobileOpen={setMobileOpen} />
-              <NavSection title={userData.email} items={userItems} setMobileOpen={setMobileOpen} />
+              <NavSection
+                title={userName}
+                items={
+                  isAuthenticated
+                    ? [
+                        {
+                          title: "Cerrar Sesión",
+                          href: "#",
+                          icon: <LogOut className="h-4 w-4" />,
+                          action: handleLogout,
+                        },
+                      ]
+                    : guestItems
+                }
+                setMobileOpen={setMobileOpen}
+              />
             </nav>
           </SheetContent>
         </Sheet>
@@ -159,20 +172,49 @@ export default function Header() {
   );
 }
 
-/* --- Subcomponente para secciones del menú móvil --- */
+/* --- Dropdown reutilizable --- */
+function DropdownMenu({ title, icon, items }) {
+  return (
+    <MenubarMenu>
+      <MenubarTrigger className="flex items-center gap-2 text-white font-medium hover:text-yellow-300 transition">
+        {icon} {title}
+        <ChevronDown className="h-3 w-3 opacity-80" />
+      </MenubarTrigger>
+
+      <MenubarContent className="bg-gradient-to-b from-blue-800 via-blue-900 to-blue-950/90 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl min-w-[180px] overflow-hidden">
+        {items.map((item) => (
+          <MenubarItem key={item.href} asChild>
+            <Link
+              to={item.href}
+              className="flex items-center gap-2 py-2.5 px-4 text-sm text-white/90 hover:text-white hover:bg-blue-700/30 transition-all"
+            >
+              {item.icon} {item.title}
+            </Link>
+          </MenubarItem>
+        ))}
+      </MenubarContent>
+    </MenubarMenu>
+  );
+}
+
+/* --- Sección del menú móvil --- */
 function NavSection({ title, items, setMobileOpen }) {
   return (
     <div>
-      <h4 className="mb-2 text-lg font-semibold flex items-center gap-2">{title}</h4>
+      <h4 className="mb-2 text-lg font-semibold flex items-center gap-2 text-yellow-300 border-b border-white/10 pb-1">
+        {title}
+      </h4>
       {items.map((item) => (
-        <Link
+        <button
           key={item.href}
-          to={item.href}
-          onClick={() => setMobileOpen(false)}
-          className="flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-white/10 transition"
+          onClick={() => {
+            if (item.action) item.action();
+            setMobileOpen(false);
+          }}
+          className="w-full text-left flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-blue-800/40 hover:text-yellow-300 transition"
         >
           {item.icon} {item.title}
-        </Link>
+        </button>
       ))}
     </div>
   );
