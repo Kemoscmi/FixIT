@@ -11,6 +11,10 @@ import { Layout } from './components/Layout/Layout';
 import { Home } from './components/Home/Home';
 import { PageNotFound } from './components/Home/PageNotFound';
 
+// Páginas de técnicos
+import { ListTecnico } from './components/Tecnico/ListTecnico'; // Componente de lista de técnicos
+import { DetailTecnico } from './components/Tecnico/DetailTecnico'; // Componente de detalle de técnico
+
 // Páginas de tickets
 import TableTickets from './components/Ticket/TableTickets';
 import { ListTickets } from './components/Ticket/ListTickets';
@@ -23,6 +27,10 @@ const rutas = createBrowserRouter([
     children: [
       // Página principal
       { index: true, element: <Home /> },
+
+       // Rutas de técnicos
+      { path: 'tecnicos', element: <ListTecnico /> },              // Vista lista de técnicos
+      { path: 'tecnico/:id', element: <DetailTecnico /> },         // Detalle de un técnico
 
       // Rutas de tickets
       { path: 'tickets', element: <ListTickets /> },              // vista general (cliente/técnico)
