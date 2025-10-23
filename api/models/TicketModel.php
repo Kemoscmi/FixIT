@@ -284,4 +284,33 @@ class TicketModel
         $vResultado = $this->enlace->ExecuteSQL($vSql);
         return !empty($vResultado);
     }
+    /* -----------------------------------------------------------
+     * (5) Obtener los tickets más recientes
+     * Muestra:
+     *  - id, título, descripción, fecha_creacion, estado, categoría y usuario solicitante
+     * Ordenados desde el más nuevo al más antiguo
+     * ----------------------------------------------------------- */
+    public function getRecientes(int $limite = 6)
+    {
+        $vSql = "
+            SELECT 
+                tk.id,
+                tk.titulo,
+                tk.descripcion,
+                tk.fecha_creacion,
+                e.nombre AS estado,
+                c.nombre AS categoria,
+                CONCAT(u.nombre, ' ', u.apellido) AS usuario
+            FROM tickets tk
+            JOIN estados_ticket e ON e.id = tk.estado_id
+            JOIN categorias c      ON c.id = tk.categoria_id
+            JOIN usuarios u        ON u.id = tk.usuario_solicitante_id
+            ORDER BY tk.fecha_creacion DESC
+            LIMIT " . intval($limite);
+
+        $vResultado = $this->enlace->ExecuteSQL($vSql);
+        return $vResultado ?: [];
+    }
+
+    
 }

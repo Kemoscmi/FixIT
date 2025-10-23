@@ -126,4 +126,41 @@ class TicketController
             handleException($e);
         }
     }
+
+        // ============================================================
+    // TICKETS RECIENTES
+    // GET -> http://localhost:81/Proyecto/api/TicketController/recientes
+    //
+    // Descripción:
+    //   Devuelve los últimos tickets creados en el sistema
+    //   (sin importar el rol), ordenados por fecha descendente.
+    //
+    // Respuesta:
+    //   id, titulo, descripcion, fecha_creacion, estado, categoria, usuario
+    // ============================================================
+    public function recientes()
+    {
+        $response = new Response();
+        try {
+            header('Content-Type: application/json; charset=utf-8');
+
+            $model = new TicketModel();
+            $data = $model->getRecientes();
+
+            $response->toJSON(
+                $data,
+                "Tickets recientes obtenidos correctamente",
+                200
+            );
+        } catch (Exception $e) {
+            http_response_code(500);
+            $response->toJSON(null, "Error al obtener tickets recientes", 500);
+            handleException($e);
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            $response->toJSON(null, "Error inesperado al obtener tickets recientes", 500);
+            handleException($e);
+        }
+    }
+
 }
