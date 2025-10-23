@@ -39,7 +39,7 @@ CREATE TABLE `asignaciones` (
   CONSTRAINT `fk_asig_regla` FOREIGN KEY (`regla_aplicada_id`) REFERENCES `reglas_autotriage` (`id`),
   CONSTRAINT `fk_asig_tecnico_usuario` FOREIGN KEY (`tecnico_id`) REFERENCES `usuarios` (`id`),
   CONSTRAINT `fk_asig_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,7 +48,7 @@ CREATE TABLE `asignaciones` (
 
 LOCK TABLES `asignaciones` WRITE;
 /*!40000 ALTER TABLE `asignaciones` DISABLE KEYS */;
-INSERT INTO `asignaciones` VALUES (11,1,NULL,2,'2025-10-13 09:00:00','Automatica',NULL,NULL,1),(12,2,NULL,2,'2025-10-13 15:00:00','Manual',NULL,NULL,1),(13,3,NULL,2,'2025-10-14 10:30:00','Automatica',NULL,NULL,1),(14,4,NULL,2,'2025-10-15 14:00:00','Manual',NULL,NULL,1),(15,8,NULL,2,'2025-10-16 08:30:00','Automatica',NULL,NULL,1),(17,10,NULL,3,'2025-10-15 00:46:52','Manual',NULL,NULL,1);
+INSERT INTO `asignaciones` VALUES (11,1,1,2,'2025-10-23 09:00:00','Automatica',NULL,NULL,1),(12,2,2,2,'2025-10-22 15:00:00','Manual',NULL,NULL,1),(13,3,2,2,'2025-10-25 10:30:00','Automatica',NULL,NULL,1),(14,4,2,2,'2025-10-15 14:00:00','Manual',NULL,NULL,1),(15,8,1,2,'2025-10-23 08:30:00','Automatica',NULL,NULL,1),(17,10,1,3,'2025-10-15 00:46:52','Manual',NULL,NULL,1);
 /*!40000 ALTER TABLE `asignaciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -481,7 +481,7 @@ CREATE TABLE `tickets` (
   CONSTRAINT `fk_ticket_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados_ticket` (`id`),
   CONSTRAINT `fk_ticket_prioridad` FOREIGN KEY (`prioridad_id`) REFERENCES `prioridades` (`id`),
   CONSTRAINT `fk_ticket_usuario` FOREIGN KEY (`usuario_solicitante_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -490,9 +490,98 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (1,'Error al abrir ERP','El ERP lanza excepción al iniciar','2025-10-09 16:02:53',3,1,4,1,NULL,'2025-10-09 18:02:53','2025-10-10 16:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(2,'Laptop no enciende','Equipo sin respuesta, posible falla de energía','2025-10-09 16:02:53',2,2,4,2,NULL,'2025-10-09 19:02:53','2025-10-11 16:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(3,'VPN caída','Usuarios no logran conectar a la VPN','2025-10-09 16:02:53',3,3,4,3,NULL,'2025-10-09 17:02:53','2025-10-10 04:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(4,'Alerta de phishing','Correo sospechoso reportado por varios usuarios','2025-10-09 16:02:53',2,4,4,4,NULL,'2025-10-09 17:02:53','2025-10-10 00:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(5,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:30:27',2,5,4,1,NULL,'2025-10-15 02:30:27','2025-10-16 00:30:27',NULL,NULL,NULL,'2025-10-15 00:30:27','2025-10-15 00:30:27'),(6,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:34:27',2,5,4,1,NULL,'2025-10-15 02:34:27','2025-10-16 00:34:27',NULL,NULL,NULL,'2025-10-15 00:34:27','2025-10-15 00:34:27'),(7,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:35:53',2,5,4,1,NULL,'2025-10-15 02:35:53','2025-10-16 00:35:53',NULL,NULL,NULL,'2025-10-15 00:35:53','2025-10-15 00:35:53'),(8,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:38:34',2,5,4,1,NULL,'2025-10-15 02:38:34','2025-10-16 00:38:34',NULL,NULL,NULL,'2025-10-15 00:38:34','2025-10-15 00:38:34'),(9,'Ticket de otro cliente','Caso 403 para cliente 1','2025-10-15 00:42:30',2,1,5,1,NULL,'2025-10-15 02:42:30','2025-10-16 00:42:30',NULL,NULL,NULL,'2025-10-15 00:42:30','2025-10-15 00:42:30'),(10,'Ticket de otro cliente','Caso 403 para cliente 1','2025-10-15 00:46:52',2,1,5,1,NULL,'2025-10-15 02:46:52','2025-10-16 00:46:52',NULL,NULL,NULL,'2025-10-15 00:46:52','2025-10-15 00:46:52');
+INSERT INTO `tickets` VALUES (1,'Error al abrir ERP','El ERP lanza excepción al iniciar','2025-10-09 16:02:53',3,1,4,1,NULL,'2025-10-09 18:02:53','2025-10-10 16:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-09 16:02:53'),(2,'Laptop no enciende','Equipo sin respuesta, posible falla de energía','2025-10-09 16:02:53',2,2,4,2,NULL,'2025-10-09 19:02:53','2025-10-11 16:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(3,'VPN caída','Usuarios no logran conectar a la VPN','2025-10-09 16:02:53',3,3,4,3,NULL,'2025-10-09 17:02:53','2025-10-10 04:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(4,'Alerta de phishing','Correo sospechoso reportado por varios usuarios','2025-10-09 16:02:53',2,4,4,4,NULL,'2025-10-09 17:02:53','2025-10-10 00:02:53',NULL,NULL,NULL,'2025-10-09 16:02:53','2025-10-15 00:30:27'),(5,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:30:27',2,5,4,1,NULL,'2025-10-15 02:30:27','2025-10-16 00:30:27',NULL,NULL,NULL,'2025-10-15 00:30:27','2025-10-15 00:30:27'),(6,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:34:27',2,5,4,1,NULL,'2025-10-15 02:34:27','2025-10-16 00:34:27',NULL,NULL,NULL,'2025-10-15 00:34:27','2025-10-15 00:34:27'),(7,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:35:53',2,5,4,1,NULL,'2025-10-15 02:35:53','2025-10-16 00:35:53',NULL,NULL,NULL,'2025-10-15 00:35:53','2025-10-15 00:35:53'),(8,'Ticket Cerrado Demo','Para ejemplo calendario','2025-10-15 00:38:34',2,5,4,1,NULL,'2025-10-15 02:38:34','2025-10-16 00:38:34',NULL,NULL,NULL,'2025-10-15 00:38:34','2025-10-15 00:38:34'),(9,'Ticket de otro cliente','Caso 403 para cliente 1','2025-10-15 00:42:30',2,1,5,1,NULL,'2025-10-15 02:42:30','2025-10-16 00:42:30',NULL,NULL,NULL,'2025-10-15 00:42:30','2025-10-15 00:42:30'),(10,'Ticket de otro cliente','Caso 403 para cliente 1','2025-10-15 00:46:52',2,1,5,1,NULL,'2025-10-15 02:46:52','2025-10-16 00:46:52',NULL,NULL,NULL,'2025-10-15 00:46:52','2025-10-15 00:46:52'),(11,'Problema con impresora de red','El cliente reporta que la impresora de red HP no imprime desde hace dos días. Se requiere revisión del puerto y conectividad.','2025-10-18 09:30:00',2,5,4,2,'2025-10-19 14:45:00','2025-10-18 12:30:00','2025-10-20 09:30:00',1,1,2,'2025-10-22 16:18:09','2025-10-22 16:18:09');
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_ticket_ai_calc_sla
+BEFORE INSERT ON tickets
+FOR EACH ROW
+BEGIN
+  DECLARE v_resp INT DEFAULT 0;
+  DECLARE v_resol INT DEFAULT 0;
+
+  SELECT s.tiempo_max_respuesta_min, s.tiempo_max_resolucion_min
+    INTO v_resp, v_resol
+    FROM categorias c
+    JOIN sla s ON s.id = c.sla_id
+   WHERE c.id = NEW.categoria_id;
+
+  SET NEW.sla_resp_limite = DATE_ADD(NEW.fecha_creacion, INTERVAL v_resp MINUTE);
+  SET NEW.sla_resol_limite = DATE_ADD(NEW.fecha_creacion, INTERVAL v_resol MINUTE);
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_ticket_au_recalc_sla
+BEFORE UPDATE ON tickets
+FOR EACH ROW
+BEGIN
+  DECLARE v_resp INT DEFAULT 0;
+  DECLARE v_resol INT DEFAULT 0;
+
+  IF (NEW.categoria_id <> OLD.categoria_id)
+     OR (NEW.fecha_creacion <> OLD.fecha_creacion) THEN
+
+    SELECT s.tiempo_max_respuesta_min, s.tiempo_max_resolucion_min
+      INTO v_resp, v_resol
+      FROM categorias c
+      JOIN sla s ON s.id = c.sla_id
+     WHERE c.id = NEW.categoria_id;
+
+    SET NEW.sla_resp_limite  = DATE_ADD(NEW.fecha_creacion, INTERVAL v_resp  MINUTE);
+    SET NEW.sla_resol_limite = DATE_ADD(NEW.fecha_creacion, INTERVAL v_resol MINUTE);
+  END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_ticket_au_cierre
+BEFORE UPDATE ON tickets
+FOR EACH ROW
+BEGIN
+  IF NEW.fecha_cierre IS NOT NULL
+     AND (OLD.fecha_cierre IS NULL OR NEW.fecha_cierre <> OLD.fecha_cierre) THEN
+    SET NEW.dias_resolucion = TIMESTAMPDIFF(DAY, NEW.fecha_creacion, NEW.fecha_cierre);
+    SET NEW.cumplio_sla_respuesta = (NEW.sla_resp_limite IS NOT NULL AND NEW.sla_resp_limite >= NEW.fecha_creacion);
+    SET NEW.cumplio_sla_resolucion = (NEW.sla_resol_limite IS NOT NULL AND NEW.fecha_cierre <= NEW.sla_resol_limite);
+  END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `usuarios`
@@ -565,70 +654,109 @@ LOCK TABLES `valoraciones` WRITE;
 UNLOCK TABLES;
 
 --
--- Temporary view structure for view `vw_carga_tecnico`
+-- Dumping events for database 'fixit'
 --
 
-DROP TABLE IF EXISTS `vw_carga_tecnico`;
-/*!50001 DROP VIEW IF EXISTS `vw_carga_tecnico`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `vw_carga_tecnico` AS SELECT 
- 1 AS `tecnico_id`,
- 1 AS `nombre`,
- 1 AS `apellido`,
- 1 AS `tickets_asignados_vigentes`*/;
-SET character_set_client = @saved_cs_client;
-
 --
--- Temporary view structure for view `vw_puntaje_ticket`
+-- Dumping routines for database 'fixit'
 --
+/*!50003 DROP FUNCTION IF EXISTS `horas_restantes_resolucion` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `horas_restantes_resolucion`(p_ticket_id INT) RETURNS decimal(10,2)
+    DETERMINISTIC
+BEGIN
+  DECLARE v_limite DATETIME;
+  DECLARE v_now DATETIME;
+  DECLARE v_hours DECIMAL(10,2);
+  SELECT sla_resol_limite INTO v_limite FROM tickets WHERE id = p_ticket_id;
+  SET v_now = NOW();
+  IF v_limite IS NULL THEN
+    RETURN NULL;
+  END IF;
+  SET v_hours = TIMESTAMPDIFF(MINUTE, v_now, v_limite) / 60.0;
+  RETURN v_hours;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `asignar_ticket_manual` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `asignar_ticket_manual`(
+  IN p_ticket_id INT,
+  IN p_tecnico_id INT,
+  IN p_metodo ENUM('Automatica','Manual'),
+  IN p_regla_aplicada_id INT,
+  IN p_puntaje DECIMAL(10,2)
+)
+BEGIN
+  START TRANSACTION;
 
-DROP TABLE IF EXISTS `vw_puntaje_ticket`;
-/*!50001 DROP VIEW IF EXISTS `vw_puntaje_ticket`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `vw_puntaje_ticket` AS SELECT 
- 1 AS `ticket_id`,
- 1 AS `prioridad`,
- 1 AS `horas_restantes_sla`,
- 1 AS `puntaje`*/;
-SET character_set_client = @saved_cs_client;
+  -- 1️⃣ Desactivar asignaciones anteriores
+  UPDATE asignaciones
+  SET vigente = 0
+  WHERE ticket_id = p_ticket_id;
 
---
--- Final view structure for view `vw_carga_tecnico`
---
+  -- 2️⃣ Insertar nueva asignación
+  INSERT INTO asignaciones (
+    ticket_id,
+    tecnico_usuario_id,
+    tecnico_id,
+    fecha_asignacion,
+    metodo,
+    regla_aplicada_id,
+    puntaje_prioridad,
+    vigente
+  )
+  VALUES (
+    p_ticket_id,
+    NULL,
+    p_tecnico_id,
+    NOW(),
+    p_metodo,
+    p_regla_aplicada_id,
+    p_puntaje,
+    1
+  );
 
-/*!50001 DROP VIEW IF EXISTS `vw_carga_tecnico`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `vw_carga_tecnico` AS select `u`.`id` AS `tecnico_id`,`u`.`nombre` AS `nombre`,`u`.`apellido` AS `apellido`,count(`a`.`id`) AS `tickets_asignados_vigentes` from (((`usuarios` `u` join `roles` `r` on(`r`.`id` = `u`.`rol_id` and `r`.`nombre` = 'Tecnico')) left join `asignaciones` `a` on(`a`.`tecnico_id` = `u`.`id` and `a`.`vigente` = 1)) left join `tickets` `tk` on(`tk`.`id` = `a`.`ticket_id` and `tk`.`estado_id` in (1,2,3))) group by `u`.`id`,`u`.`nombre`,`u`.`apellido` */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
+  -- 3️⃣ Actualizar estado del ticket
+  UPDATE tickets
+  SET estado_id = 2
+  WHERE id = p_ticket_id;
 
---
--- Final view structure for view `vw_puntaje_ticket`
---
+  -- 4️⃣ Insertar en historial
+  INSERT INTO historial_estados (ticket_id, estado_id, usuario_id, observaciones)
+  VALUES (
+    p_ticket_id,
+    2,
+    p_tecnico_id,
+    CONCAT('Asignado por método ', p_metodo)
+  );
 
-/*!50001 DROP VIEW IF EXISTS `vw_puntaje_ticket`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `vw_puntaje_ticket` AS select `tk`.`id` AS `ticket_id`,`pr`.`id` AS `prioridad`,`horas_restantes_resolucion`(`tk`.`id`) AS `horas_restantes_sla`,`pr`.`id` * 1000 - coalesce(`horas_restantes_resolucion`(`tk`.`id`),0) AS `puntaje` from (`tickets` `tk` join `prioridades` `pr` on(`pr`.`id` = `tk`.`prioridad_id`)) */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
+  COMMIT;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -639,4 +767,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-15 13:26:57
+-- Dump completed on 2025-10-22 21:18:06
