@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
-import { Clock, Layers, Info, AlertTriangle, CheckCircle } from "lucide-react";
+import { Clock, Layers, Info, AlertTriangle, CheckCircle, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 

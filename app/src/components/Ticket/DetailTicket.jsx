@@ -1,146 +1,184 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import TicketService from "../../services/TicketService";
-import { ErrorAlert } from "../ui/custom/ErrorAlert";
-import { LoadingGrid } from "../ui/custom/LoadingGrid";
-import { EmptyState } from "../ui/custom/EmptyState";
-import { Card, CardContent } from "@/components/ui/card";
+import useAuth from "../../auth/store/auth.store";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Calendar,
-  User,
-  Layers,
-  Clock,
-  ChevronRight,
-  ArrowLeft,
-  ImageIcon,
-  MessageSquare,
-  Star,
-} from "lucide-react";
+import { LoadingGrid } from "../ui/custom/LoadingGrid";
+import { ErrorAlert } from "../ui/custom/ErrorAlert";
+import { Clock, User, MessageSquare, Star, ArrowLeft } from "lucide-react";
 
 export function DetailTicket() {
-  const navigate = useNavigate();
   const { id } = useParams();
-  const [ticket, setTicket] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // Simula rol y user activo (luego se obtiene del login)
-  const rolId = 2; // 1=Admin, 2=Técnico, 3=Cliente
-  const userId = 3;
+  const rolId = user?.rol_id;
+  const userId = user?.id;
+
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchTicket = async () => {
       try {
-        const response = await TicketService.getTicketById(id, { rolId, userId });
-        console.log(response.data);
-        setTicket(response.data);
-        if (!response.data.success) setError(response.data.message);
+        const res = await TicketService.getTicketById(id, { rolId, userId });
+        setData(res.data?.data || {});
       } catch (err) {
-        if (err.name !== "AbortError") setError(err.message);
+        console.error("Error al obtener ticket:", err);
+        setError("Error al obtener el detalle del ticket.");
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
-  }, [id]);
 
-  if (loading) return <LoadingGrid count={1} type="grid" />;
-  if (error) return <ErrorAlert title="Error al cargar ticket" message={error} />;
-  if (!ticket || !ticket.data) return <EmptyState message="Ticket no encontrado." />;
+    if (id && rolId && userId) fetchTicket();
+  }, [id, rolId, userId]);
 
-  const t = ticket.data;
+  if (loading) return <LoadingGrid />;
+  if (error) return <ErrorAlert title="Error" message={error} />;
+  if (!data) return <ErrorAlert title="Sin datos" message="Ticket no encontrado." />;
+
+  const { basicos, sla, historial, valoracion } = data;
+
+  // 🎨 Colores de estado
+  const estadoColors = {
+    Pendiente: "bg-gray-400",
+    Asignado: "bg-blue-500",
+    "En Proceso": "bg-yellow-500",
+    Resuelto: "bg-green-500",
+    Cerrado: "bg-gray-700",
+  };
 
   return (
-    <div className="max-w-5xl mx-auto py-12 px-4 space-y-6">
-      <div className="flex flex-col md:flex-row gap-8 items-start">
-        {/* Sección de información básica */}
-        <div className="flex-1 space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight">{t.titulo}</h1>
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="flex items-center gap-3">
-                  <Calendar className="text-primary" />
-                  <span className="font-semibold">Fecha creación:</span>
-                  <p className="text-muted-foreground">{t.fecha_creacion}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <User className="text-primary" />
-                  <span className="font-semibold">Solicitante:</span>
-                  <p className="text-muted-foreground">{t.usuario_solicitante}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Layers className="text-primary" />
-                  <span className="font-semibold">Categoría:</span>
-                  <p className="text-muted-foreground">{t.categoria}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="text-primary" />
-                  <span className="font-semibold">Estado:</span>
-                  <Badge variant="secondary">{t.estado}</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      {/* Encabezado */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-2">
+          🧾 Ticket #{basicos?.id}
+        </h1>
+        <Badge className={`${estadoColors[basicos?.estado] || "bg-gray-500"} text-white text-base`}>
+          {basicos?.estado}
+        </Badge>
       </div>
+      <p className="text-gray-600 text-sm">
+        Creado el {new Date(basicos?.fecha_creacion).toLocaleString("es-CR")}
+      </p>
 
-      {/* Historial de estados */}
-      <Card>
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <MessageSquare className="text-primary" /> Historial de estados
-          </h2>
-          {t.historial && t.historial.length > 0 ? (
-            <ul className="space-y-4">
-              {t.historial.map((h, idx) => (
-                <li key={idx} className="border-b pb-2">
-                  <p className="font-semibold">{h.estado}</p>
-                  <p className="text-sm text-muted-foreground">{h.observacion}</p>
-                  {h.imagenes && h.imagenes.length > 0 && (
-                    <div className="flex gap-2 mt-2 flex-wrap">
-                      {h.imagenes.map((img, i) => (
-                        <img
-                          key={i}
-                          src={`${import.meta.env.VITE_BASE_URL}uploads/${img}`}
-                          alt={`Evidencia ${i + 1}`}
-                          className="h-24 w-24 rounded object-cover border"
-                        />
-                      ))}
+      {/* Datos principales */}
+      <Card className="border border-gray-200 shadow-md bg-gray-50">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-gray-800">
+            Detalles del Ticket
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid md:grid-cols-2 gap-4 text-gray-700">
+          <p><strong>Título:</strong> {basicos?.titulo}</p>
+          <p><strong>Descripción:</strong> {basicos?.descripcion}</p>
+          <p><strong>Categoría:</strong> {basicos?.categoria}</p>
+          <p><strong>Prioridad:</strong> {basicos?.prioridad}</p>
+          <p><strong>Solicitante:</strong> {basicos?.solicitante}</p>
+          <p><strong>Días de resolución:</strong> {basicos?.dias_resolucion ?? "—"}</p>
+        </CardContent>
+      </Card>
+
+      {/* Sección SLA */}
+      <Card className="border border-gray-200 shadow-md bg-blue-50">
+        <CardHeader className="flex items-center gap-2">
+          <Clock className="text-blue-700" />
+          <CardTitle className="text-lg font-semibold text-blue-800">
+            Monitoreo SLA
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid md:grid-cols-2 gap-4 text-gray-700">
+          <p> <strong>Horas restantes para respuesta:</strong> {sla?.hrs_resp_restantes ?? "N/A"} h</p>
+          <p> <strong>Horas restantes para resolución:</strong> {sla?.hrs_resol_restantes ?? "N/A"} h</p>
+          <p> <strong>Cumplió SLA de respuesta:</strong> {basicos?.cumplio_sla_respuesta ? "Sí" : "No"}</p>
+          <p> <strong>Cumplió SLA de resolución:</strong> {basicos?.cumplio_sla_resolucion ? "Sí" : "No"}</p>
+        </CardContent>
+      </Card>
+
+      {/* Historial como línea de tiempo */}
+      <Card className="border border-gray-200 shadow-md">
+        <CardHeader className="flex items-center gap-2">
+          <MessageSquare className="text-purple-700" />
+          <CardTitle className="text-lg font-semibold text-purple-800">
+            Historial de Estados
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {historial && historial.length > 0 ? (
+            <div className="relative border-l-4 border-purple-400 ml-4 space-y-6">
+              {historial.map((h, i) => (
+                <div key={i} className="ml-6 relative">
+                  <span className="absolute -left-3 top-1.5 w-5 h-5 rounded-full bg-purple-500 border-2 border-white shadow"></span>
+                  <div className="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-500">
+                        {new Date(h.fecha).toLocaleString("es-CR")}
+                      </span>
+                      <Badge className={`${estadoColors[h.estado] || "bg-gray-400"} text-white`}>
+                        {h.estado}
+                      </Badge>
                     </div>
-                  )}
-                </li>
+                    <p className="mt-1 text-sm text-gray-700">
+                      <User className="inline-block w-4 h-4 mr-1 text-gray-500" />
+                      {h.usuario}
+                    </p>
+                    <p className="mt-2 text-gray-600 text-sm italic">
+                      “{h.observaciones || "Sin observaciones"}”
+                    </p>
+
+                    {h.imagenes && h.imagenes.length > 0 && (
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        {h.imagenes.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={img.ruta}
+                            alt={img.descripcion || "Evidencia"}
+                            className="rounded-lg border border-gray-300 shadow-sm hover:scale-105 transition-transform"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           ) : (
-            <EmptyState message="Sin historial registrado." />
+            <p className="text-gray-500 text-sm">Sin historial registrado.</p>
           )}
         </CardContent>
       </Card>
 
       {/* Valoración */}
-      {t.valoracion && (
-        <Card>
-          <CardContent className="p-6 space-y-2">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Star className="text-primary" /> Valoración del cliente
-            </h2>
-            <p>Puntaje: ⭐ {t.valoracion.puntaje}/5</p>
-            <p className="text-muted-foreground">{t.valoracion.comentario}</p>
+      {valoracion && (
+        <Card className="border border-gray-200 shadow-md bg-yellow-50">
+          <CardHeader className="flex items-center gap-2">
+            <Star className="text-yellow-600" />
+            <CardTitle className="text-lg font-semibold text-yellow-700">
+              Valoración del Cliente
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-gray-700">
+            <p><strong>Puntaje:</strong> {valoracion.puntaje} / 5 ⭐</p>
+            <p><strong>Comentario:</strong> {valoracion.comentario || "Sin comentario"}</p>
           </CardContent>
         </Card>
       )}
 
-      <Button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Regresar
-      </Button>
+      {/* Botón de regreso */}
+      <div className="flex justify-start mt-6">
+        <Button
+          variant="outline"
+          className="bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center gap-2"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="w-4 h-4" /> Regresar
+        </Button>
+      </div>
     </div>
   );
 }

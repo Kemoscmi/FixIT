@@ -77,19 +77,27 @@ const useAuth = create((set) => ({
       if (response.data?.data?.usuario && response.data?.data?.token) {
         const { token, usuario } = response.data.data;
 
-        //Guardamos los datos en localStorage
-        // Esto permite que la sesión se mantenga incluso si el usuario recarga la página
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(usuario));
+        
+const userData = { ...usuario };
+userData.rol_id =
+  userData.rol === "Administrador"
+    ? 1
+    : userData.rol === "Tecnico"
+    ? 2
+    : userData.rol === "Cliente"
+    ? 3
+    : null;
 
-        //  Actualizamos el estado global para que toda la app sepa que ya hay sesión activa
-        set({
-          user: usuario,
-          token,
-          isAuthenticated: true,
-          loading: false,
-          error: null,
-        });
+localStorage.setItem("token", token);
+localStorage.setItem("user", JSON.stringify(userData));
+
+set({
+  user: userData,
+  token,
+  isAuthenticated: true,
+  loading: false,
+  error: null,
+});
 
         console.log("✅ Login exitoso:", usuario);
         return { success: true };

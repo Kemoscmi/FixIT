@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // BASE: apunta al directorio de tu API PHP (termina en '/')
-// Ej.: VITE_BASE_URL="http://localhost:81/Proyecto/api/"
+// Ejemplo en .env:  VITE_BASE_URL="http://localhost:81/Proyecto/api/"
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'TicketController';
 
 class TicketService {
@@ -36,6 +36,15 @@ class TicketService {
     return axios.get(`${BASE_URL}/${id}`, {
       params: { rol_id: rolId, user_id: userId },
     });
+  }
+
+  /**
+   * 🔹 OBTENER TICKETS RECIENTES
+   * GET -> {BASE_URL}/recientes
+   * Devuelve los últimos tickets creados en el sistema.
+   */
+  getRecientes() {
+    return axios.get(`${BASE_URL}/recientes`);
   }
 
   // --- Métodos futuros (cuando los tengas en tu API) ---
