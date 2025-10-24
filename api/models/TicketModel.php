@@ -312,5 +312,49 @@ class TicketModel
         return $vResultado ?: [];
     }
 
-    
+/* -----------------------------------------------------------
+ * ACTUALIZAR ESTADO DEL TICKET
+ * Parámetros:
+ *  - ticketId (int)
+ *  - nuevoEstado (int)
+ *  - usuarioId (int)
+ * Retorna:
+ *  - bool (true si se actualizó correctamente)
+ * ----------------------------------------------------------- */
+public function updateEstado(int $ticketId, int $nuevoEstado, int $usuarioId): bool
+{
+    try {
+        // Validar que el ticket exista
+        $sqlCheck = "SELECT id FROM tickets WHERE id = $ticketId";
+        $ticket = $this->enlace->executeSQL($sqlCheck);
+        if (empty($ticket)) {
+            error_log("⚠️ Ticket no encontrado: ID $ticketId");
+            return false;
+        }
+
+        // Actualizar estado del ticket
+        $sqlUpdate = "UPDATE tickets
+                      SET estado_id = $nuevoEstado,
+                          actualizado_en = NOW()
+                      WHERE id = $ticketId";
+        $ok1 = $this->enlace->executeSQL_DML($sqlUpdate); // ✅ CORRECTO
+
+        // Insertar registro en historial_estados
+        $sqlHist = "INSERT INTO historial_estados (ticket_id, estado_id, usuario_id, fecha, observaciones)
+                    VALUES ($ticketId, $nuevoEstado, $usuarioId, NOW(), 'Cambio de estado manual')";
+        $ok2 = $this->enlace->executeSQL_DML($sqlHist); // ✅ CORRECTO
+
+        // Verificar ejecución correcta
+        if ($ok1 === false || $ok2 === false) {
+            error_log("❌ Error en ejecución SQL en updateEstado");
+            return false;
+        }
+
+        return true;
+    } catch (Throwable $e) {
+        error_log("❌ Excepción en updateEstado(): " . $e->getMessage());
+        return false;
+    }
+}
+
 }

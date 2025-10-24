@@ -162,5 +162,59 @@ class TicketController
             handleException($e);
         }
     }
+    // ============================================================
+// ACTUALIZAR ESTADO DE UN TICKET
+// PUT -> http://localhost:81/Proyecto/api/TicketController/updateEstado
+//
+// Body JSON: {
+//   "ticket_id": 5,
+//   "nuevo_estado_id": 3,
+//   "usuario_id": 2
+// }
+//
+// Respuesta:
+//   - 200 OK con mensaje de confirmación
+// ============================================================
+public function updateEstado()
+{
+    $response = new Response();
+    try {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        if (
+            empty($input['ticket_id']) ||
+            empty($input['nuevo_estado_id']) ||
+            empty($input['usuario_id'])
+        ) {
+            http_response_code(400);
+            $response->toJSON(null, "Faltan parámetros: ticket_id, nuevo_estado_id o usuario_id", 400);
+            return;
+        }
+
+        $ticketId = intval($input['ticket_id']);
+        $nuevoEstado = intval($input['nuevo_estado_id']);
+        $usuarioId = intval($input['usuario_id']);
+
+        $model = new TicketModel();
+        $ok = $model->updateEstado($ticketId, $nuevoEstado, $usuarioId);
+
+        if ($ok) {
+            $response->toJSON(["ticket_id" => $ticketId], "Estado actualizado correctamente", 200);
+        } else {
+            http_response_code(400);
+            $response->toJSON(null, "No se pudo actualizar el estado del ticket", 400);
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        $response->toJSON(null, "Error al actualizar el estado", 500);
+        handleException($e);
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        $response->toJSON(null, "Error inesperado", 500);
+        handleException($e);
+    }
+}
 
 }
