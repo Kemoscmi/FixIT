@@ -51,11 +51,6 @@ export function ListCardTickets({ data, rolId }) {
               <CardTitle className="text-lg font-semibold text-gray-800 truncate">
                 {item.titulo || "Sin título"}
               </CardTitle>
-              <p className="text-xs text-gray-500">
-                {item.fecha_creacion
-                  ? new Date(item.fecha_creacion).toLocaleDateString()
-                  : "Fecha no disponible"}
-              </p>
             </CardHeader>
 
             {/* 🟩 Contenido */}
@@ -82,10 +77,6 @@ export function ListCardTickets({ data, rolId }) {
                 {item.prioridad || "No definida"}
               </p>
 
-              {/* ID visual */}
-              <p className="text-xs text-gray-400 mt-2">
-                <strong>ID:</strong> #{item.id}
-              </p>
             </CardContent>
 
             {/* 🟩 Footer */}

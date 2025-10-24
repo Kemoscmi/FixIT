@@ -13,7 +13,7 @@
   --popover-foreground: oklch(0.25 0 0);
 
   /* === COLORES DEL SISTEMA === */
-  --primary: #0b51ca; /*  profesional (FixIT) */
+  --primary: #e3e3e3; /*  profesional (FixIT) */
   --primary-foreground: #ffffff;
 
   --secondary: #1e90ff; /* Azul brillante: soporte / tecnología */

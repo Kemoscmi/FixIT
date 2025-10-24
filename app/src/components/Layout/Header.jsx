@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/menubar";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import useAuth from "../../auth/store/auth.store"; //   store global de autenticación
+import Logo from "../../assets/Logo.png";
+
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -63,18 +65,17 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 z-50 w-full bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md border-b border-white/10 shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between px-6 py-3 max-w-[1280px] mx-auto text-white">
-        {/* -------- LOGO -------- */}
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-lg md:text-xl font-extrabold tracking-wide hover:opacity-90 transition"
-        >
-          <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-sm shadow-sm">
-            <Ticket className="h-6 w-6 text-yellow-300" />
-          </div>
-          <span className="hidden sm:inline font-extrabold tracking-tight">
-            <span className="text-yellow-300">Fix</span>IT
-          </span>
-        </Link>
+      {/* -------- LOGO -------- */}
+<Link
+  to="/"
+  className="flex items-center gap-3 hover:opacity-90 transition"
+>
+  <img
+    src={Logo}
+    alt="FixIT Logo"
+    className="h-10 w-auto drop-shadow-sm"
+  />
+</Link>
 
         {/* -------- NAV ESCRITORIO -------- */}
         <div className="hidden md:flex flex-1 justify-center">

@@ -99,7 +99,7 @@ set({
   error: null,
 });
 
-        console.log("✅ Login exitoso:", usuario);
+        console.log(" Login exitoso:", usuario);
         return { success: true };
       }
 
@@ -165,6 +165,5 @@ set({
   },
 }));
 
-// Exportamos el hook personalizado para usarlo en cualquier componente
-// Ejemplo: const { login, logout, isAuthenticated, user } = useAuth();
+
 export default useAuth;

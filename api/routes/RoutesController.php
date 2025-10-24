@@ -4,6 +4,7 @@ class RoutesController
     private $authMiddleware;
     private $protectedRoutes = [];
 
+    
     public function __construct()
     {
         // $this->authMiddleware = new AuthMiddleware();
