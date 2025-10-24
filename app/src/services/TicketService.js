@@ -1,60 +1,79 @@
-import axios from 'axios';
+import axios from "axios";
 
 // BASE: apunta al directorio de tu API PHP (termina en '/')
-// Ejemplo en .env:  VITE_BASE_URL="http://localhost:81/Proyecto/api/"
-const BASE_URL = import.meta.env.VITE_BASE_URL + 'TicketController';
+// Ejemplo en .env: VITE_BASE_URL="http://localhost:81/Proyecto/api/"
+const BASE_URL = import.meta.env.VITE_BASE_URL + "TicketController";
 
 class TicketService {
   /**
-   * LISTADO POR ROL
-   * GET -> {BASE_URL}?rol_id=1&user_id=1
-   * Params:
-   *  - rolId: 1=Admin | 2=Tecnico | 3=Cliente (obligatorio)
-   *  - userId: ID del usuario (obligatorio)
+   * ✅ LISTADO DE TICKETS SEGÚN ROL
+   *  - Admin (rolId = 1): todos los tickets
+   *  - Técnico (rolId = 2): solo los asignados a él
+   *  - Cliente (rolId = 3): solo los creados por él
    */
-  getTickets({ rolId, userId }) {
-    if (!rolId || !userId) {
-      return Promise.reject(new Error('Faltan parámetros: rolId y userId'));
+  async getTickets({ rolId, userId }) {
+    try {
+      if (!rolId || !userId) {
+        throw new Error("Faltan parámetros: rolId y userId");
+      }
+
+      // ✅ construye exactamente lo que el backend espera
+      const url = `${BASE_URL}?rol_id=${rolId}&user_id=${userId}`;
+      const response = await axios.get(url);
+      return response;
+    } catch (error) {
+      console.error("❌ Error en TicketService.getTickets:", error);
+      throw error;
     }
-    return axios.get(BASE_URL, {
-      params: { rol_id: rolId, user_id: userId },
-    });
   }
 
   /**
-   * DETALLE DE TICKET
+   * ✅ DETALLE DE TICKET POR ID
    * GET -> {BASE_URL}/{id}?rol_id=1&user_id=1
-   * Params:
-   *  - id: ID del ticket (obligatorio)
-   *  - rolId: 1=Admin | 2=Tecnico | 3=Cliente (obligatorio)
-   *  - userId: ID del usuario (obligatorio)
    */
-  getTicketById(id, { rolId, userId }) {
-    if (!id || !rolId || !userId) {
-      return Promise.reject(new Error('Faltan parámetros: id, rolId y userId'));
+  async getTicketById(id, { rolId, userId }) {
+    try {
+      if (!id || !rolId || !userId) {
+        throw new Error("Faltan parámetros: id, rolId y userId");
+      }
+
+      // ✅ backend usa /TicketController/{id}
+      const url = `${BASE_URL}/${id}?rol_id=${rolId}&user_id=${userId}`;
+      const response = await axios.get(url);
+      return response;
+    } catch (error) {
+      console.error("❌ Error en TicketService.getTicketById:", error);
+      throw error;
     }
-    return axios.get(`${BASE_URL}/${id}`, {
-      params: { rol_id: rolId, user_id: userId },
-    });
   }
 
   /**
-   * 🔹 OBTENER TICKETS RECIENTES
+   * ✅ OBTENER TICKETS RECIENTES
    * GET -> {BASE_URL}/recientes
-   * Devuelve los últimos tickets creados en el sistema.
    */
-  getRecientes() {
-    return axios.get(`${BASE_URL}/recientes`);
+  async getRecientes() {
+    try {
+      const response = await axios.get(`${BASE_URL}/recientes`);
+      return response;
+    } catch (error) {
+      console.error("❌ Error en TicketService.getRecientes:", error);
+      throw error;
+    }
   }
 
-  // --- Métodos futuros (cuando los tengas en tu API) ---
-  // createTicket(payload) { ... }
-  // updateEstado(id, body) { ... }
-  // cerrar(id, body) { ... }
-  // uploadImagen(id, formData) { ... }
-  // getAsignacionesSemana({ tecnico_id, base }) { ... }
-  // getNotificaciones() { ... }
-  // valorar(id, body) { ... }
+  /**
+ * ACTUALIZAR ESTADO DEL TICKET
+ * PUT -> {BASE_URL}/updateEstado
+ * Body:
+ * {
+ *   ticket_id: number,
+ *   nuevo_estado_id: number,
+ *   usuario_id: number
+ * }
+ */
+updateEstado(payload) {
+  return axios.put(`${BASE_URL}/updateEstado`, payload);
+}
 }
 
 export default new TicketService();

@@ -41,7 +41,7 @@ export default function Header() {
   };
 
   const navItems = [
-    { title: "Inicio", href: "/", icon: <Home className="h-4 w-4" /> },
+    { title: "Inicio", href: "Principal", icon: <Home className="h-4 w-4" /> },
     { title: "Mis Tickets", href: "/tickets", icon: <Ticket className="h-4 w-4" /> },
     { title: "Asignaciones", href: "/asignaciones", icon: <ClipboardList className="h-4 w-4" /> },
   ];
@@ -78,20 +78,27 @@ export default function Header() {
 
         {/* -------- NAV ESCRITORIO -------- */}
         <div className="hidden md:flex flex-1 justify-center">
-          <Menubar className="w-auto bg-transparent border-none shadow-none space-x-8">
-            {/* --- Navegación --- */}
-            <DropdownMenu
-              title="Navegación"
-              icon={<ClipboardList className="h-4 w-4" />}
-              items={navItems}
-            />
+      <Menubar className="w-auto bg-transparent border-none shadow-none space-x-8">
+  {/* --- Ítems principales --- */}
+  {navItems.map((item) => (
+    <MenubarMenu key={item.href}>
+      <MenubarTrigger asChild>
+        <Link
+          to={item.href}
+          className="flex items-center gap-2 text-white font-medium hover:text-yellow-300 transition"
+        >
+          {item.icon} {item.title}
+        </Link>
+      </MenubarTrigger>
+    </MenubarMenu>
+  ))}
 
-            {/* --- Administración --- */}
-            <DropdownMenu
-              title="Administración"
-              icon={<Wrench className="h-4 w-4" />}
-              items={mantItems}
-            />
+  {/* --- Administración --- */}
+  <DropdownMenu
+    title="Administración"
+    icon={<Wrench className="h-4 w-4" />}
+    items={mantItems}
+  />
 
             {/* --- Usuario --- */}
             <MenubarMenu>
@@ -145,9 +152,19 @@ export default function Header() {
                 <Ticket className="text-yellow-300" />
                 <span>FixIT</span>
               </div>
-
-              <NavSection title="Navegación" items={navItems} setMobileOpen={setMobileOpen} />
-              <NavSection title="Administración" items={mantItems} setMobileOpen={setMobileOpen} />
+{navItems.map((item) => (
+  <button
+    key={item.href}
+    onClick={() => {
+      navigate(item.href);
+      setMobileOpen(false);
+    }}
+    className="w-full text-left flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-blue-800/40 hover:text-yellow-300 transition"
+  >
+    {item.icon} {item.title}
+  </button>
+))}
+<NavSection title="Administración" items={mantItems} setMobileOpen={setMobileOpen} />
               <NavSection
                 title={userName}
                 items={

@@ -12,11 +12,13 @@ import { EmptyState } from "../ui/custom/EmptyState";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 
 /**
- * Vista de Asignaciones
+ * Vista de Asignaciones (PASO 5 - Avance 3)
  * -------------------------------------------------------------
- * Muestra las asignaciones del técnico o administrador,
- * con opción de filtrar por semana (input type="week").
- * Si el rol es Admin, permite asignar técnicos desde la misma vista.
+ * Muestra las asignaciones del técnico activo o administrador.
+ * - Organizadas por semana
+ * - Colores y estilo profesional azul
+ * - Tarjetas con datos clave (ID, categoría, estado, SLA)
+ * - Botón “Ver detalle” funcional
  */
 export default function AsignacionesView() {
   const navigate = useNavigate();
@@ -29,15 +31,23 @@ export default function AsignacionesView() {
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState("");
 
-  // Estados para asignación en línea
-  const [showAsignar, setShowAsignar] = useState(null); // ticket_id activo
+  const [showAsignar, setShowAsignar] = useState(null);
   const [tecnicos, setTecnicos] = useState([]);
   const [selectedTecnico, setSelectedTecnico] = useState("");
 
   const rolId = user?.rol_id;
   const userId = user?.id;
 
-  // 🔹 Cargar TODAS las asignaciones al iniciar
+  // 🎨 Colores de estado
+  const estadoColors = {
+    Pendiente: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    Asignado: "bg-blue-100 text-blue-800 border-blue-300",
+    "En Proceso": "bg-indigo-100 text-indigo-800 border-indigo-300",
+    Resuelto: "bg-green-100 text-green-800 border-green-300",
+    Cerrado: "bg-red-100 text-red-800 border-red-300",
+  };
+
+  // 🔹 Cargar asignaciones
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -60,21 +70,18 @@ export default function AsignacionesView() {
         setLoading(false);
       }
     };
-
     if (rolId && userId) fetchData();
   }, [rolId, userId]);
 
-  // 🔹 Obtener número de semana
+  // 🔹 Filtro por semana
   const getWeekNumber = (date) => {
     const firstJan = new Date(date.getFullYear(), 0, 1);
     const days = Math.floor((date - firstJan) / (24 * 60 * 60 * 1000));
     return Math.ceil((days + firstJan.getDay() + 1) / 7);
   };
 
-  // 🔹 Filtro por semana
   const handleFilterWeek = (value) => {
     setSelectedWeek(value);
-
     if (!value || value.trim() === "") {
       setFiltered(data);
       return;
@@ -88,7 +95,6 @@ export default function AsignacionesView() {
       const yearNumber = date.getFullYear();
       return weekNumber === parseInt(week) && yearNumber === parseInt(year);
     });
-
     setFiltered(filteredByWeek);
   };
 
@@ -163,13 +169,17 @@ export default function AsignacionesView() {
     return <EmptyState message="No hay asignaciones registradas." />;
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4 text-gray-900">
-        {rolId === 1 ? "Asignaciones Generales" : "Mis Asignaciones"}
+    <div className="max-w-7xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-2 text-blue-900">
+        {rolId === 1 ? "Asignaciones Generales" : "Mis Asignaciones Semanales"}
       </h1>
+      <p className="text-gray-600 mb-6">
+        Visualiza tus tickets asignados por fecha y estado. Usa el filtro de semana
+        para concentrarte en tus asignaciones actuales.
+      </p>
 
       {/* 🔸 Filtro de semana */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-8">
         <label className="text-sm font-medium text-gray-700">
           Filtrar por semana:
         </label>
@@ -182,40 +192,23 @@ export default function AsignacionesView() {
         <Button
           size="sm"
           variant="outline"
-          onClick={async () => {
+          onClick={() => {
             setSelectedWeek("");
-            setLoading(true);
-            try {
-              const response = await AsignacionService.getAsignaciones({
-                rolId,
-                userId,
-              });
-              const asignaciones = response.data?.data?.asignaciones || {};
-              const all = Object.entries(asignaciones).flatMap(([fecha, items]) =>
-                items.map((i) => ({
-                  ...i,
-                  fecha_asignacion: i.fecha_asignacion || fecha || null,
-                }))
-              );
-              setData(all);
-              setFiltered(all);
-            } catch (error) {
-              console.error("Error al recargar asignaciones:", error);
-              setError("Error al recargar asignaciones.");
-            } finally {
-              setLoading(false);
-            }
+            setFiltered(data);
           }}
         >
           Mostrar todas
         </Button>
       </div>
 
-      {/* 🔸 Tablero tipo calendario */}
+      {/* 🔸 Tablero tipo agenda semanal */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Object.entries(groupedByDay).map(([day, asignaciones]) => (
-          <Card key={day} className="border border-gray-200 shadow-md">
-            <CardHeader>
+          <Card
+            key={day}
+            className="border border-blue-100 shadow-md rounded-xl hover:shadow-lg transition-all"
+          >
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-t-xl">
               <CardTitle className="text-lg font-semibold capitalize">
                 {day === "Sin fecha"
                   ? "🟡 Tickets sin asignar"
@@ -226,25 +219,31 @@ export default function AsignacionesView() {
                     })}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 bg-white rounded-b-xl">
               {asignaciones.map((a, idx) => (
                 <div
                   key={idx}
-                  className="p-3 rounded-lg border bg-white hover:bg-blue-50 transition"
+                  className={`p-4 border-l-4 ${
+                    estadoColors[a.estado] || "border-gray-300"
+                  } rounded-lg bg-blue-50 hover:bg-blue-100 transition`}
                 >
                   <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold">{a.titulo}</span>
+                    <span className="font-semibold text-gray-900">
+                      #{a.id} — {a.titulo}
+                    </span>
                     <Badge
-                      style={{
-                        backgroundColor: a.estado_color || "#9ca3af",
-                        color: "white",
-                      }}
+                      className={
+                        estadoColors[a.estado] ||
+                        "bg-gray-200 text-gray-700 border-gray-300"
+                      }
                     >
                       {a.estado}
                     </Badge>
                   </div>
 
-                  <p className="text-sm text-gray-600">{a.categoria}</p>
+                  <p className="text-sm text-gray-700">
+                    Categoría: <span className="font-medium">{a.categoria}</span>
+                  </p>
 
                   {rolId === 1 && (
                     <p className="text-xs text-gray-500">
@@ -256,21 +255,21 @@ export default function AsignacionesView() {
                     SLA: {a.sla_status || "N/A"} ({a.sla_hrs ?? "N/A"}h)
                   </p>
 
-                  {/* 🔹 Botones de acción */}
-                  <div className="flex flex-col gap-2 mt-2">
+                  {/* Botones */}
+                  <div className="flex justify-between items-center mt-3">
                     <Button
                       size="sm"
-                      className="bg-blue-700 text-white hover:bg-blue-800"
+                      className="bg-blue-600 text-white hover:bg-blue-700"
                       onClick={() => navigate(a.ver_detalle)}
                     >
-                      Ver Detalle
+                      Ver detalle
                     </Button>
 
-                    {/* 🔹 Solo admin y sin técnico */}
+                    {/* Asignar técnico (solo admin) */}
                     {rolId === 1 && day === "Sin fecha" && (
                       <>
                         {showAsignar === a.ticket_id ? (
-                          <div className="flex flex-col gap-2 mt-2 border p-2 rounded-md bg-gray-50">
+                          <div className="flex flex-col gap-2 mt-2">
                             <select
                               className="border p-2 rounded-md"
                               value={selectedTecnico}
@@ -283,27 +282,13 @@ export default function AsignacionesView() {
                                 </option>
                               ))}
                             </select>
-
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                className="bg-green-600 text-white hover:bg-green-700"
-                                onClick={() => handleAsignar(a.ticket_id)}
-                              >
-                                Guardar
-                              </Button>
-
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setShowAsignar(null);
-                                  setSelectedTecnico("");
-                                }}
-                              >
-                                Cancelar
-                              </Button>
-                            </div>
+                            <Button
+                              size="sm"
+                              className="bg-green-600 text-white hover:bg-green-700"
+                              onClick={() => handleAsignar(a.ticket_id)}
+                            >
+                              Guardar
+                            </Button>
                           </div>
                         ) : (
                           <Button
@@ -326,6 +311,7 @@ export default function AsignacionesView() {
           </Card>
         ))}
       </div>
+      
     </div>
   );
 }
