@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../auth/store/auth.store"; // Hook global de autenticación
+import fixitLogo from "../../assets/Logo2.png";
+
 
 export default function Home() {
   const { isAuthenticated, user } = useAuth();
@@ -200,23 +202,11 @@ export default function Home() {
 function Logo({ small = false }) {
   return (
     <div className="flex items-center gap-2">
-      <svg
-        width={small ? 20 : 28}
-        height={small ? 20 : 28}
-        viewBox="0 0 24 24"
-        fill="none"
-      >
-        <path
-          d="M7 7l3 3m7.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM4 20l5-5 3 3-5 5H4v-3z"
-          stroke="#1d4ed8"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <span className={`font-extrabold ${small ? "text-base" : "text-xl"}`}>
-        <span className="text-blue-700">Fix</span>IT
-      </span>
+      <img
+        src={fixitLogo}
+        alt="FixIT Logo"
+        className={`${small ? "h-6" : "h-10"} w-auto object-contain`}
+      />
     </div>
   );
 }

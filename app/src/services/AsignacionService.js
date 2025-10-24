@@ -1,4 +1,4 @@
-// 📁 services/AsignacionService.js
+//  services/AsignacionService.js
 // -------------------------------------------------------------
 // Este servicio maneja las peticiones HTTP relacionadas con las
 // asignaciones (para técnicos y administradores).
@@ -16,7 +16,7 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_BASE_URL + "AsignacionController";
 
 class AsignacionService {
-  // 🔹 Obtener asignaciones (todas o por semana)
+  // Obtener asignaciones (todas o por semana)
   // Si no se pasa “date”, devuelve todas.
   // GET -> /AsignacionController/semana?rol_id=2&user_id=3
   // GET -> /AsignacionController/semana?rol_id=2&user_id=3&date=YYYY-MM-DD
