@@ -21,6 +21,10 @@ import { PageNotFound } from "./components/Home/PageNotFound";
 import { ListTecnico } from "./components/Tecnico/ListTecnico";
 import { DetailTecnico } from "./components/Tecnico/DetailTecnico";
 
+//  🧩 Módulo de categorías
+import { ListCategoria } from "./components/Categoria/ListCategoria";
+import { DetailCategoria } from "./components/Categoria/DetailCategoria";
+
 //  🧩 Módulo de tickets
 import TableTickets from "./components/Ticket/TableTickets";
 import { ListTickets } from "./components/Ticket/ListTickets";
@@ -53,6 +57,11 @@ const rutas = createBrowserRouter([
           // Sección de técnicos
           { path: "tecnicos", element: <ListTecnico /> },
           { path: "tecnico/:id", element: <DetailTecnico /> },
+
+          // Sección de categorías
+          { path: "categorias", element: <ListCategoria /> },
+          { path: "categoria/:id", element: <DetailCategoria /> },
+
 
           // Sección de tickets
           { path: "tickets", element: <ListTickets /> },
