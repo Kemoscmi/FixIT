@@ -16,7 +16,10 @@ class CategoriaModel
         return $vResultado;
     }
 
-  /* Obtener una categoría por ID con detalles */
+  /* Obtener una categoría por ID con detalles 
+  Este método busca una categoría por su ID, verifica si existe, y si sí, 
+  le agrega sus etiquetas, especialidades y datos del SLA antes de devolverla al frontend.
+  */
 public function get($id)
 {
     // Obtener los datos básicos de la categoría
