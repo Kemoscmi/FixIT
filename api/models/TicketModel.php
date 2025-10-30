@@ -36,22 +36,28 @@ class TicketModel
      * Retorna:
      *  - array de objetos (cada objeto con las 4 columnas)
      * ----------------------------------------------------------- */
-    public function listAdmin(int $adminId)
-    {
-        if (!$this->assertRole($adminId, 1)) return [];
+  public function listAdmin(int $adminId)
+{
+    if (!$this->assertRole($adminId, 1)) return [];
 
-        $vSql = "
-            SELECT tk.id,
-                   tk.titulo,
-                   tk.fecha_creacion,
-                   e.nombre AS estado
-            FROM tickets tk
-            JOIN estados_ticket e ON e.id = tk.estado_id
-            ORDER BY tk.fecha_creacion DESC
-        ";
-        $vResultado = $this->enlace->ExecuteSQL($vSql);
-        return $vResultado ?: [];
-    }
+    $vSql = "
+        SELECT 
+            tk.id,
+            tk.titulo,
+            tk.fecha_creacion,
+            e.nombre AS estado,
+            c.nombre AS categoria,
+            p.nombre AS prioridad
+        FROM tickets tk
+        JOIN estados_ticket e ON e.id = tk.estado_id
+        LEFT JOIN categorias c ON c.id = tk.categoria_id
+        LEFT JOIN prioridades p ON p.id = tk.prioridad_id
+        ORDER BY tk.fecha_creacion DESC
+    ";
+    $vResultado = $this->enlace->ExecuteSQL($vSql);
+    return $vResultado ?: [];
+}
+
 
     /* -----------------------------------------------------------
      * (2) TÉCNICO: Listar tickets ASIGNADOS al técnico (máx. 4 campos)
@@ -61,25 +67,30 @@ class TicketModel
      * Retorna:
      *  - array de objetos
      * ----------------------------------------------------------- */
-    public function listTecnico(int $tecnicoId)
-    {
-        if (!$this->assertRole($tecnicoId, 2)) return [];
+   public function listTecnico(int $tecnicoId)
+{
+    if (!$this->assertRole($tecnicoId, 2)) return [];
 
-        $vSql = "
-            SELECT tk.id,
-                   tk.titulo,
-                   tk.fecha_creacion,
-                   e.nombre AS estado
-            FROM asignaciones a
-            JOIN tickets tk       ON tk.id = a.ticket_id
-            JOIN estados_ticket e ON e.id = tk.estado_id
-            WHERE a.vigente = 1
-              AND a.tecnico_id = " . intval($tecnicoId) . "
-            ORDER BY tk.fecha_creacion DESC
-        ";
-        $vResultado = $this->enlace->ExecuteSQL($vSql);
-        return $vResultado ?: [];
-    }
+    $vSql = "
+        SELECT 
+            tk.id,
+            tk.titulo,
+            tk.fecha_creacion,
+            e.nombre AS estado,
+            c.nombre AS categoria,
+            p.nombre AS prioridad
+        FROM asignaciones a
+        JOIN tickets tk ON tk.id = a.ticket_id
+        JOIN estados_ticket e ON e.id = tk.estado_id
+        LEFT JOIN categorias c ON c.id = tk.categoria_id
+        LEFT JOIN prioridades p ON p.id = tk.prioridad_id
+        WHERE a.vigente = 1
+          AND a.tecnico_id = " . intval($tecnicoId) . "
+        ORDER BY tk.fecha_creacion DESC
+    ";
+    $vResultado = $this->enlace->ExecuteSQL($vSql);
+    return $vResultado ?: [];
+}
 
     /* -----------------------------------------------------------
      * (3) CLIENTE: Listar tickets creados por el cliente (máx. 4 campos)
@@ -88,23 +99,28 @@ class TicketModel
      * Retorna:
      *  - array de objetos
      * ----------------------------------------------------------- */
-    public function listCliente(int $clienteId)
-    {
-        if (!$this->assertRole($clienteId, 3)) return [];
+   public function listCliente(int $clienteId)
+{
+    if (!$this->assertRole($clienteId, 3)) return [];
 
-        $vSql = "
-            SELECT tk.id,
-                   tk.titulo,
-                   tk.fecha_creacion,
-                   e.nombre AS estado
-            FROM tickets tk
-            JOIN estados_ticket e ON e.id = tk.estado_id
-            WHERE tk.usuario_solicitante_id = " . intval($clienteId) . "
-            ORDER BY tk.fecha_creacion DESC
-        ";
-        $vResultado = $this->enlace->ExecuteSQL($vSql);
-        return $vResultado ?: [];
-    }
+    $vSql = "
+        SELECT 
+            tk.id,
+            tk.titulo,
+            tk.fecha_creacion,
+            e.nombre AS estado,
+            c.nombre AS categoria,
+            p.nombre AS prioridad
+        FROM tickets tk
+        JOIN estados_ticket e ON e.id = tk.estado_id
+        LEFT JOIN categorias c ON c.id = tk.categoria_id
+        LEFT JOIN prioridades p ON p.id = tk.prioridad_id
+        WHERE tk.usuario_solicitante_id = " . intval($clienteId) . "
+        ORDER BY tk.fecha_creacion DESC
+    ";
+    $vResultado = $this->enlace->ExecuteSQL($vSql);
+    return $vResultado ?: [];
+}
 
     /* -----------------------------------------------------------
      * (4) DETALLE por ID: datos completos del ticket
@@ -321,10 +337,10 @@ class TicketModel
  * Retorna:
  *  - bool (true si se actualizó correctamente)
  * ----------------------------------------------------------- */
-public function updateEstado(int $ticketId, int $nuevoEstado, int $usuarioId): bool
+public function updateEstado(int $ticketId, int $nuevoEstado, int $usuarioId)
 {
     try {
-        // Validar que el ticket exista
+        // 1️⃣ Validar que el ticket exista
         $sqlCheck = "SELECT id FROM tickets WHERE id = $ticketId";
         $ticket = $this->enlace->executeSQL($sqlCheck);
         if (empty($ticket)) {
@@ -332,29 +348,34 @@ public function updateEstado(int $ticketId, int $nuevoEstado, int $usuarioId): b
             return false;
         }
 
-        // Actualizar estado del ticket
+        // 2️⃣ Actualizar estado del ticket
         $sqlUpdate = "UPDATE tickets
                       SET estado_id = $nuevoEstado,
                           actualizado_en = NOW()
                       WHERE id = $ticketId";
-        $ok1 = $this->enlace->executeSQL_DML($sqlUpdate); // ✅ CORRECTO
+        $ok1 = $this->enlace->executeSQL_DML($sqlUpdate);
 
-        // Insertar registro en historial_estados
+        // 3️⃣ Insertar registro en historial_estados y obtener su ID
         $sqlHist = "INSERT INTO historial_estados (ticket_id, estado_id, usuario_id, fecha, observaciones)
                     VALUES ($ticketId, $nuevoEstado, $usuarioId, NOW(), 'Cambio de estado manual')";
-        $ok2 = $this->enlace->executeSQL_DML($sqlHist); // ✅ CORRECTO
+        $lastId = $this->enlace->executeSQL_DML_last($sqlHist);
 
-        // Verificar ejecución correcta
-        if ($ok1 === false || $ok2 === false) {
+        if ($ok1 === false || $lastId === 0) {
             error_log("❌ Error en ejecución SQL en updateEstado");
             return false;
         }
 
-        return true;
+        // ✅ 4️⃣ Retornar el ID del historial insertado
+        return [
+            "success" => true,
+            "historial_id" => $lastId
+        ];
     } catch (Throwable $e) {
         error_log("❌ Excepción en updateEstado(): " . $e->getMessage());
         return false;
     }
 }
+
+
 
 }

@@ -43,5 +43,64 @@ class Tecnico
         handleException($e);
     }
     } 
+    // ============================================================
+// SUBIR IMÁGENES DE ESTADO
+// POST -> http://localhost:81/Proyecto/api/TicketController/uploadImagenes
+//
+// Body (form-data):
+//   - historial_id (int)
+//   - imagenes[] (file, múltiples)
+//
+// Guarda las imágenes y las asocia al historial_estados
+// ============================================================
+public function uploadImagenes()
+{
+    $response = new Response();
+    header("Content-Type: application/json");
+
+    $historialId = $_POST["historial_id"] ?? null;
+    if (!$historialId) {
+        http_response_code(400);
+        $response->toJSON(null, "Falta el parámetro historial_id", 400);
+        return;
+    }
+
+    $uploadDir = "../uploads/estados/";
+    if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
+
+    try {
+        // ✅ Usa tu clase de conexión real
+        $db = new MySqlConnect();
+        $rutasGuardadas = [];
+
+        foreach ($_FILES["imagenes"]["tmp_name"] as $index => $tmpName) {
+            $nombre = uniqid("img_") . "_" . basename($_FILES["imagenes"]["name"][$index]);
+            $destino = $uploadDir . $nombre;
+
+            if (move_uploaded_file($tmpName, $destino)) {
+                $rutaRelativa = "uploads/estados/" . $nombre;
+
+                // 👇 Como tu clase no soporta parámetros ?, usá string concatenado seguro
+                $sql = "INSERT INTO imagenes_estado (historial_id, ruta) 
+                        VALUES ($historialId, '$rutaRelativa')";
+                $db->executeSQL_DML($sql);
+
+                $rutasGuardadas[] = $rutaRelativa;
+            }
+        }
+
+        $response->toJSON([
+            "success" => true,
+            "message" => "Imágenes subidas correctamente",
+            "rutas" => $rutasGuardadas
+        ], "Carga completada", 200);
+
+    } catch (Throwable $e) {
+        http_response_code(500);
+        $response->toJSON(null, "Error al subir imágenes: " . $e->getMessage(), 500);
+    }
+}
+
+
 }
 
