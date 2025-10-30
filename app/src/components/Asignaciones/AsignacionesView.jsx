@@ -1,27 +1,64 @@
-// components/Asignaciones/AsignacionesView.jsx
-import React, { useEffect, useState } from "react";
-import AsignacionService from "../../services/AsignacionService";
+// ============================================================
+//  COMPONENTE: AsignacionesView.jsx
+// ------------------------------------------------------------
+// Este componente muestra las asignaciones semanales del técnico o administrador
+// en forma de calendario (lunes a domingo). Permite filtrar por semana,
+// calcular el avance del SLA de cada ticket y ver detalles individuales.
+// ============================================================
+
+//  Importaciones principales de React
+import React, { useEffect, useState } from "react"; // useState y useEffect son hooks
+import AsignacionService from "../../services/AsignacionService"; // servicio que obtiene las asignaciones desde la API
+
+//  Componentes UI reutilizables (diseño de tarjeta, botones, badges, etc.)
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import useAuth from "../../auth/store/auth.store";
-import { LoadingGrid } from "../ui/custom/LoadingGrid";
-import { ErrorAlert } from "../ui/custom/ErrorAlert";
 
+// Navegación interna y autenticación del usuario
+import { useNavigate } from "react-router-dom";
+import useAuth from "../../auth/store/auth.store"; // almacén de datos del usuario autenticado
+
+//  Componentes de estado visual
+import { LoadingGrid } from "../ui/custom/LoadingGrid"; // muestra carga animada
+import { ErrorAlert } from "../ui/custom/ErrorAlert"; // muestra errores
+
+// ============================================================
+// Componente principal: AsignacionesView
+// ============================================================
 export default function AsignacionesView() {
+
+  //  Hook para redirigir entre vistas
   const navigate = useNavigate();
+
+  // Extrae los datos del usuario autenticado
   const { user } = useAuth();
 
+  // ============================================================
+  // Estados internos del componente
+  // ------------------------------------------------------------
+  // data: todas las asignaciones cargadas
+  // filtered: asignaciones filtradas según semana seleccionada
+  // error: mensaje de error (si ocurre)
+  // loading: indica si los datos se están cargando
+  // selectedWeek: semana seleccionada en el filtro tipo calendario
+  // ============================================================
   const [data, setData] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState("");
 
+  // Extrae los valores del usuario (rol e id)
   const rolId = user?.rol_id;
   const userId = user?.id;
 
+  // ============================================================
+  //  Colores de estado (badge visual)
+  // ------------------------------------------------------------
+  // Define un color diferente para cada estado de asignación.
+  // Se usan clases Tailwind para definir bordes, fondo y texto.
+  // ============================================================
   const estadoColors = {
     Pendiente: "border-yellow-400 bg-yellow-50 text-yellow-800",
     Asignado: "border-blue-400 bg-blue-50 text-blue-800",
@@ -30,33 +67,53 @@ export default function AsignacionesView() {
     Cerrado: "border-red-400 bg-red-50 text-red-800",
   };
 
-  // 🔹 Cargar datos desde API
+  // ============================================================
+  // useEffect → carga de datos al montar el componente
+  // ------------------------------------------------------------
+  // Llama al servicio AsignacionService para obtener las asignaciones
+  // del usuario según su rol. Los datos se agrupan por fecha.
+  // ============================================================
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Llama al endpoint del backend (pasa rolId y userId)
         const response = await AsignacionService.getAsignaciones({ rolId, userId });
+
+        // Extrae las asignaciones desde la respuesta (objeto anidado)
         const asignaciones = response.data?.data?.asignaciones || {};
 
+        // Convierte el objeto en un arreglo plano:
+        // cada fecha tiene múltiples asignaciones
         const all = Object.entries(asignaciones).flatMap(([fecha, items]) =>
           items.map((i) => ({
             ...i,
+            // Si la fecha es "Sin fecha", asigna null para evitar errores
             fecha_asignacion: fecha === "Sin fecha" ? null : fecha,
           }))
         );
 
+        // Actualiza los estados locales
         setData(all);
         setFiltered(all);
       } catch (err) {
         console.error("Error al cargar asignaciones:", err);
         setError("Error al cargar las asignaciones.");
       } finally {
+        // Quita el loader al terminar (éxito o error)
         setLoading(false);
       }
     };
+
+    // Ejecuta la carga solo si existen rol y usuario
     if (rolId && userId) fetchData();
   }, [rolId, userId]);
 
-  // 🔹 Filtro de semana
+  // ============================================================
+  // handleFilterWeek → filtra las asignaciones por semana
+  // ------------------------------------------------------------
+  // Convierte el valor del input tipo "week" en un rango de fechas
+  // (lunes a domingo) y filtra las asignaciones dentro de ese rango.
+  // ============================================================
   const handleFilterWeek = (value) => {
     setSelectedWeek(value);
     if (!value) {
@@ -64,26 +121,41 @@ export default function AsignacionesView() {
       return;
     }
 
+    // Separa año y número de semana (ejemplo: "2025-W43")
     const [year, week] = value.split("-W").map(Number);
+
+    // Calcula el primer día del año y el inicio de la semana seleccionada
     const firstDayOfYear = new Date(year, 0, 1);
     const firstWeekStart = new Date(firstDayOfYear);
     firstWeekStart.setDate(firstDayOfYear.getDate() - firstDayOfYear.getDay() + 1 + (week - 1) * 7);
+
+    // Calcula el último día (domingo) de esa semana
     const lastWeekEnd = new Date(firstWeekStart);
     lastWeekEnd.setDate(firstWeekStart.getDate() + 6);
 
+    // Filtra las asignaciones dentro de ese rango de fechas
     const filteredByWeek = data.filter((a) => {
       if (!a.fecha_asignacion) return false;
       const fecha = new Date(a.fecha_asignacion);
       return fecha >= firstWeekStart && fecha <= lastWeekEnd;
     });
 
+    // Actualiza el estado con el nuevo filtro
     setFiltered(filteredByWeek);
   };
 
-  if (loading) return <LoadingGrid />;
-  if (error) return <ErrorAlert title="Error" message={error} />;
+  // ============================================================
+  //  Estados de carga y error
+  // ============================================================
+  if (loading) return <LoadingGrid />; // muestra animación de carga
+  if (error) return <ErrorAlert title="Error" message={error} />; // muestra mensaje de error
 
-  // 🔹 Semana base (si se seleccionó, esa; si no, la actual)
+  // ============================================================
+  //  Determinar la semana base (por defecto, la actual)
+  // ------------------------------------------------------------
+  // Si el usuario selecciona una semana, se usa esa como referencia.
+  // Si no, se calcula automáticamente la semana actual (lunes a domingo).
+  // ============================================================
   const baseDate = selectedWeek
     ? (() => {
         const [year, week] = selectedWeek.split("-W").map(Number);
@@ -93,17 +165,22 @@ export default function AsignacionesView() {
       })()
     : (() => {
         const today = new Date();
-        const day = today.getDay() === 0 ? 7 : today.getDay();
+        const day = today.getDay() === 0 ? 7 : today.getDay(); // Si es domingo, se toma como día 7
         const monday = new Date(today);
-        monday.setDate(today.getDate() - day + 1);
+        monday.setDate(today.getDate() - day + 1); // retrocede hasta el lunes
         return monday;
       })();
 
-  // 🔹 Crear arreglo lunes-domingo
+  // ============================================================
+  //  Crear arreglo de días (lunes a domingo)
+  // ------------------------------------------------------------
+  // Genera un arreglo con 7 objetos (uno por día),
+  // incluyendo nombre, fecha ISO y formato corto para mostrar.
+  // ============================================================
   const diasSemana = Array.from({ length: 7 }).map((_, i) => {
     const fecha = new Date(baseDate);
     fecha.setDate(baseDate.getDate() + i);
-    const fechaISO = fecha.toISOString().split("T")[0];
+    const fechaISO = fecha.toISOString().split("T")[0]; // formato YYYY-MM-DD
     return {
       nombre: fecha.toLocaleDateString("es-CR", { weekday: "long" }),
       fechaISO,
@@ -111,7 +188,12 @@ export default function AsignacionesView() {
     };
   });
 
-  // 🔹 Agrupar asignaciones por fecha real
+  // ============================================================
+  // Agrupar asignaciones por fecha real
+  // ------------------------------------------------------------
+  // Convierte el arreglo de asignaciones en un objeto donde
+  // cada clave es una fecha, y su valor es un arreglo de tickets.
+  // ============================================================
   const asignacionesPorFecha = filtered.reduce((acc, asignacion) => {
     const fecha = asignacion.fecha_asignacion
       ? new Date(asignacion.fecha_asignacion).toISOString().split("T")[0]
@@ -121,12 +203,16 @@ export default function AsignacionesView() {
     return acc;
   }, {});
 
+  // Variables auxiliares para mostrar el rango de la semana actual
   const inicioSemana = diasSemana[0].fechaMostrar;
   const finSemana = diasSemana[6].fechaMostrar;
 
-  // 🔹 UI
+  // ============================================================
+  //  Renderizado principal de la interfaz
+  // ============================================================
   return (
     <div className="max-w-7xl mx-auto p-6">
+      {/* Título y descripción general */}
       <h1 className="text-3xl font-bold mb-2 text-blue-900">
         {rolId === 1 ? "Asignaciones Generales" : "Mis Asignaciones Semanales"}
       </h1>
@@ -137,7 +223,7 @@ export default function AsignacionesView() {
         Semana del <b>{inicioSemana}</b> al <b>{finSemana}</b>
       </p>
 
-      {/* Filtro de semana */}
+      {/*  Filtro de semana */}
       <div className="flex items-center gap-3 mb-8">
         <label className="text-sm font-medium text-gray-700">Filtrar por semana:</label>
         <input
@@ -148,9 +234,10 @@ export default function AsignacionesView() {
         />
       </div>
 
-      {/* Vista calendario completa */}
+      {/*  Vista completa tipo calendario */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
         {diasSemana.map((dia) => {
+          // Obtiene todas las asignaciones del día actual
           const asignacionesDelDia = asignacionesPorFecha[dia.fechaISO] || [];
 
           return (
@@ -158,7 +245,7 @@ export default function AsignacionesView() {
               key={dia.fechaISO}
               className="border border-blue-100 shadow-md rounded-xl hover:shadow-lg transition-all bg-white/90 backdrop-blur-sm"
             >
-              {/* Encabezado del día */}
+              {/*  Encabezado del día (nombre + fecha) */}
               <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-t-xl">
                 <CardTitle className="flex justify-between items-center">
                   <span className="capitalize">{dia.nombre}</span>
@@ -166,22 +253,25 @@ export default function AsignacionesView() {
                 </CardTitle>
               </CardHeader>
 
-              {/* Contenido del día */}
+              {/*  Contenido de asignaciones del día */}
               <CardContent className="space-y-3 bg-white rounded-b-xl min-h-[160px] p-4">
                 {asignacionesDelDia.length > 0 ? (
                   asignacionesDelDia.map((a, idx) => {
-                    // ✅ Cálculo real de SLA
+                    //  Cálculo real de SLA (porcentaje de tiempo restante)
                     const fechaInicio = new Date(a.fecha_creacion);
                     const fechaLimite = new Date(a.sla_resol_limite);
                     const ahora = new Date();
 
+                    // Diferencia total y tiempo transcurrido
                     const totalMs = fechaLimite - fechaInicio;
                     const transcurridoMs = ahora - fechaInicio;
 
+                    // Porcentaje de SLA restante
                     let slaProgress = 100 - (transcurridoMs / totalMs) * 100;
                     if (slaProgress < 0) slaProgress = 0;
                     if (slaProgress > 100) slaProgress = 100;
 
+                    // Estado textual del SLA
                     const slaStatus = ahora > fechaLimite ? "Vencido" : "En curso";
 
                     return (
@@ -191,6 +281,7 @@ export default function AsignacionesView() {
                           estadoColors[a.estado] || "border-gray-300"
                         } shadow-sm hover:shadow-md transition`}
                       >
+                        {/*  Encabezado de ticket */}
                         <div className="flex justify-between items-start mb-2">
                           <div>
                             <p className="font-semibold text-gray-900 text-sm">
@@ -203,6 +294,8 @@ export default function AsignacionesView() {
                               SLA: {slaStatus} ({Math.round(slaProgress)}%)
                             </p>
                           </div>
+
+                          {/* Etiqueta de estado visual */}
                           <Badge
                             className={`${
                               estadoColors[a.estado] || "bg-gray-200 text-gray-700 border-gray-300"
@@ -212,7 +305,7 @@ export default function AsignacionesView() {
                           </Badge>
                         </div>
 
-                        {/* Barra SLA */}
+                        {/*  Barra visual del SLA */}
                         <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-2">
                           <div
                             className={`h-2 rounded-full ${
@@ -222,7 +315,7 @@ export default function AsignacionesView() {
                           ></div>
                         </div>
 
-                        {/* Botón Ver detalle */}
+                        {/*  Botón para ver detalle del ticket */}
                         <div className="text-right">
                           <Button
                             size="sm"
@@ -236,6 +329,7 @@ export default function AsignacionesView() {
                     );
                   })
                 ) : (
+                  // Si no hay asignaciones para ese día
                   <p className="text-sm text-gray-400 text-center italic mt-8">
                     — Sin asignaciones —
                   </p>
