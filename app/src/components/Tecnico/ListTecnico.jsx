@@ -36,7 +36,7 @@ export function ListTecnico() { // Componente principal para listar técnicos
     );
 
   return ( // Si todo está bien, muestra la lista de técnicos
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 py-12 px-6">
+    <div className="min-h-screen bg-white py-12 px-6">
       {/* Fondo con degradado y espacio interno */}
       <div className="text-center mb-10"> {/* Encabezado del listado */}
         <h2 className="text-4xl font-extrabold bg-gradient-to-r from-sky-600 to-blue-700 bg-clip-text text-transparent mb-3">
@@ -44,7 +44,7 @@ export function ListTecnico() { // Componente principal para listar técnicos
         </h2>
         <p className="text-gray-600 max-w-xl mx-auto">
           Especialistas capacitados en diferentes áreas del soporte técnico, siempre listos para ayudarte.
-        </p>
+        </p> 
       </div>
 
       {/* Grid con las tarjetas de técnicos */}
