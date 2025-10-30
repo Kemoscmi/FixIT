@@ -74,6 +74,38 @@ class TicketService {
 updateEstado(payload) {
   return axios.put(`${BASE_URL}/updateEstado`, payload);
 }
+/**
+ * ✅ SUBIR IMÁGENES DEL ESTADO
+ * POST -> {BASE_URL}/ImagenesEstado/upload
+ * Body: FormData con:
+ *   - historial_id
+ *   - imagenes[] (múltiples archivos)
+ */
+async uploadImagenes(historialId, imagenes) {
+  try {
+    const formData = new FormData();
+    formData.append("historial_id", historialId);
+    imagenes.forEach((file) => formData.append("imagenes[]", file));
+
+    const response = await axios.post(
+      import.meta.env.VITE_BASE_URL + "ImagenesEstado/upload",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error al subir imágenes:", error);
+    throw error;
+  }
+}
+
+
+
+
 }
 
 export default new TicketService();

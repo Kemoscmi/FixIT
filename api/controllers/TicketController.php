@@ -198,10 +198,13 @@ public function updateEstado()
         $usuarioId = intval($input['usuario_id']);
 
         $model = new TicketModel();
-        $ok = $model->updateEstado($ticketId, $nuevoEstado, $usuarioId);
+        $result = $model->updateEstado($ticketId, $nuevoEstado, $usuarioId);
 
-        if ($ok) {
-            $response->toJSON(["ticket_id" => $ticketId], "Estado actualizado correctamente", 200);
+        if ($result && isset($result["success"])) {
+            $response->toJSON([
+                "ticket_id" => $ticketId,
+                "historial_id" => $result["historial_id"]
+            ], "Estado actualizado correctamente", 200);
         } else {
             http_response_code(400);
             $response->toJSON(null, "No se pudo actualizar el estado del ticket", 400);
