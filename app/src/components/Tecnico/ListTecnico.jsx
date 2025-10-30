@@ -1,39 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import TecnicoService from '@/services/TecnicoService';  // Importamos el servicio de técnicos
-import { TecnicosListCard } from './TecnicosListCard';  // Componente de tarjeta de técnico
+import React, { useEffect, useState } from "react"; // Importa React y los hooks useEffect y useState
+import TecnicoService from "@/services/TecnicoService"; // Servicio que obtiene los técnicos desde el backend
+import { TecnicosListCard } from "./TecnicosListCard"; // Componente que muestra cada técnico como tarjeta
+import { Loader2 } from "lucide-react"; // Icono animado para el cargando
 
-export function ListTecnico() {
-  const [tecnicos, setTecnicos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export function ListTecnico() { // Componente principal para listar técnicos
+  const [tecnicos, setTecnicos] = useState([]); // Estado que guarda la lista de técnicos
+  const [loading, setLoading] = useState(true); // Estado para controlar si está cargando
+  const [error, setError] = useState(null); // Estado para manejar errores
 
-  useEffect(() => {
-    TecnicoService.getTecnicos()  // Llamamos al servicio para obtener todos los técnicos
-      .then((response) => {
-        setTecnicos(response.data);  // Guardamos los técnicos en el estado
-        setLoading(false);  // Terminamos la carga
+  useEffect(() => { // Hook que se ejecuta al montar el componente
+    TecnicoService.getTecnicos() // Llama al servicio para traer los técnicos del backend
+      .then((response) => { // Si la respuesta es correcta
+        setTecnicos(response.data); // Guarda los técnicos en el estado
+        setLoading(false); // Cambia el estado de carga a falso
       })
-      .catch((error) => {
-        setError(error.message);  // Guardamos el error en el estado
-        setLoading(false);
+      .catch((error) => { // Si ocurre un error
+        setError(error.message); // Guarda el mensaje de error
+        setLoading(false); // Detiene el estado de carga
       });
-  }, []);
+  }, []); // Solo se ejecuta una vez al inicio
 
-  if (loading) return <p className="text-center">Cargando técnicos...</p>;
-  if (error) return <p className="text-center">Error: {error}</p>;
+  if (loading) // Si está cargando, muestra el spinner
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh] text-blue-700">
+        <Loader2 className="animate-spin h-10 w-10 mb-4" /> {/* Ícono animado */}
+        <p className="text-lg font-medium">Cargando técnicos...</p> {/* Texto de carga */}
+      </div>
+    );
 
-  return (
-    <div className="container mx-auto p-6">
-      <h2 className="text-3xl font-semibold mb-4 text-center">Listado de Técnicos</h2>
-      {/* Usamos un grid para el diseño de las tarjetas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Aquí renderizamos cada técnico dentro de un card */}
-        {tecnicos && tecnicos.length > 0 ? (
+  if (error) // Si hay error, muestra el mensaje
+    return (
+      <p className="text-center text-red-500 text-lg mt-8">
+        Error: {error}
+      </p>
+    );
+
+  return ( // Si todo está bien, muestra la lista de técnicos
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 py-12 px-6">
+      {/* Fondo con degradado y espacio interno */}
+      <div className="text-center mb-10"> {/* Encabezado del listado */}
+        <h2 className="text-4xl font-extrabold bg-gradient-to-r from-sky-600 to-blue-700 bg-clip-text text-transparent mb-3">
+          Nuestros Técnicos
+        </h2>
+        <p className="text-gray-600 max-w-xl mx-auto">
+          Especialistas capacitados en diferentes áreas del soporte técnico, siempre listos para ayudarte.
+        </p>
+      </div>
+
+      {/* Grid con las tarjetas de técnicos */}
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+        {tecnicos?.length > 0 ? ( // Si hay técnicos, los recorre y muestra
           tecnicos.map((tecnico) => (
-            <TecnicosListCard key={tecnico.id} tecnico={tecnico} />
+            <TecnicosListCard key={tecnico.id} tecnico={tecnico} /> // Tarjeta individual
           ))
-        ) : (
-          <p>No se encontraron técnicos.</p>
+        ) : ( // Si no hay técnicos
+          <p className="text-center col-span-full text-gray-600">
+            No se encontraron técnicos registrados.
+          </p>
         )}
       </div>
     </div>

@@ -35,7 +35,7 @@ class Tecnico
             return;
         }
 
-        // Si se encuentra el técnico, respondemos con los datos
+        // Si si encuentra el técnico, respondemos con los datos
         $response->toJSON($result);
 
     } catch (Exception $e) {

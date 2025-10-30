@@ -1,40 +1,62 @@
-import React, { useEffect, useState } from "react";
-import CategoriaService from "@/services/CategoriaService";
-import { CategoriaListCard } from "./CategoriaListCard";
+import React, { useEffect, useState } from "react"; // Importa React y los hooks para manejar estado y efectos
+import CategoriaService from "@/services/CategoriaService"; // Servicio que obtiene las categorías desde el backend
+import { CategoriaListCard } from "./CategoriaListCard"; // Componente de tarjeta individual para cada categoría
+import { Loader2 } from "lucide-react"; // Ícono animado de carga
 
-export function ListCategoria() {
-  const [categorias, setCategorias] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export function ListCategoria() { // Componente principal para listar categorías
+  const [categorias, setCategorias] = useState([]); // Estado con la lista de categorías
+  const [loading, setLoading] = useState(true); // Controla si los datos están cargando
+  const [error, setError] = useState(null); // Guarda posibles errores
 
-  useEffect(() => {
-    CategoriaService.getCategorias()
-      .then((response) => {
-        setCategorias(response.data); // viene dentro de data.data según backend
-        setLoading(false);
+  useEffect(() => { // Se ejecuta al montar el componente
+    CategoriaService.getCategorias() // Llama al servicio para obtener las categorías
+      .then((response) => { 
+        setCategorias(response.data); // Guarda las categorías recibidas
+        setLoading(false); // Termina la carga
       })
-      .catch((error) => {
-        setError(error.message);
-        setLoading(false);
+      .catch((error) => { // Si ocurre un error
+        setError(error.message); // Guarda el mensaje de error
+        setLoading(false); // Detiene el estado de carga
       });
-  }, []);
+  }, []); // Se ejecuta solo una vez al iniciar
 
-  if (loading) return <p className="text-center text-lg">Cargando categorías...</p>;
-  if (error) return <p className="text-center text-red-500">Error: {error}</p>;
+  if (loading) // Si está cargando, muestra el spinner
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh] text-blue-700">
+        <Loader2 className="animate-spin h-10 w-10 mb-4" /> {/* Ícono girando */}
+        <p className="text-lg font-medium">Cargando categorías...</p>
+      </div>
+    );
 
-  return (
-    <div className="container mx-auto p-6">
-      <h2 className="text-3xl font-semibold mb-6 text-center text-blue-700">
-        Listado de Categorías
-      </h2>
+  if (error) // Si hay error, muestra mensaje
+    return (
+      <p className="text-center text-red-500 text-lg mt-8">
+        Error: {error}
+      </p>
+    );
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categorias && categorias.length > 0 ? (
+  return ( // Si todo está bien, renderiza las categorías
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-pink-100 py-12 px-6">
+      {/* Fondo con degradado suave */}
+      <div className="text-center mb-10">
+        <h2 className="text-4xl font-extrabold bg-gradient-to-r from-sky-600 via-indigo-600 to-pink-600 bg-clip-text text-transparent mb-3">
+          Categorías de Soporte
+        </h2>
+        <p className="text-gray-600 max-w-xl mx-auto">
+          Explora las distintas áreas de soporte técnico disponibles. Cada categoría incluye etiquetas, especialidades y tiempos de respuesta definidos.
+        </p>
+      </div>
+
+      {/* Grid con todas las tarjetas de categorías */}
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+        {categorias?.length > 0 ? ( // Si hay categorías, las recorre y renderiza
           categorias.map((categoria) => (
-            <CategoriaListCard key={categoria.id} categoria={categoria} />
+            <CategoriaListCard key={categoria.id} categoria={categoria} /> // Tarjeta individual
           ))
-        ) : (
-          <p className="text-center">No se encontraron categorías registradas.</p>
+        ) : ( // Si no hay registros
+          <p className="text-center col-span-full text-gray-600">
+            No se encontraron categorías registradas.
+          </p>
         )}
       </div>
     </div>
