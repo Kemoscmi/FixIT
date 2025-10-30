@@ -29,7 +29,7 @@ export function DetailTecnico() { // Componente para mostrar los detalles de un 
     return <p className="text-center text-red-500 text-lg mt-10">Error: {error}</p>;
 
   return ( // Si todo está bien, muestra la vista del detalle
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-4xl mx-auto bg-white/70 backdrop-blur-md shadow-xl rounded-2xl overflow-hidden border border-blue-100">
         
         {/* 🧩 Encabezado con fondo degradado y avatar */}
