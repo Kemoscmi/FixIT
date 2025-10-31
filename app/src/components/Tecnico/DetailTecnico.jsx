@@ -32,7 +32,7 @@ export function DetailTecnico() { // Componente para mostrar los detalles de un 
     <div className="min-h-screen bg-white py-12">
       <div className="max-w-4xl mx-auto bg-white/70 backdrop-blur-md shadow-xl rounded-2xl overflow-hidden border border-blue-100">
         
-        {/* 🧩 Encabezado con fondo degradado y avatar */}
+        {/* 🧩 Encabezado y avatar */}
         <div className="relative h-40 bg-gradient-to-r from-blue-700 to-blue-900">
           <div className="absolute bottom-0 left-8 translate-y-[20%] flex items-center gap-4">
             <div className="w-28 h-28 bg-white border-4 border-blue-800 rounded-full flex items-center justify-center shadow-lg">
@@ -78,8 +78,9 @@ export function DetailTecnico() { // Componente para mostrar los detalles de un 
           <div className="bg-blue-50 rounded-lg p-5 shadow-inner">
             <h3 className="text-xl font-semibold text-blue-700 mb-3">Especialidades</h3>
             <ul className="list-disc pl-6 text-gray-700">
-              {tecnico.especialidades?.map((esp, i) => (
-                <li key={i}>{esp.nombre}</li> // Muestra cada especialidad
+                {/* El ? es como un if, si si hay algo hago, si no no */}
+              {tecnico.especialidades?.map((esp, i) => ( 
+                <li key={i}>{esp.nombre}</li> // Muestra cada especialidad (li es item de lista)
               ))}
             </ul>
           </div>
