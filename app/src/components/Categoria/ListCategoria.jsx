@@ -37,8 +37,7 @@ export function ListCategoria() { // Componente principal para listar categoría
 
   return ( // Si todo está bien, renderiza las categorías
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-pink-100 py-12 px-6">
-      {/* Fondo con degradado suave */}
-      <div className="text-center mb-10">
+      <div className="text-center mb-10"> {/* Encabezado del listado */}
         <h2 className="text-4xl font-extrabold bg-gradient-to-r from-sky-600 via-indigo-600 to-pink-600 bg-clip-text text-transparent mb-3">
           Categorías de Soporte
         </h2>
@@ -49,7 +48,8 @@ export function ListCategoria() { // Componente principal para listar categoría
 
       {/* Grid con todas las tarjetas de categorías */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-        {categorias?.length > 0 ? ( // Si hay categorías, las recorre y renderiza
+         {/* El ? es como un if, si si hay algo hago, si no no */}
+        {categorias?.length > 0 ? ( // Si hay categorías, las recorre y muestra
           categorias.map((categoria) => (
             <CategoriaListCard key={categoria.id} categoria={categoria} /> // Tarjeta individual
           ))
@@ -59,6 +59,6 @@ export function ListCategoria() { // Componente principal para listar categoría
           </p>
         )}
       </div>
-    </div>
+    </div> 
   );
 }
