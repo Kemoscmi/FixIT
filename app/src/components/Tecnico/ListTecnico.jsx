@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"; // Importa React y los hooks useEffect y useState
+import React, { useEffect, useState } from "react"; // Importamos React y los hooks useEffect y useState
 import TecnicoService from "@/services/TecnicoService"; // Servicio que obtiene los técnicos desde el backend
 import { TecnicosListCard } from "./TecnicosListCard"; // Componente que muestra cada técnico como tarjeta
-import { Loader2 } from "lucide-react"; // Icono animado para el cargando
+import { Loader2 } from "lucide-react"; //librería de íconos moderna para React // Icono animado para el cargando
 
 export function ListTecnico() { // Componente principal para listar técnicos
   const [tecnicos, setTecnicos] = useState([]); // Estado que guarda la lista de técnicos
@@ -37,7 +37,6 @@ export function ListTecnico() { // Componente principal para listar técnicos
 
   return ( // Si todo está bien, muestra la lista de técnicos
     <div className="min-h-screen bg-white py-12 px-6">
-      {/* Fondo con degradado y espacio interno */}
       <div className="text-center mb-10"> {/* Encabezado del listado */}
         <h2 className="text-4xl font-extrabold bg-gradient-to-r from-sky-600 to-blue-700 bg-clip-text text-transparent mb-3">
           Nuestros Técnicos
@@ -49,7 +48,9 @@ export function ListTecnico() { // Componente principal para listar técnicos
 
       {/* Grid con las tarjetas de técnicos */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+         {/* El ? es como un if, si si hay algo hago, si no no */}
         {tecnicos?.length > 0 ? ( // Si hay técnicos, los recorre y muestra
+        //map() sirve para recorrer un arreglo y renderizar algo por cada elemento.
           tecnicos.map((tecnico) => (
             <TecnicosListCard key={tecnico.id} tecnico={tecnico} /> // Tarjeta individual
           ))

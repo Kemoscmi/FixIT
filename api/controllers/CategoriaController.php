@@ -5,7 +5,7 @@ class Categoria
     // Listar todas las categorías
     public function index()
     {
-        try {
+        try { 
             $response = new Response();
             $model = new CategoriaModel();  // Instanciamos el modelo de Categorías
             $result = $model->all();  // Obtenemos todas las categorías
@@ -24,10 +24,7 @@ class Categoria
             $response = new Response();
             $model = new CategoriaModel();  // Instanciamos el modelo de Categorías
             $result = $model->get($param);  // Obtenemos la categoría por ID
-            if ($result === null) {
-                $response->toJSON(null, "Categoría no encontrada", 404);  // Respuesta en caso de no encontrarla
-                return;
-            }
+            
             $response->toJSON($result);  // Respondemos con los detalles de la categoría
         } catch (Exception $e) {
             $response->toJSON(null, "Error al obtener la categoría", 500);  // Respuesta en caso de error

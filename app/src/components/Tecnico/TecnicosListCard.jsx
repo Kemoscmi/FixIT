@@ -11,8 +11,7 @@ export function TecnicosListCard({ tecnico }) { // Recibe un técnico como propi
 
   return (
     <div className="relative overflow-hidden bg-white/70 border border-gray-200 backdrop-blur-lg shadow-lg rounded-2xl p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-blue-400 group">
-      {/* Contenedor principal con efecto hover y sombra */}
-      
+      {/* Contenedor principal con efecto hover y sombra */}    
       <div className="relative z-10 flex flex-col gap-4"> {/* Contenido interno */}
         <div className="flex items-center gap-3"> {/* Nombre + icono */}
           <div className="p-3 bg-blue-100 rounded-full"> {/* Fondo del icono */}

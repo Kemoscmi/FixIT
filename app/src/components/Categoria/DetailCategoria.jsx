@@ -67,6 +67,7 @@ export function DetailCategoria() { // Componente principal de detalle de catego
           </h3>
           <div className="flex flex-wrap gap-2 mt-2">
             {categoria.etiquetas?.length > 0 ? ( // Si hay etiquetas
+        //map() sirve para recorrer un arreglo (array) y renderizar algo por cada elemento.
               categoria.etiquetas.map((etq, i) => (
                 <span
                   key={i}
@@ -132,6 +133,6 @@ export function DetailCategoria() { // Componente principal de detalle de catego
           Volver al listado
         </button>
       </div>
-    </div>
+    </div> 
   );
 }
