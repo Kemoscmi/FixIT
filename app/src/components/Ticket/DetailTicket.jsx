@@ -183,7 +183,7 @@ export function DetailTicket() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 py-12">
       <div className="max-w-5xl mx-auto bg-white/70 backdrop-blur-md shadow-xl rounded-2xl overflow-hidden border border-blue-100">
-        
+
         {/* 🔹 Encabezado superior con icono y nombre del ticket */}
         <div className="relative h-40 bg-gradient-to-r from-blue-700 to-blue-900">
           <div className="absolute bottom-0 left-8 translate-y-[20%] flex items-center gap-4">
@@ -203,14 +203,13 @@ export function DetailTicket() {
 
         {/* 🔹 Cuerpo principal del ticket */}
         <div className="p-8 mt-6 space-y-8">
-          
+
           {/* Estado actual del ticket */}
           <div className="flex justify-between items-center">
             <Badge
-              className={`${
-                estadoColors[basicos?.estado] ||
+              className={`${estadoColors[basicos?.estado] ||
                 "bg-gray-200 text-gray-700 border-gray-300"
-              } border font-semibold text-base px-4 py-1.5`}
+                } border font-semibold text-base px-4 py-1.5`}
             >
               {basicos?.estado}
             </Badge>

@@ -11,9 +11,9 @@ class TicketModel
     // Propiedad pública para mantener la conexión activa a la base de datos
     public $enlace;
 
- 
+
     // Constructor: inicializa la conexión al crear la instancia del modelo
-  
+
     public function __construct()
     {
         // Se crea una nueva conexión utilizando la clase MySqlConnect,
@@ -233,7 +233,7 @@ class TicketModel
                     "estado"       => $r->estado,
                     "usuario_id"   => $r->usuario_id,
                     "usuario"      => $r->usuario,
-                    "observaciones"=> $r->observaciones,
+                    "observaciones" => $r->observaciones,
                     "imagenes"     => []
                 ];
             }
@@ -242,7 +242,7 @@ class TicketModel
                 $historial[$hid]["imagenes"][] = [
                     "imagen_id"  => $r->imagen_id,
                     "ruta"       => $r->ruta,
-                    "descripcion"=> $r->imagen_desc
+                    "descripcion" => $r->imagen_desc
                 ];
             }
         }
@@ -274,7 +274,7 @@ class TicketModel
             "basicos"   => $basicos,     // Información general
             "sla"       => $sla,         // Cálculo y cumplimiento de SLA
             "historial" => $historial,   // Estados y observaciones
-            "valoracion"=> $valoracion   // Comentarios del cliente
+            "valoracion" => $valoracion   // Comentarios del cliente
         ];
     }
 

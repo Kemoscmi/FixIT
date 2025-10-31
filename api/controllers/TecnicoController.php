@@ -80,7 +80,7 @@ public function uploadImagenes()
             if (move_uploaded_file($tmpName, $destino)) {
                 $rutaRelativa = "uploads/estados/" . $nombre;
 
-                // 👇 Como tu clase no soporta parámetros ?, usá string concatenado seguro
+              
                 $sql = "INSERT INTO imagenes_estado (historial_id, ruta) 
                         VALUES ($historialId, '$rutaRelativa')";
                 $db->executeSQL_DML($sql);

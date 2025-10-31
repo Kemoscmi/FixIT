@@ -54,9 +54,15 @@ class TicketController
 
             // Según el rol del usuario, se ejecuta el método correspondiente del modelo
             switch ($rolId) {
-                case 1: $data = $model->listAdmin($userId);   break; // Admin ve todos los tickets
-                case 2: $data = $model->listTecnico($userId); break; // Técnico ve los tickets asignados
-                case 3: $data = $model->listCliente($userId); break; // Cliente ve sus propios tickets
+                case 1:
+                    $data = $model->listAdmin($userId);
+                    break; // Admin ve todos los tickets
+                case 2:
+                    $data = $model->listTecnico($userId);
+                    break; // Técnico ve los tickets asignados
+                case 3:
+                    $data = $model->listCliente($userId);
+                    break; // Cliente ve sus propios tickets
                 default:
                     // Si el rol no es válido, se devuelve error 400 con mensaje explicativo
                     http_response_code(400);
@@ -119,11 +125,11 @@ class TicketController
 
             // --- Validación de permisos según el rol ---
             $authorized = false;
-            if ($rolId === 1) {                 
+            if ($rolId === 1) {
                 $authorized = true; // Admin puede ver todos
-            } elseif ($rolId === 2) {           
+            } elseif ($rolId === 2) {
                 $authorized = $model->assignedToTech($ticketId, $userId); // Verifica si el técnico tiene ese ticket
-            } elseif ($rolId === 3) {           
+            } elseif ($rolId === 3) {
                 $authorized = $model->belongsToClient($ticketId, $userId); // Verifica si el cliente es el solicitante
             } else {
                 http_response_code(400);
@@ -222,7 +228,7 @@ class TicketController
         try {
             header('Content-Type: application/json; charset=utf-8');
 
-            // ✅ Se obtienen los valores enviados por POST (formulario)
+            //  Se obtienen los valores enviados por POST (formulario)
             $ticketId       = isset($_POST['ticket_id']) ? intval($_POST['ticket_id']) : 0;
             $nuevoEstado    = isset($_POST['nuevo_estado_id']) ? intval($_POST['nuevo_estado_id']) : 0;
             $usuarioId      = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : 0;
@@ -235,10 +241,10 @@ class TicketController
                 return;
             }
 
-            // ✅ Se crea una instancia del modelo para acceder a la base de datos
+            //  Se crea una instancia del modelo para acceder a la base de datos
             $model = new TicketModel();
 
-            // 1️⃣ Se inserta un nuevo registro en la tabla historial_estados
+            // Se inserta un nuevo registro en la tabla historial_estados
             // Esta tabla guarda todos los cambios de estado que ha tenido un ticket
             $sqlHist = "
                 INSERT INTO historial_estados (ticket_id, estado_id, usuario_id, fecha, observaciones)
@@ -247,7 +253,7 @@ class TicketController
             // addslashes() escapa comillas y caracteres especiales para evitar errores SQL
             $historialId = $model->enlace->executeSQL_DML_last($sqlHist);
 
-            // 2️⃣ Se actualiza el estado del ticket en la tabla principal
+            //  Se actualiza el estado del ticket en la tabla principal
             $sqlUpdate = "
                 UPDATE tickets
                 SET estado_id = $nuevoEstado,
@@ -257,7 +263,7 @@ class TicketController
             // executeSQL_DML ejecuta la consulta sin esperar retorno de filas
             $model->enlace->executeSQL_DML($sqlUpdate);
 
-            // 3️⃣ Si se enviaron imágenes, se procesan una por una
+            //  Si se enviaron imágenes, se procesan una por una
             if (!empty($_FILES['imagenes']['name'][0])) {
                 // Carpeta donde se guardarán las imágenes subidas
                 $uploadDir = "../uploads/estados/";
@@ -299,13 +305,12 @@ class TicketController
                 }
             }
 
-            // ✅ Respuesta final si todo se ejecutó correctamente
+            // Respuesta final si todo se ejecutó correctamente
             $response->toJSON([
                 "success" => true,
                 "ticket_id" => $ticketId,
                 "historial_id" => $historialId
             ], "Estado actualizado correctamente", 200);
-
         } catch (Exception $e) {
             http_response_code(500);
             $response->toJSON(null, "Error al actualizar el estado", 500);
