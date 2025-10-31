@@ -39,7 +39,7 @@ CREATE TABLE `asignaciones` (
   CONSTRAINT `fk_asig_regla` FOREIGN KEY (`regla_aplicada_id`) REFERENCES `reglas_autotriage` (`id`),
   CONSTRAINT `fk_asig_tecnico_usuario` FOREIGN KEY (`tecnico_id`) REFERENCES `usuarios` (`id`),
   CONSTRAINT `fk_asig_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,9 +48,79 @@ CREATE TABLE `asignaciones` (
 
 LOCK TABLES `asignaciones` WRITE;
 /*!40000 ALTER TABLE `asignaciones` DISABLE KEYS */;
-INSERT INTO `asignaciones` VALUES (100,100,2,2,'2025-10-27 09:00:00','Automatica',1,NULL,1),(101,101,2,2,'2025-10-28 09:30:00','Manual',2,NULL,1),(102,102,2,2,'2025-10-29 10:30:00','Automatica',3,NULL,1),(103,103,3,3,'2025-10-29 11:15:00','Automatica',4,NULL,1),(104,104,2,2,'2025-10-31 08:15:00','Manual',1,NULL,0);
+INSERT INTO `asignaciones` VALUES (100,100,2,2,'2025-10-27 09:00:00','Automatica',1,NULL,1),(101,101,2,2,'2025-10-28 09:30:00','Manual',2,NULL,1),(102,102,2,2,'2025-10-29 10:30:00','Automatica',3,NULL,1),(103,103,3,3,'2025-10-29 11:15:00','Automatica',4,NULL,1),(104,104,2,2,'2025-10-31 08:15:00','Manual',1,NULL,0),(105,105,2,2,'2025-10-30 09:15:00','Automatica',3,NULL,1),(106,106,2,2,'2025-10-30 09:20:00','Automatica',3,NULL,1);
 /*!40000 ALTER TABLE `asignaciones` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_aumentar_carga_trabajo
+AFTER INSERT ON asignaciones
+FOR EACH ROW
+BEGIN
+  UPDATE usuarios
+  SET carga_trabajo = COALESCE(carga_trabajo, 0) + 1
+  WHERE id = NEW.tecnico_id;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_disminuir_carga_trabajo
+AFTER UPDATE ON asignaciones
+FOR EACH ROW
+BEGIN
+  -- Solo ejecuta si el campo vigente pasó de 1 a 0
+  IF OLD.vigente = 1 AND NEW.vigente = 0 THEN
+    UPDATE usuarios
+    SET carga_trabajo = GREATEST(COALESCE(carga_trabajo, 0) - 1, 0)
+    WHERE id = NEW.tecnico_id;
+  END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_disminuir_carga_trabajo_delete
+AFTER DELETE ON asignaciones
+FOR EACH ROW
+BEGIN
+  -- Cuando se elimina una asignación, reducimos la carga del técnico
+  UPDATE usuarios
+  SET carga_trabajo = GREATEST(COALESCE(carga_trabajo, 0) - 1, 0)
+  WHERE id = OLD.tecnico_id;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `categoria_especialidad`
@@ -235,7 +305,7 @@ CREATE TABLE `historial_estados` (
   CONSTRAINT `fk_hist_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados_ticket` (`id`),
   CONSTRAINT `fk_hist_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`),
   CONSTRAINT `fk_hist_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -244,7 +314,7 @@ CREATE TABLE `historial_estados` (
 
 LOCK TABLES `historial_estados` WRITE;
 /*!40000 ALTER TABLE `historial_estados` DISABLE KEYS */;
-INSERT INTO `historial_estados` VALUES (4,100,1,'2025-10-21 09:15:00',4,'Creación del ticket'),(5,100,2,'2025-10-21 09:30:00',2,'Asignado al técnico hardware'),(6,100,3,'2025-10-21 10:00:00',2,'Cambio de cartucho y revisión de cola de impresión'),(7,100,4,'2025-10-21 11:00:00',2,'Impresora operativa'),(8,100,5,'2025-10-21 11:30:00',4,'Cliente confirma solución'),(9,101,1,'2025-10-22 10:00:00',4,'Ticket creado'),(10,101,2,'2025-10-22 10:20:00',3,'Asignado manualmente'),(11,101,3,'2025-10-22 11:00:00',3,'Revisión de consultas SQL lentas'),(12,101,4,'2025-10-22 12:00:00',3,'Optimización de índices'),(13,101,5,'2025-10-22 12:30:00',4,'Cliente confirma rendimiento correcto'),(14,102,1,'2025-10-23 08:40:00',4,'Ticket creado'),(15,102,2,'2025-10-23 09:00:00',2,'Asignado a soporte de red'),(16,102,3,'2025-10-23 09:30:00',2,'Reinicio de servidor Exchange'),(17,102,4,'2025-10-23 10:15:00',2,'Correo restablecido'),(18,102,5,'2025-10-23 10:45:00',4,'Cliente satisfecho');
+INSERT INTO `historial_estados` VALUES (4,100,1,'2025-10-21 09:15:00',4,'Creación del ticket'),(5,100,2,'2025-10-21 09:30:00',2,'Asignado al técnico hardware'),(6,100,3,'2025-10-21 10:00:00',2,'Cambio de cartucho y revisión de cola de impresión'),(7,100,4,'2025-10-21 11:00:00',2,'Impresora operativa'),(8,100,5,'2025-10-21 11:30:00',4,'Cliente confirma solución'),(9,101,1,'2025-10-22 10:00:00',4,'Ticket creado'),(10,101,2,'2025-10-22 10:20:00',3,'Asignado manualmente'),(11,101,3,'2025-10-22 11:00:00',3,'Revisión de consultas SQL lentas'),(12,101,4,'2025-10-22 12:00:00',3,'Optimización de índices'),(13,101,5,'2025-10-22 12:30:00',4,'Cliente confirma rendimiento correcto'),(14,102,1,'2025-10-23 08:40:00',4,'Ticket creado'),(15,102,2,'2025-10-23 09:00:00',2,'Asignado a soporte de red'),(16,102,3,'2025-10-23 09:30:00',2,'Reinicio de servidor Exchange'),(17,102,4,'2025-10-23 10:15:00',2,'Correo restablecido'),(18,102,5,'2025-10-23 10:45:00',4,'Cliente satisfecho'),(19,101,2,'2025-10-30 14:08:10',1,'se ve azul ajunto imagen'),(20,104,4,'2025-10-30 21:00:28',1,'Ya estaba disponible la actualizacion'),(21,104,5,'2025-10-30 21:00:39',1,''),(22,104,5,'2025-10-30 21:00:40',1,'');
 /*!40000 ALTER TABLE `historial_estados` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -263,7 +333,7 @@ CREATE TABLE `imagenes_estado` (
   PRIMARY KEY (`id`),
   KEY `ix_img_hist` (`historial_id`),
   CONSTRAINT `fk_img_hist` FOREIGN KEY (`historial_id`) REFERENCES `historial_estados` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -272,6 +342,7 @@ CREATE TABLE `imagenes_estado` (
 
 LOCK TABLES `imagenes_estado` WRITE;
 /*!40000 ALTER TABLE `imagenes_estado` DISABLE KEYS */;
+INSERT INTO `imagenes_estado` VALUES (20,19,'uploads/estados/1761854890_1ad9dda8-614a-45e6-9bff-f06757713c9f.png','Evidencia del cambio de estado'),(21,20,'uploads/estados/1761879628_imagen_2025-10-30_210002010.png','Evidencia del cambio de estado');
 /*!40000 ALTER TABLE `imagenes_estado` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -482,7 +553,7 @@ CREATE TABLE `tickets` (
   CONSTRAINT `fk_ticket_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados_ticket` (`id`),
   CONSTRAINT `fk_ticket_prioridad` FOREIGN KEY (`prioridad_id`) REFERENCES `prioridades` (`id`),
   CONSTRAINT `fk_ticket_usuario` FOREIGN KEY (`usuario_solicitante_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -491,9 +562,98 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (100,'Error al iniciar sesión en ERP','Usuario reporta error 403 al intentar ingresar al ERP.','2025-10-27 08:15:00',2,1,4,1,NULL,'2025-10-27 10:15:00','2025-10-28 08:15:00',NULL,NULL,NULL,'2025-10-30 12:38:57','2025-10-30 12:38:57'),(101,'Pantalla azul en laptop Lenovo','Laptop presenta BSOD al encender, posible falla en RAM.','2025-10-28 09:00:00',3,2,4,2,NULL,'2025-10-28 12:00:00','2025-10-30 09:00:00',NULL,NULL,NULL,'2025-10-30 12:38:57','2025-10-30 12:38:57'),(102,'VPN intermitente','La conexión VPN se corta cada 5 minutos en red interna.','2025-10-29 10:00:00',2,3,4,3,NULL,'2025-10-29 11:00:00','2025-10-29 22:00:00',NULL,NULL,NULL,'2025-10-30 12:38:57','2025-10-30 12:38:57'),(103,'Correo phishing detectado','Correo sospechoso detectado en múltiples cuentas.','2025-10-29 11:00:00',1,4,5,4,'2025-10-29 16:00:00','2025-10-29 12:00:00','2025-10-29 19:00:00',1,1,0,'2025-10-30 12:38:57','2025-10-30 12:38:57'),(104,'Actualización de software completada','Se actualizó el ERP sin errores posteriores.','2025-10-31 08:00:00',1,5,5,1,'2025-11-01 09:30:00','2025-10-31 10:00:00','2025-11-01 08:00:00',1,1,1,'2025-10-30 12:38:57','2025-10-30 12:38:57');
+INSERT INTO `tickets` VALUES (100,'Error al iniciar sesión en ERP','Usuario reporta error 403 al intentar ingresar al ERP.','2025-10-27 08:15:00',2,1,4,1,NULL,'2025-10-27 10:15:00','2025-10-28 08:15:00',NULL,NULL,NULL,'2025-10-30 12:38:57','2025-10-30 12:38:57'),(101,'Pantalla azul en laptop Lenovo','Laptop presenta BSOD al encender, posible falla en RAM.','2025-10-28 09:00:00',3,2,4,2,NULL,'2025-10-28 12:00:00','2025-10-30 09:00:00',NULL,NULL,NULL,'2025-10-30 12:38:57','2025-10-30 14:08:10'),(102,'VPN intermitente','La conexión VPN se corta cada 5 minutos en red interna.','2025-10-29 10:00:00',2,3,4,3,NULL,'2025-10-29 11:00:00','2025-10-29 22:00:00',NULL,NULL,NULL,'2025-10-30 12:38:57','2025-10-30 12:38:57'),(103,'Correo phishing detectado','Correo sospechoso detectado en múltiples cuentas.','2025-10-29 11:00:00',1,4,5,4,'2025-10-29 16:00:00','2025-10-29 12:00:00','2025-10-29 19:00:00',1,1,0,'2025-10-30 12:38:57','2025-10-30 12:38:57'),(104,'Actualización de software completada','Se actualizó el ERP sin errores posteriores.','2025-10-31 08:00:00',1,5,5,1,'2025-11-01 09:30:00','2025-10-31 10:00:00','2025-11-01 08:00:00',1,1,1,'2025-10-30 12:38:57','2025-10-30 21:00:40'),(105,'Conexión lenta en red corporativa','El usuario reporta lentitud constante al acceder a recursos compartidos en la red interna.','2025-10-30 09:00:00',3,3,4,3,NULL,'2025-10-31 10:00:00','2025-10-31 21:00:00',1,0,NULL,'2025-10-30 23:28:40','2025-10-30 23:34:17'),(106,'Problemas intermitentes de WiFi en sala de reuniones','El usuario reporta desconexiones aleatorias al conectarse al WiFi institucional.','2025-10-30 09:00:00',2,2,4,3,NULL,'2025-10-30 10:00:00','2025-10-30 21:00:00',1,NULL,NULL,'2025-10-30 23:36:46','2025-10-30 23:36:46');
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_ticket_ai_calc_sla
+BEFORE INSERT ON tickets
+FOR EACH ROW
+BEGIN
+  DECLARE v_resp INT DEFAULT 0;
+  DECLARE v_resol INT DEFAULT 0;
+
+  SELECT s.tiempo_max_respuesta_min, s.tiempo_max_resolucion_min
+    INTO v_resp, v_resol
+    FROM categorias c
+    JOIN sla s ON s.id = c.sla_id
+   WHERE c.id = NEW.categoria_id;
+
+  SET NEW.sla_resp_limite = DATE_ADD(NEW.fecha_creacion, INTERVAL v_resp MINUTE);
+  SET NEW.sla_resol_limite = DATE_ADD(NEW.fecha_creacion, INTERVAL v_resol MINUTE);
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_ticket_au_recalc_sla
+BEFORE UPDATE ON tickets
+FOR EACH ROW
+BEGIN
+  DECLARE v_resp INT DEFAULT 0;
+  DECLARE v_resol INT DEFAULT 0;
+
+  IF (NEW.categoria_id <> OLD.categoria_id)
+     OR (NEW.fecha_creacion <> OLD.fecha_creacion) THEN
+
+    SELECT s.tiempo_max_respuesta_min, s.tiempo_max_resolucion_min
+      INTO v_resp, v_resol
+      FROM categorias c
+      JOIN sla s ON s.id = c.sla_id
+     WHERE c.id = NEW.categoria_id;
+
+    SET NEW.sla_resp_limite  = DATE_ADD(NEW.fecha_creacion, INTERVAL v_resp  MINUTE);
+    SET NEW.sla_resol_limite = DATE_ADD(NEW.fecha_creacion, INTERVAL v_resol MINUTE);
+  END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER trg_ticket_au_cierre
+BEFORE UPDATE ON tickets
+FOR EACH ROW
+BEGIN
+  IF NEW.fecha_cierre IS NOT NULL
+     AND (OLD.fecha_cierre IS NULL OR NEW.fecha_cierre <> OLD.fecha_cierre) THEN
+    SET NEW.dias_resolucion = TIMESTAMPDIFF(DAY, NEW.fecha_creacion, NEW.fecha_cierre);
+    SET NEW.cumplio_sla_respuesta = (NEW.sla_resp_limite IS NOT NULL AND NEW.sla_resp_limite >= NEW.fecha_creacion);
+    SET NEW.cumplio_sla_resolucion = (NEW.sla_resol_limite IS NOT NULL AND NEW.fecha_cierre <= NEW.sla_resol_limite);
+  END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `usuarios`
@@ -530,7 +690,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'admin@fixit.cr','1234','Admin','FixIT',NULL,1,NULL,NULL,0,NULL,1,'2025-10-09 16:02:53','2025-10-29 23:04:28'),(2,'jesibajaca@est.utn.ac.cr','1234','Jesús Darián','Sibaja Cascante','84086025',2,'Disponible','Técnico líder',4,NULL,1,'2025-10-09 16:02:53','2025-10-30 12:38:57'),(3,'kemoscosomi@est.utn.ac.cr','1234','Keity Paola','Moscoso Miranda','63299589',2,'Disponible','Soporte N2',2,NULL,1,'2025-10-09 16:02:53','2025-10-30 12:38:57'),(4,'cliente1@fixit.cr','1234','Usuario','Cliente',NULL,3,NULL,NULL,0,NULL,1,'2025-10-09 16:02:53','2025-10-29 23:04:28'),(5,'cliente2@fixit.cr','1234','Cliente','Dos',NULL,3,NULL,NULL,0,NULL,1,'2025-10-15 00:42:30','2025-10-29 23:04:28'),(8,'tecnico3@fixit.cr','1234','Valerie','Araya','60112233',2,'Disponible','Soporte de hardware',0,NULL,1,'2025-10-29 23:34:03','2025-10-29 23:34:03'),(9,'tecnico4@fixit.cr','1234','Sebastián','Rodriguez','72112233',2,'Ocupado','Especialista en ciberseguridad',1,NULL,1,'2025-10-29 23:34:03','2025-10-29 23:43:02'),(10,'tecnico5@fixit.cr','1234','Fiorella','Calderón','88885555',2,'Ocupado','Soporte de software',0,NULL,1,'2025-10-29 23:34:03','2025-10-29 23:43:02'),(11,'tecnico6@fixit.cr','1234','Ana','Arias','88983903',2,'Ocupado','Soporte de software',0,NULL,1,'2025-10-29 23:45:16','2025-10-29 23:45:16');
+INSERT INTO `usuarios` VALUES (1,'admin@fixit.cr','1234','Admin','FixIT',NULL,1,NULL,NULL,0,NULL,1,'2025-10-09 16:02:53','2025-10-29 23:04:28'),(2,'jesibajaca@est.utn.ac.cr','1234','Jesús Darián','Sibaja Cascante','84086025',2,'Disponible','Técnico líder',5,NULL,1,'2025-10-09 16:02:53','2025-10-30 23:36:59'),(3,'kemoscosomi@est.utn.ac.cr','1234','Keity Paola','Moscoso Miranda','63299589',2,'Disponible','Soporte N2',2,NULL,1,'2025-10-09 16:02:53','2025-10-30 12:38:57'),(4,'cliente1@fixit.cr','1234','Usuario','Cliente',NULL,3,NULL,NULL,0,NULL,1,'2025-10-09 16:02:53','2025-10-29 23:04:28'),(5,'cliente2@fixit.cr','1234','Cliente','Dos',NULL,3,NULL,NULL,0,NULL,1,'2025-10-15 00:42:30','2025-10-29 23:04:28'),(8,'tecnico3@fixit.cr','1234','Valerie','Araya','60112233',2,'Disponible','Soporte de hardware',0,NULL,1,'2025-10-29 23:34:03','2025-10-29 23:34:03'),(9,'tecnico4@fixit.cr','1234','Sebastián','Rodriguez','72112233',2,'Ocupado','Especialista en ciberseguridad',1,NULL,1,'2025-10-29 23:34:03','2025-10-29 23:43:02'),(10,'tecnico5@fixit.cr','1234','Fiorella','Calderón','88885555',2,'Ocupado','Soporte de software',0,NULL,1,'2025-10-29 23:34:03','2025-10-29 23:43:02'),(11,'tecnico6@fixit.cr','1234','Ana','Arias','88983903',2,'Ocupado','Soporte de software',0,NULL,1,'2025-10-29 23:45:16','2025-10-29 23:45:16');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -582,6 +742,10 @@ SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = @saved_cs_client;
 
 --
+-- Dumping events for database 'fixit'
+--
+
+--
 -- Final view structure for view `vw_carga_tecnico`
 --
 
@@ -608,4 +772,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-30 13:00:52
+-- Dump completed on 2025-10-31  0:21:20

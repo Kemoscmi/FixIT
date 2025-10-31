@@ -76,21 +76,38 @@ export default function AsignacionesView() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Llama al endpoint del backend (pasa rolId y userId)
+        // Llama al endpoint del backend
         const response = await AsignacionService.getAsignaciones({ rolId, userId });
 
-        // Extrae las asignaciones desde la respuesta (objeto anidado)
-        const asignaciones = response.data?.data?.asignaciones || {};
+        console.log("🔍 Respuesta del backend:", response.data); // <-- importante para ver la estructura
 
-        // Convierte el objeto en un arreglo plano:
-        // cada fecha tiene múltiples asignaciones
-        const all = Object.entries(asignaciones).flatMap(([fecha, items]) =>
-          items.map((i) => ({
+        // Puede venir como objeto agrupado o como arreglo plano
+        const raw = response.data?.data?.asignaciones;
+
+        let all = [];
+
+        if (Array.isArray(raw)) {
+          // ✅ Si viene como arreglo plano
+          all = raw.map((i) => ({
             ...i,
-            // Si la fecha es "Sin fecha", asigna null para evitar errores
-            fecha_asignacion: fecha === "Sin fecha" ? null : fecha,
-          }))
-        );
+            fecha_asignacion: i.fecha_asignacion
+              ? new Date(i.fecha_asignacion.replace(" ", "T") + "Z")
+                .toISOString()
+                .split("T")[0]
+              : null,
+          }));
+        } else if (raw && typeof raw === "object") {
+          // ✅ Si viene agrupado por fechas
+          all = Object.entries(raw).flatMap(([fecha, items]) =>
+            items.map((i) => ({
+              ...i,
+              fecha_asignacion:
+                fecha === "Sin fecha"
+                  ? null
+                  : new Date(fecha.replace(" ", "T") + "Z").toISOString().split("T")[0],
+            }))
+          );
+        }
 
         // Actualiza los estados locales
         setData(all);
@@ -99,14 +116,13 @@ export default function AsignacionesView() {
         console.error("Error al cargar asignaciones:", err);
         setError("Error al cargar las asignaciones.");
       } finally {
-        // Quita el loader al terminar (éxito o error)
         setLoading(false);
       }
     };
 
-    // Ejecuta la carga solo si existen rol y usuario
     if (rolId && userId) fetchData();
   }, [rolId, userId]);
+
 
   // ============================================================
   // handleFilterWeek → filtra las asignaciones por semana
@@ -136,8 +152,11 @@ export default function AsignacionesView() {
     // Filtra las asignaciones dentro de ese rango de fechas
     const filteredByWeek = data.filter((a) => {
       if (!a.fecha_asignacion) return false;
-      const fecha = new Date(a.fecha_asignacion);
-      return fecha >= firstWeekStart && fecha <= lastWeekEnd;
+      const fecha = new Date(a.fecha_asignacion + "T00:00:00");
+      return (
+        fecha.getTime() >= firstWeekStart.setHours(0, 0, 0, 0) &&
+        fecha.getTime() <= lastWeekEnd.setHours(23, 59, 59, 999)
+      );
     });
 
     // Actualiza el estado con el nuevo filtro
@@ -158,18 +177,18 @@ export default function AsignacionesView() {
   // ============================================================
   const baseDate = selectedWeek
     ? (() => {
-        const [year, week] = selectedWeek.split("-W").map(Number);
-        const d = new Date(year, 0, 1);
-        d.setDate(d.getDate() - d.getDay() + 1 + (week - 1) * 7);
-        return d;
-      })()
+      const [year, week] = selectedWeek.split("-W").map(Number);
+      const d = new Date(year, 0, 1);
+      d.setDate(d.getDate() - d.getDay() + 1 + (week - 1) * 7);
+      return d;
+    })()
     : (() => {
-        const today = new Date();
-        const day = today.getDay() === 0 ? 7 : today.getDay(); // Si es domingo, se toma como día 7
-        const monday = new Date(today);
-        monday.setDate(today.getDate() - day + 1); // retrocede hasta el lunes
-        return monday;
-      })();
+      const today = new Date();
+      const day = today.getDay() === 0 ? 7 : today.getDay(); // Si es domingo, se toma como día 7
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - day + 1); // retrocede hasta el lunes
+      return monday;
+    })();
 
   // ============================================================
   //  Crear arreglo de días (lunes a domingo)
@@ -180,7 +199,7 @@ export default function AsignacionesView() {
   const diasSemana = Array.from({ length: 7 }).map((_, i) => {
     const fecha = new Date(baseDate);
     fecha.setDate(baseDate.getDate() + i);
-    const fechaISO = fecha.toISOString().split("T")[0]; // formato YYYY-MM-DD
+    const fechaISO = fecha.toLocaleDateString("sv-SE"); // formato ISO local YYYY-MM-DD
     return {
       nombre: fecha.toLocaleDateString("es-CR", { weekday: "long" }),
       fechaISO,
@@ -258,9 +277,17 @@ export default function AsignacionesView() {
                 {asignacionesDelDia.length > 0 ? (
                   asignacionesDelDia.map((a, idx) => {
                     //  Cálculo real de SLA (porcentaje de tiempo restante)
-                    const fechaInicio = new Date(a.fecha_creacion);
-                    const fechaLimite = new Date(a.sla_resol_limite);
+                    //  Normalización de fechas (convierte MySQL -> formato ISO correcto)
+                    const parseToLocalDate = (str) => {
+                      if (!str) return null;
+                      // Si la cadena viene como 'YYYY-MM-DD HH:mm:ss'
+                      return new Date(str.replace(" ", "T"));
+                    };
+
+                    const fechaInicio = parseToLocalDate(a.fecha_creacion);
+                    const fechaLimite = parseToLocalDate(a.sla_resol_limite);
                     const ahora = new Date();
+
 
                     // Diferencia total y tiempo transcurrido
                     const totalMs = fechaLimite - fechaInicio;
@@ -277,9 +304,8 @@ export default function AsignacionesView() {
                     return (
                       <div
                         key={idx}
-                        className={`p-3 rounded-lg border-l-4 ${
-                          estadoColors[a.estado] || "border-gray-300"
-                        } shadow-sm hover:shadow-md transition`}
+                        className={`p-3 rounded-lg border-l-4 ${estadoColors[a.estado] || "border-gray-300"
+                          } shadow-sm hover:shadow-md transition`}
                       >
                         {/*  Encabezado de ticket */}
                         <div className="flex justify-between items-start mb-2">
@@ -290,16 +316,19 @@ export default function AsignacionesView() {
                             <p className="text-xs text-gray-600">
                               Categoría: <strong>{a.categoria}</strong>
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p
+                              className={`text-xs font-medium ${slaStatus === "Vencido" ? "text-black-600" : "text-gray-500"
+                                }`}
+                            >
                               SLA: {slaStatus} ({Math.round(slaProgress)}%)
                             </p>
+
                           </div>
 
                           {/* Etiqueta de estado visual */}
                           <Badge
-                            className={`${
-                              estadoColors[a.estado] || "bg-gray-200 text-gray-700 border-gray-300"
-                            } flex-shrink-0 inline-flex items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium rounded-full shadow-sm`}
+                            className={`${estadoColors[a.estado] || "bg-gray-200 text-gray-700 border-gray-300"
+                              } flex-shrink-0 inline-flex items-center justify-center whitespace-nowrap px-3 py-1 text-xs font-medium rounded-full shadow-sm`}
                           >
                             {a.estado}
                           </Badge>
@@ -308,11 +337,16 @@ export default function AsignacionesView() {
                         {/*  Barra visual del SLA */}
                         <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-2">
                           <div
-                            className={`h-2 rounded-full ${
-                              slaStatus === "Vencido" ? "bg-red-400" : "bg-green-500"
-                            }`}
-                            style={{ width: `${slaProgress}%` }}
+                            className={`h-2 rounded-full transition-all duration-300 ${slaStatus === "Vencido"
+                              ? "bg-red-600"       // 🔴 rojo fuerte cuando está vencido
+                              : "bg-green-500"     // 🟢 verde normal si está en curso
+                              }`}
+                            style={{
+                              width: `${slaStatus === "Vencido" ? 100 : slaProgress}%`, // <-- fuerza barra roja completa
+                              opacity: slaStatus === "Vencido" ? 1 : 0.9,               // mejora el contraste
+                            }}
                           ></div>
+
                         </div>
 
                         {/*  Botón para ver detalle del ticket */}

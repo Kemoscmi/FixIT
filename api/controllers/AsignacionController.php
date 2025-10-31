@@ -102,15 +102,16 @@ class AsignacionController
 
                 // Se agrupan los datos del ticket dentro del día correspondiente
                 $byDay[$day][] = [
-                    'ticket_id'    => $r->ticket_id,          // ID del ticket
-                    'titulo'       => $r->titulo,             // Título del ticket
-                    'categoria'    => $r->categoria,          // Categoría asociada
-                    'estado'       => $r->estado,             // Estado actual
+                    'ticket_id'    => $r->ticket_id,
+                    'titulo'       => $r->titulo,
+                    'categoria'    => $r->categoria,
+                    'estado'       => $r->estado,
+                    'fecha_creacion' => $r->fecha_creacion,
+                    'sla_resol_limite' => $r->sla_resol_limite,
                     'estado_color' => $r->estado_color,       // Color visual (de la paleta)
                     'estado_icon'  => $r->estado_icon,        // Ícono visual
                     'tecnico'      => $r->tecnico ?? 'N/A',   // Técnico asignado (si no hay → N/A)
                     'hora'         => $hora,                  // Hora de asignación
-                    'sla_hrs'      => $r->horas_restantes_sla, // Horas restantes del SLA
                     'sla_status'   => $r->sla_status ?? 'N/A', // Estado del SLA (Dentro o Vencido)
                     'sla_progress' => $r->sla_progress ?? 0,   // Porcentaje visual de progreso del SLA
                     'ver_detalle'  => "/tickets/" . $r->ticket_id // Enlace directo al detalle del ticket
@@ -129,7 +130,6 @@ class AsignacionController
                 "message" => "Asignaciones obtenidas correctamente",
                 "data"    => $payload
             ]);
-
         } catch (\Throwable $e) {
             // Captura errores no controlados (excepciones o errores de PHP)
             http_response_code(500); // 500 → Error interno del servidor
