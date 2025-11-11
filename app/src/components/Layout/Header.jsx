@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Layers,
@@ -17,6 +17,7 @@ import {
   User,
   Home,
   Users2,
+  Bell,
 } from "lucide-react";
 
 import {
@@ -27,9 +28,9 @@ import {
   MenubarItem,
 } from "@/components/ui/menubar";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-import useAuth from "../../auth/store/auth.store"; //   store global de autenticación
+import useAuth from "../../auth/store/auth.store";
 import Logo from "../../assets/Logo.png";
-
+import NotificacionService from "../../services/NotificacionService";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -42,10 +43,42 @@ export default function Header() {
     navigate("/login");
   };
 
+  const rolId = user?.rol_id;
+  const rol = user?.rol;
+
+  // ✅ Condiciones de rol
+  const isAdmin = rol === "Administrador" || rolId === 1;
+  const isTecnico = rol === "Técnico" || rolId === 2;
+
+  // 🔔 Estado para notificaciones
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchNotificaciones = async () => {
+      try {
+        const res = await NotificacionService.getByUser(user.id);
+        if (res.success) setNotificaciones(res.data);
+      } catch (error) {
+        console.error("Error cargando notificaciones:", error);
+      }
+    };
+
+    fetchNotificaciones();
+
+    const interval = setInterval(fetchNotificaciones, 30000);
+    return () => clearInterval(interval);
+  }, [user?.id]);
+
+  // ✅ Ítems visibles según rol
   const navItems = [
     { title: "Inicio", href: "Principal", icon: <Home className="h-4 w-4" /> },
     { title: "Mis Tickets", href: "/tickets", icon: <Ticket className="h-4 w-4" /> },
-    { title: "Asignaciones", href: "/asignaciones", icon: <ClipboardList className="h-4 w-4" /> },
+    ...(isAdmin || isTecnico
+      ? [{ title: "Asignaciones", href: "/asignaciones", icon: <ClipboardList className="h-4 w-4" /> }]
+      : []),
   ];
 
   const mantItems = [
@@ -65,43 +98,79 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 z-50 w-full bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md border-b border-white/10 shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between px-6 py-3 max-w-[1280px] mx-auto text-white">
-      {/* -------- LOGO -------- */}
-<Link
-  to="/"
-  className="flex items-center gap-3 hover:opacity-90 transition"
->
-  <img
-    src={Logo}
-    alt="FixIT Logo"
-    className="h-10 w-auto drop-shadow-sm"
-  />
-</Link>
 
-        {/* -------- NAV ESCRITORIO -------- */}
-        <div className="hidden md:flex flex-1 justify-center">
-      <Menubar className="w-auto bg-transparent border-none shadow-none space-x-8">
-  {/* --- Ítems principales --- */}
-  {navItems.map((item) => (
-    <MenubarMenu key={item.href}>
-      <MenubarTrigger asChild>
-        <Link
-          to={item.href}
-          className="flex items-center gap-2 text-white font-medium hover:text-yellow-300 transition"
-        >
-          {item.icon} {item.title}
+        {/* LOGO */}
+        <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition">
+          <img src={Logo} alt="FixIT Logo" className="h-10 w-auto drop-shadow-sm" />
         </Link>
-      </MenubarTrigger>
-    </MenubarMenu>
-  ))}
 
-  {/* --- Administración --- */}
-  <DropdownMenu
-    title="Administración"
-    icon={<Wrench className="h-4 w-4" />}
-    items={mantItems}
-  />
+        {/* NAV ESCRITORIO */}
+        <div className="hidden md:flex flex-1 justify-center">
+          <Menubar className="w-auto bg-transparent border-none shadow-none space-x-8">
+            {navItems.map((item) => (
+              <MenubarMenu key={item.href}>
+                <MenubarTrigger asChild>
+                  <Link
+                    to={item.href}
+                    className="flex items-center gap-2 text-white font-medium hover:text-yellow-300 transition"
+                  >
+                    {item.icon} {item.title}
+                  </Link>
+                </MenubarTrigger>
+              </MenubarMenu>
+            ))}
 
-            {/* --- Usuario --- */}
+            {/* SOLO ADMIN VE ESTO */}
+            {isAdmin && (
+              <DropdownMenu
+                title="Administración"
+                icon={<Wrench className="h-4 w-4" />}
+                items={mantItems}
+              />
+            )}
+
+            {/* 🔔 Notificaciones */}
+            <div className="relative mr-3">
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                className="relative p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+              >
+                <Bell className="h-5 w-5 text-yellow-300" />
+                {notificaciones.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-1.5 rounded-full">
+                    {notificaciones.length}
+                  </span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white/90 text-gray-800 rounded-lg shadow-lg border border-gray-200 z-50">
+                  <div className="p-3 border-b bg-blue-700 text-white font-semibold rounded-t-lg">
+                    Notificaciones
+                  </div>
+
+                  {notificaciones.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">Sin notificaciones nuevas</div>
+                  ) : (
+                    <ul className="max-h-72 overflow-y-auto">
+                      {notificaciones.map((n, i) => (
+                        <li
+                          key={i}
+                          className="px-4 py-3 border-b hover:bg-blue-50 cursor-pointer transition"
+                        >
+                          <p className="text-sm text-gray-800">{n.mensaje}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(n.fecha).toLocaleString("es-CR")}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* USUARIO */}
             <MenubarMenu>
               <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-yellow-300 transition">
                 <User className="h-4 w-4" /> {userName}
@@ -109,16 +178,14 @@ export default function Header() {
               </MenubarTrigger>
               <MenubarContent className="bg-gradient-to-b from-blue-800 to-blue-950/90 backdrop-blur-md border border-white/10 rounded-md shadow-xl">
                 {isAuthenticated ? (
-                  <>
-                    <MenubarItem asChild>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2 py-2 px-4 text-sm text-white hover:bg-white/10 transition"
-                      >
-                        <LogOut className="h-4 w-4" /> Cerrar Sesión
-                      </button>
-                    </MenubarItem>
-                  </>
+                  <MenubarItem asChild>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 py-2 px-4 text-sm text-white hover:bg-white/10 transition"
+                    >
+                      <LogOut className="h-4 w-4" /> Cerrar Sesión
+                    </button>
+                  </MenubarItem>
                 ) : (
                   guestItems.map((item) => (
                     <MenubarItem key={item.href} asChild>
@@ -136,7 +203,7 @@ export default function Header() {
           </Menubar>
         </div>
 
-        {/* -------- NAV MÓVIL -------- */}
+        {/* NAV MÓVIL */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
             <button className="md:hidden inline-flex items-center justify-center p-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
@@ -153,19 +220,30 @@ export default function Header() {
                 <Ticket className="text-yellow-300" />
                 <span>FixIT</span>
               </div>
-{navItems.map((item) => (
-  <button
-    key={item.href}
-    onClick={() => {
-      navigate(item.href);
-      setMobileOpen(false);
-    }}
-    className="w-full text-left flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-blue-800/40 hover:text-yellow-300 transition"
-  >
-    {item.icon} {item.title}
-  </button>
-))}
-<NavSection title="Administración" items={mantItems} setMobileOpen={setMobileOpen} />
+
+              {navItems.map((item) => (
+                <button
+                  key={item.href}
+                  onClick={() => {
+                    navigate(item.href);
+                    setMobileOpen(false);
+                  }}
+                  className="w-full text-left flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-blue-800/40 hover:text-yellow-300 transition"
+                >
+                  {item.icon} {item.title}
+                </button>
+              ))}
+
+              {/* SOLO ADMIN VE ESTO */}
+              {isAdmin && (
+                <NavSection
+                  title="Administración"
+                  items={mantItems}
+                  setMobileOpen={setMobileOpen}
+                  navigate={navigate}
+                />
+              )}
+
               <NavSection
                 title={userName}
                 items={
@@ -181,6 +259,7 @@ export default function Header() {
                     : guestItems
                 }
                 setMobileOpen={setMobileOpen}
+                navigate={navigate}
               />
             </nav>
           </SheetContent>
@@ -216,7 +295,7 @@ function DropdownMenu({ title, icon, items }) {
 }
 
 /* --- Sección del menú móvil --- */
-function NavSection({ title, items, setMobileOpen }) {
+function NavSection({ title, items, setMobileOpen, navigate }) {
   return (
     <div>
       <h4 className="mb-2 text-lg font-semibold flex items-center gap-2 text-yellow-300 border-b border-white/10 pb-1">
@@ -227,6 +306,7 @@ function NavSection({ title, items, setMobileOpen }) {
           key={item.href}
           onClick={() => {
             if (item.action) item.action();
+            else navigate(item.href);
             setMobileOpen(false);
           }}
           className="w-full text-left flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-blue-800/40 hover:text-yellow-300 transition"

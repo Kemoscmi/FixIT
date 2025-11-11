@@ -362,4 +362,62 @@ class TicketModel
             return false;
         }
     }
+    /* -----------------------------------------------------------
+ * CREAR NUEVO TICKET
+ * ----------------------------------------------------------- */
+public function create($data)
+{
+    try {
+        // Validar que los campos requeridos existan
+        if (
+            empty($data['titulo']) ||
+            empty($data['descripcion']) ||
+            empty($data['prioridad_id']) ||
+            empty($data['usuario_solicitante_id']) ||
+            empty($data['categoria_id'])
+        ) {
+            return [
+                "success" => false,
+                "message" => "Todos los campos son obligatorios"
+            ];
+        }
+
+        // Insertar el ticket
+        $vSql = "
+            INSERT INTO tickets (
+                titulo, descripcion, fecha_creacion, prioridad_id, estado_id,
+                usuario_solicitante_id, categoria_id
+            ) VALUES (
+                '" . addslashes($data['titulo']) . "',
+                '" . addslashes($data['descripcion']) . "',
+                NOW(),
+                " . intval($data['prioridad_id']) . ",
+                1, -- Estado inicial Pendiente
+                " . intval($data['usuario_solicitante_id']) . ",
+                " . intval($data['categoria_id']) . "
+            )
+        ";
+
+        $lastId = $this->enlace->executeSQL_DML_last($vSql);
+
+        if ($lastId > 0) {
+            return [
+                "success" => true,
+                "message" => "Ticket creado correctamente",
+                "id" => $lastId
+            ];
+        } else {
+            return [
+                "success" => false,
+                "message" => "No se pudo crear el ticket"
+            ];
+        }
+    } catch (Throwable $e) {
+        return [
+            "success" => false,
+            "message" => "Error al crear el ticket: " . $e->getMessage()
+        ];
+    }
+}
+
 }
