@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react"; // Importa React y hooks par
 import { useParams, useNavigate } from "react-router-dom"; // Permite acceder al parámetro :id de la URL y navegar
 import TicketService from "../../services/TicketService"; // Servicio encargado de las peticiones al backend
 import useAuthStore from "../../auth/store/auth.store"; // Hook global que contiene datos del usuario autenticado
-
+import toast from "react-hot-toast";
 //  Importación de iconos visuales desde lucide-react
 import {
   FileText,
@@ -126,41 +126,50 @@ export function DetailTicket() {
   //   Permite cambiar el estado del ticket, añadir observaciones
   //   y subir imágenes al backend.
   // ============================================================
-  const handleActualizarEstado = async () => {
-    if (!nuevoEstado)
-      return alert("⚠️ Selecciona un estado antes de confirmar.");
+const handleActualizarEstado = async () => {
+  if (!nuevoEstado)
+    return toast.error("⚠️ Selecciona un estado antes de confirmar", {
+      position: "top-center",
+      duration: 3000,
+    });
 
-    try {
-      // 🧾 Crea objeto FormData para enviar archivos e información
-      const formData = new FormData();
-      formData.append("ticket_id", basicos.id); // ID del ticket
-      formData.append("nuevo_estado_id", getEstadoId(nuevoEstado)); // Convierte nombre a ID
-      formData.append("usuario_id", userId); // ID del usuario que actualiza
-      formData.append("observaciones", observaciones); // Texto escrito
+  try {
+    const formData = new FormData();
+    formData.append("ticket_id", basicos.id);
+    formData.append("nuevo_estado_id", getEstadoId(nuevoEstado));
+    formData.append("usuario_id", userId);
+    formData.append("observaciones", observaciones);
+    imagenes.forEach((file) => formData.append("imagenes[]", file));
 
-      // Adjunta las imágenes seleccionadas
-      imagenes.forEach((file) => formData.append("imagenes[]", file));
+    const res = await TicketService.updateEstado(formData);
 
-      //  Envía al backend PHP mediante el servicio
-      const res = await TicketService.updateEstado(formData);
+    if (res.data?.success) {
+      const refreshed = await TicketService.getTicketById(id, { rolId, userId });
+      setData(refreshed.data?.data || {});
+      setOpenModal(false);
+      setImagenes([]);
+      setObservaciones("");
+      setNuevoEstado("");
 
-      // Si se actualiza correctamente
-      if (res.data?.success) {
-        const refreshed = await TicketService.getTicketById(id, { rolId, userId });
-        setData(refreshed.data?.data || {});
-        setOpenModal(false);
-        setImagenes([]);
-        setObservaciones("");
-        setNuevoEstado("");
-        alert("✅ Estado actualizado correctamente");
-      } else {
-        alert("⚠️ No se pudo actualizar el estado del ticket");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Error al actualizar el estado del ticket");
+      toast.success(" Estado actualizado correctamente", {
+        position: "top-center",
+        duration: 3000,
+      });
+    } else {
+      toast.error(" No se pudo actualizar el estado del ticket", {
+        position: "top-center",
+        duration: 3000,
+      });
     }
-  };
+  } catch (err) {
+    console.error(err);
+    toast.error(" Error al actualizar el estado del ticket", {
+      position: "top-center",
+      duration: 3000,
+    });
+  }
+};
+
 
   // ============================================================
   //  Función auxiliar: getEstadoId
@@ -184,7 +193,7 @@ export function DetailTicket() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 py-12">
       <div className="max-w-5xl mx-auto bg-white/70 backdrop-blur-md shadow-xl rounded-2xl overflow-hidden border border-blue-100">
 
-        {/* 🔹 Encabezado superior con icono y nombre del ticket */}
+        {/*  Encabezado superior con icono y nombre del ticket */}
         <div className="relative h-40 bg-gradient-to-r from-blue-700 to-blue-900">
           <div className="absolute bottom-0 left-8 translate-y-[20%] flex items-center gap-4">
             <div className="w-28 h-28 bg-white border-4 border-blue-800 rounded-full flex items-center justify-center shadow-lg">
@@ -201,7 +210,7 @@ export function DetailTicket() {
           </div>
         </div>
 
-        {/* 🔹 Cuerpo principal del ticket */}
+        {/*  Cuerpo principal del ticket */}
         <div className="p-8 mt-6 space-y-8">
 
           {/* Estado actual del ticket */}

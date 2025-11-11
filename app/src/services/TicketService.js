@@ -103,7 +103,7 @@ class TicketService {
       //  Devuelve la respuesta
       return response;
     } catch (error) {
-      console.error("❌ Error en TicketService.getTicketById:", error);
+      console.error(" Error en TicketService.getTicketById:", error);
       throw error;
     }
   }
@@ -162,22 +162,57 @@ class TicketService {
     });
   }
 
-  /**
-   *  MÉTODO FUTURO: subir imágenes del estado
+
+
+    /**
+   *  MÉTODO: createTicket()
    * ----------------------------------------------------------
    * Descripción:
-   *   Endpoint que permitirá subir evidencias asociadas a un cambio de estado.
-   *   Aún no implementado, pero documentado.
+   *   Crea un nuevo ticket en el sistema enviando los datos
+   *   al backend PHP mediante una solicitud POST.
    * ----------------------------------------------------------
-   * Endpoint esperado:
-   *   POST -> {BASE_URL}/ImagenesEstado/upload
+   * Endpoint del backend:
+   *   POST -> {BASE_URL}/create
+   * Ejemplo:
+   *   http://localhost:81/Proyecto/api/TicketController/create
    * ----------------------------------------------------------
-   * Body (FormData):
+   * Body esperado:
    *   {
-   *     historial_id: number,
-   *     imagenes[]: archivos de imagen
+   *     titulo: string,
+   *     descripcion: string,
+   *     prioridad_id: number,
+   *     categoria_id: number,
+   *     usuario_solicitante_id: number
    *   }
+   * ----------------------------------------------------------
+   * Retorna:
+   *   La respuesta JSON del backend, con mensajes de éxito o error.
    */
+  async createTicket(ticketData) {
+    try {
+      // Validación básica
+      if (!ticketData || typeof ticketData !== "object") {
+        throw new Error("Los datos del ticket son inválidos o están vacíos");
+      }
+
+      console.log(" Enviando ticket al backend:", ticketData);
+
+      // Enviar los datos al endpoint del backend
+      const response = await axios.post(`${BASE_URL}/create`, ticketData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log(" Respuesta del backend (Ticket creado):", response.data);
+
+      return response; // Devuelve la respuesta al componente que lo invoca
+    } catch (error) {
+      console.error(" Error en TicketService.createTicket:", error);
+      throw error; // Reenvía el error al componente
+    }
+  }
+
 }
 
 // ============================================================

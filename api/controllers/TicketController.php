@@ -321,4 +321,33 @@ class TicketController
             handleException($e);
         }
     }
+   public function create()
+{
+    $response = new Response();
+
+    try {
+        $request = new Request();
+        $data = $request->getJSON();
+
+        // 🔹 Convertir el objeto stdClass a un arreglo asociativo
+        $dataArray = json_decode(json_encode($data), true);
+
+        // Instanciar el modelo y llamar al método create
+        $model = new TicketModel();
+        $result = $model->create($dataArray);
+
+        // Enviar respuesta
+        if ($result["success"]) {
+            $response->toJSON($result, $result["message"], 200);
+        } else {
+            $response->toJSON($result, $result["message"], 400);
+        }
+
+    } catch (Throwable $e) {
+        $response->toJSON(null, "Error en el servidor: " . $e->getMessage(), 500);
+        handleException($e);
+    }
+}
+
+
 }

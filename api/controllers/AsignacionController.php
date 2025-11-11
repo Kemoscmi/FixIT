@@ -21,14 +21,14 @@ class AsignacionController
             // Establece el encabezado (header) HTTP para indicar que la respuesta será JSON con codificación UTF-8
             header('Content-Type: application/json; charset=utf-8');
 
-            // 1️⃣ Parámetros del query string (de la URL)
+            //  Parámetros del query string (de la URL)
             // Ejemplo de URL:
             // http://localhost:81/Proyecto/api/AsignacionController/semana?rol_id=2&user_id=3&date=2025-10-29
             $rolId  = isset($_GET['rol_id'])  ? intval($_GET['rol_id'])  : 0;  // Convierte a número entero
             $userId = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
             $base   = isset($_GET['date'])    ? trim($_GET['date'])      : null; // Fecha base (formato YYYY-MM-DD)
 
-            // 2️⃣ Validaciones mínimas: revisa que se hayan enviado rol y usuario
+            //  Validaciones mínimas: revisa que se hayan enviado rol y usuario
             if (!$rolId || !$userId) {
                 http_response_code(400); // 400 → Solicitud incorrecta
                 echo json_encode([
@@ -38,7 +38,7 @@ class AsignacionController
                 return; // Detiene la ejecución
             }
 
-            // 3️⃣ Validar formato de la fecha si se envía el parámetro "date"
+            //  Validar formato de la fecha si se envía el parámetro "date"
             // Expresión regular para validar formato YYYY-MM-DD
             if ($base && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $base)) {
                 http_response_code(400);
@@ -49,10 +49,10 @@ class AsignacionController
                 return;
             }
 
-            // 4️⃣ Se crea una instancia del modelo que maneja la lógica de asignaciones
+            // Se crea una instancia del modelo que maneja la lógica de asignaciones
             $model = new AsignacionModel();
 
-            // 5️⃣ Si se recibe una fecha base → se calcula la semana (lunes a domingo)
+            //  Si se recibe una fecha base → se calcula la semana (lunes a domingo)
             if ($base) {
                 $ts = strtotime($base); // Convierte la fecha en timestamp (segundos desde 1970)
                 if ($ts === false) {
@@ -74,28 +74,28 @@ class AsignacionController
                 // Calcula el domingo de esa semana (suma los días que faltan)
                 $sunday = date('Y-m-d', strtotime("+" . (7 - $dow) . " days", $ts));
 
-                // 6️⃣ Consultar el modelo: obtiene las asignaciones de esa semana según el rol
+                //  Consultar el modelo: obtiene las asignaciones de esa semana según el rol
                 $rows = $model->weeklyByRole($rolId, $userId, $monday, $sunday);
                 $week = ['monday' => $monday, 'sunday' => $sunday]; // Guarda el rango semanal
             } else {
-                // 7️⃣ Si no se envió fecha, obtiene todas las asignaciones
+                // 7️ Si no se envió fecha, obtiene todas las asignaciones
                 $rows = $model->allByRole($rolId, $userId);
                 $week = null; // No hay semana específica
             }
 
-            // 8️⃣ Agrupar las asignaciones por día
+            //  Agrupar las asignaciones por día
             // Se crea un arreglo vacío donde cada clave será un día de la semana
             $byDay = [];
 
             foreach ($rows as $r) {
-                // 🟢 Verifica si la asignación tiene una fecha válida
+                //  Verifica si la asignación tiene una fecha válida
                 $fecha = $r->fecha_asignacion ?? null;
                 if ($fecha && strtotime($fecha)) {
                     // Si la fecha es válida, se separa el día (YYYY-MM-DD) y la hora (HH:MM)
                     $day = date('Y-m-d', strtotime($fecha));
                     $hora = date('H:i', strtotime($fecha));
                 } else {
-                    // 🟡 Si no tiene fecha (por ejemplo, ticket aún no asignado)
+                    //  Si no tiene fecha (por ejemplo, ticket aún no asignado)
                     $day = 'Sin fecha';
                     $hora = null;
                 }
@@ -118,7 +118,7 @@ class AsignacionController
                 ];
             }
 
-            // 9️⃣ Construir la respuesta final en formato JSON
+            //  Construir la respuesta final en formato JSON
             $payload = [
                 'week' => $week,             // Información de la semana (si aplica)
                 'asignaciones' => $byDay     // Asignaciones agrupadas por día
