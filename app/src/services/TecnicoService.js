@@ -39,6 +39,18 @@ class TecnicoService {
         }
       });
   }
+
+   // ✅ CREAR
+  createTecnico(data) {
+    return axios.post(BASE_URL, data)
+      .then(res => res.data);
+  }
+
+  // ✅ ACTUALIZAR
+  updateTecnico(id, data) {
+    return axios.put(`${BASE_URL}/${id}`, data)
+      .then(res => res.data);
+  }
 }
 
 // Exporta una instancia del servicio lista para usarse

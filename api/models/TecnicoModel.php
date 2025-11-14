@@ -23,30 +23,101 @@ class TecnicoModel
    /* Obtener un técnico por ID */
 public function get($id)
 {
-    // Consulta SQL para obtener la información del técnico
+    // Consulta SQL del técnico
     $vSql = "SELECT id, nombre, apellido, correo, telefono, disponibilidad, observaciones, carga_trabajo
              FROM usuarios
-             WHERE rol_id = 2 AND id = $id AND activo = 1";  // Filtramos por técnico activo
+             WHERE rol_id = 2 AND id = $id AND activo = 1";
 
-    // Ejecutamos la consulta
-    $vResultado = $this->enlace->ExecuteSQL($vSql);
- 
-    // Convertir el objeto a un array
-    // Esto permite manipular mejor los datos del resultado 
-    // y facilita que PHP lo convierta correctamente a JSON al enviarlo al frontend.
-    $vResultado = (array) $vResultado[0];
+    $data = $this->enlace->ExecuteSQL($vSql);
 
-    // Obtener las especialidades del técnico
-    $vSqlEspecialidades = "SELECT e.nombre 
+    if (!$data || !isset($data[0])) {
+        return null; // <- EVITA TODOS LOS PUTOS ERRORES
+    }
+
+    $vResultado = (array) $data[0];
+
+    // Traer especialidades
+    $vSqlEspecialidades = "SELECT e.id, e.nombre
                            FROM especialidades e
-                           JOIN tecnico_especialidad te ON e.id = te.especialidad_id
+                           INNER JOIN tecnico_especialidad te ON e.id = te.especialidad_id
                            WHERE te.usuario_id = $id";
+
     $especialidades = $this->enlace->ExecuteSQL($vSqlEspecialidades);
 
-    // Añadimos las especialidades a la información del técnico
-    $vResultado['especialidades'] = $especialidades;
+    // Asegurar siempre un array
+    if (!is_array($especialidades)) {
+        $especialidades = [];
+    } 
 
-    // Si se encuentra el técnico, retornamos el primer resultado con las especialidades
+    $vResultado["especialidades"] = array_values($especialidades);
+
     return $vResultado;
 }
+
+/* Crear técnico */
+  public function create($data)
+    {
+        // Crear usuario
+        $sql = "INSERT INTO usuarios 
+                (nombre, apellido, correo, contrasena_hash, telefono, observaciones, disponibilidad, activo, rol_id, carga_trabajo, creado_en, actualizado_en)
+                VALUES (
+                    '{$data['nombre']}',
+                    '{$data['apellido']}',
+                    '{$data['correo']}',
+                    '{$data['contrasena']}',
+                    '{$data['telefono']}',
+                    '{$data['observaciones']}',
+                    '{$data['disponibilidad']}',
+                    {$data['activo']},
+                    2,
+                    0,
+                    NOW(),
+                    NOW()
+                )";
+
+        $usuarioId = $this->enlace->executeSQL_DML_last($sql);
+
+        // Insertar especialidades
+        if (!empty($data['especialidades'])) {
+            foreach ($data['especialidades'] as $esp) {
+                $sqlEsp = "INSERT INTO tecnico_especialidad (usuario_id, especialidad_id)
+                           VALUES ($usuarioId, $esp)";
+                $this->enlace->executeSQL_DML($sqlEsp);
+            }
+        }
+
+        return ["success" => true, "id" => $usuarioId];
+    }
+
+    // Actualizar tecnico
+    public function update($id, $data)
+    {
+        $sql = "UPDATE usuarios SET
+                    nombre = '{$data['nombre']}',
+                    apellido = '{$data['apellido']}',
+                    correo = '{$data['correo']}',
+                    telefono = '{$data['telefono']}',
+                    observaciones = '{$data['observaciones']}',
+                    disponibilidad = '{$data['disponibilidad']}',
+                    activo = {$data['activo']},
+                    actualizado_en = NOW()
+                WHERE id = $id";
+
+        $this->enlace->executeSQL_DML($sql);
+
+        // Borrar especialidades anteriores
+        $sqlDel = "DELETE FROM tecnico_especialidad WHERE usuario_id = $id";
+        $this->enlace->executeSQL_DML($sqlDel);
+
+        // Insertar nuevas especialidades
+        if (!empty($data['especialidades'])) {
+            foreach ($data['especialidades'] as $esp) {
+                $sqlEsp = "INSERT INTO tecnico_especialidad (usuario_id, especialidad_id)
+                           VALUES ($id, $esp)";
+                $this->enlace->executeSQL_DML($sqlEsp);
+            }
+        }
+
+        return ["success" => true];
+    }
 }

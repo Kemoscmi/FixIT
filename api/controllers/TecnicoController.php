@@ -43,8 +43,35 @@ class Tecnico
         $response->toJSON(null, "Error al obtener el técnico", 500);  // Respuesta en caso de error
         handleException($e);
     }
-    } 
+    }  
 
+
+    // POST: Crear técnico
+    public function create()
+    {
+        try {
+            $response = new Response();
+            $data = json_decode(file_get_contents("php://input"), true);
+            $model = new TecnicoModel();
+
+            $result = $model->create($data);
+            $response->toJSON($result, "Técnico creado correctamente", 201);
+        } catch (Exception $e) {
+            $response->toJSON(null, "Error al crear técnico", 500);
+            handleException($e);
+        }
+    }
+
+    // PUT: Actualizar técnico
+   public function update($id)
+{
+    $response = new Response();
+    $data = json_decode(file_get_contents("php://input"), true);
+    $model = new TecnicoModel();
+
+    $result = $model->update($id, $data);
+    $response->toJSON($result, "Técnico actualizado correctamente");
+}
 
 }
 

@@ -85,14 +85,26 @@ export function DetailTecnico() { // Componente para mostrar los detalles de un 
             </ul>
           </div>
 
-          {/* 🧩 Botón para volver al listado */}
-          <button
-            onClick={() => navigate("/tecnicos")} // Redirige al listado
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-3 rounded-md shadow-lg hover:scale-105 transition-all"
-          >
-            <ArrowLeftCircle className="h-5 w-5" /> {/* Ícono de flecha */}
-            Volver al listado
-          </button>
+          <div className="flex gap-4 mt-6">
+
+            {/* Botón regresar */}
+            <button
+              onClick={() => navigate("/tecnicos")}
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900 text-white px-6 py-3 rounded-md shadow-lg hover:scale-105 transition-all"
+            >
+              <ArrowLeftCircle className="h-5 w-5" />
+              Volver al listado
+            </button>
+
+            {/* Botón editar */}
+            <button
+              onClick={() => navigate(`/tecnico/edit/${tecnico.id}`)}
+              className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-md shadow-lg hover:scale-105 transition-all"
+            >
+              Editar técnico
+            </button>
+
+          </div>
         </div>
       </div>
     </div>
