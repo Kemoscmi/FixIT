@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import { createBrowserRouter } from 'react-router-dom';
 import { RouterProvider } from 'react-router';
+import { Toaster } from "react-hot-toast";
 
 // Layout general
 import { Layout } from './components/Layout/Layout';
@@ -16,6 +17,7 @@ import { PageNotFound } from './components/Home/PageNotFound';
 // Módulo Técnicos
 import { ListTecnico } from './components/Tecnico/ListTecnico';
 import { DetailTecnico } from './components/Tecnico/DetailTecnico';
+import { FormTecnico } from './components/Tecnico/FormTecnico';
 
 // Módulo Categorías
 import { ListCategoria } from './components/Categoria/ListCategoria';
@@ -50,6 +52,8 @@ const rutas = createBrowserRouter([
           // Categorías
           { path: 'categorias', element: <ListCategoria /> },
           { path: 'categoria/:id', element: <DetailCategoria /> },
+          { path: 'tecnico/create', element: <FormTecnico /> },
+          { path: 'tecnico/edit/:id', element: <FormTecnico /> },
 
           // Tickets
           { path: 'tickets', element: <ListTickets /> },
@@ -75,5 +79,13 @@ const rutas = createBrowserRouter([
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <RouterProvider router={rutas} />
+   <Toaster 
+      position="top-right"
+      toastOptions={{
+        duration: 3000,
+        style: { fontSize: "15px" }
+      }}
+    />
+
   </StrictMode>,
 );

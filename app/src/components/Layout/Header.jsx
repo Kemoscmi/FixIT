@@ -30,7 +30,6 @@ import {
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import useAuth from "../../auth/store/auth.store";
 import Logo from "../../assets/Logo.png";
-import NotificacionService from "../../services/NotificacionService";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -50,26 +49,9 @@ export default function Header() {
   const isAdmin = rol === "Administrador" || rolId === 1;
   const isTecnico = rol === "Técnico" || rolId === 2;
 
-  // 🔔 Estado para notificaciones
-  const [notificaciones, setNotificaciones] = useState([]);
-  const [notifOpen, setNotifOpen] = useState(false);
-
   useEffect(() => {
     if (!user?.id) return;
 
-    const fetchNotificaciones = async () => {
-      try {
-        const res = await NotificacionService.getByUser(user.id);
-        if (res.success) setNotificaciones(res.data);
-      } catch (error) {
-        console.error("Error cargando notificaciones:", error);
-      }
-    };
-
-    fetchNotificaciones();
-
-    const interval = setInterval(fetchNotificaciones, 30000);
-    return () => clearInterval(interval);
   }, [user?.id]);
 
   // ✅ Ítems visibles según rol
@@ -128,47 +110,6 @@ export default function Header() {
                 items={mantItems}
               />
             )}
-
-            {/* 🔔 Notificaciones */}
-            <div className="relative mr-3">
-              <button
-                onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-              >
-                <Bell className="h-5 w-5 text-yellow-300" />
-                {notificaciones.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-1.5 rounded-full">
-                    {notificaciones.length}
-                  </span>
-                )}
-              </button>
-
-              {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white/90 text-gray-800 rounded-lg shadow-lg border border-gray-200 z-50">
-                  <div className="p-3 border-b bg-blue-700 text-white font-semibold rounded-t-lg">
-                    Notificaciones
-                  </div>
-
-                  {notificaciones.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">Sin notificaciones nuevas</div>
-                  ) : (
-                    <ul className="max-h-72 overflow-y-auto">
-                      {notificaciones.map((n, i) => (
-                        <li
-                          key={i}
-                          className="px-4 py-3 border-b hover:bg-blue-50 cursor-pointer transition"
-                        >
-                          <p className="text-sm text-gray-800">{n.mensaje}</p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(n.fecha).toLocaleString("es-CR")}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-            </div>
 
             {/* USUARIO */}
             <MenubarMenu>
