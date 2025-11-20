@@ -27,6 +27,7 @@ require_once "models/CategoriaModel.php";
 require_once "models/PrioridadModel.php";  
 require_once "models/EtiquetaModel.php";
 require_once "models/EspecialidadModel.php";
+require_once "models/SlaModel.php";
 
     
 // Controladores
@@ -38,6 +39,8 @@ require_once "controllers/CategoriaController.php";
 require_once "controllers/PrioridadController.php";
 require_once "controllers/EtiquetaController.php";
 require_once "controllers/EspecialidadController.php";
+require_once "controllers/SLAController.php";
+
 
 //Enrutador
 require_once "routes/RoutesController.php";

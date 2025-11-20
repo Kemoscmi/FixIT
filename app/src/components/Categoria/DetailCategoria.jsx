@@ -1,73 +1,70 @@
-import React, { useEffect, useState } from "react"; // Importa React y los hooks para estado y efectos
-import { useParams, useNavigate } from "react-router-dom"; // Permite leer parámetros y navegar entre rutas
-import CategoriaService from "@/services/CategoriaService"; // Servicio que obtiene las categorías del backend
-import { Layers, Tag, Star, Clock, ArrowLeftCircle } from "lucide-react"; // Íconos usados en la vista
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import CategoriaService from "@/services/CategoriaService";
+import { Layers, Tag, Star, Clock, ArrowLeftCircle, Pencil } from "lucide-react";
 
-export function DetailCategoria() { // Componente principal de detalle de categoría
-  const { id } = useParams(); // Obtiene el ID desde la URL
-  const [categoria, setCategoria] = useState(null); // Guarda la categoría seleccionada
-  const [loading, setLoading] = useState(true); // Controla el estado de carga
-  const [error, setError] = useState(null); // Guarda mensajes de error
-  const navigate = useNavigate(); // Permite volver al listado
+export function DetailCategoria() {
+  const { id } = useParams();
+  const [categoria, setCategoria] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  useEffect(() => { // Se ejecuta cuando cambia el ID
-    CategoriaService.getCategoriaById(id) // Llama al backend para obtener la categoría
+  useEffect(() => {
+    CategoriaService.getCategoriaById(id)
       .then((response) => {
-        setCategoria(response.data); // Guarda los datos obtenidos
-        setLoading(false); // Termina la carga
+        setCategoria(response.data);
+        setLoading(false);
       })
-      .catch((error) => { // Si hay error
-        setError(error.message); // Guarda el error
-        setLoading(false); // Termina la carga
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
       });
-  }, [id]); // Solo se ejecuta cuando cambia el parámetro id
+  }, [id]);
 
-  if (loading) // Pantalla de carga
+  if (loading)
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] text-indigo-600">
-        <Clock className="animate-spin h-10 w-10 mb-4" /> {/* Ícono animado */}
+        <Clock className="animate-spin h-10 w-10 mb-4" />
         <p className="text-lg font-medium">Cargando detalles...</p>
       </div>
     );
 
-  if (error) // Si hay error
+  if (error)
     return (
-      <p className="text-center text-red-500 text-lg mt-8">
-        Error: {error}
-      </p>
+      <p className="text-center text-red-500 text-lg mt-8">Error: {error}</p>
     );
 
-  if (!categoria) // Si no existe la categoría
+  if (!categoria)
     return (
       <p className="text-center text-gray-500 text-lg mt-8">
         Categoría no encontrada.
       </p>
     );
 
-  return ( // Si todo está bien, muestra el detalle
+  return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-pink-100 py-12 px-6">
       <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-lg shadow-xl rounded-2xl p-8 border border-gray-200">
-        
-        {/* 🔹 Encabezado principal */}
+
+        {/* ENCABEZADO */}
         <div className="flex items-center gap-4 mb-6">
           <div className="p-4 bg-gradient-to-br from-blue-100 to-pink-100 rounded-full shadow-sm">
-            <Layers className="h-8 w-8 text-blue-700" /> {/* Ícono de capa */}
+            <Layers className="h-8 w-8 text-blue-700" />
           </div>
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-1">
-              {categoria.nombre} {/* Nombre de la categoría */}
+              {categoria.nombre}
             </h2>
           </div>
         </div>
 
-        {/* 🔹 Etiquetas */}
+        {/* ETIQUETAS */}
         <div className="mb-6">
-          <h3 className="text-xl font-semibold text-black-700 flex items-center gap-2">
+          <h3 className="text-xl font-semibold flex items-center gap-2">
             <Tag className="h-5 w-5" /> Etiquetas
           </h3>
           <div className="flex flex-wrap gap-2 mt-2">
-            {categoria.etiquetas?.length > 0 ? ( // Si hay etiquetas
-        //map() sirve para recorrer un arreglo (array) y renderizar algo por cada elemento.
+            {categoria.etiquetas?.length > 0 ? (
               categoria.etiquetas.map((etq, i) => (
                 <span
                   key={i}
@@ -76,19 +73,19 @@ export function DetailCategoria() { // Componente principal de detalle de catego
                   {etq.nombre}
                 </span>
               ))
-            ) : ( // Si no hay
+            ) : (
               <p className="text-gray-500 text-sm">Sin etiquetas registradas.</p>
             )}
           </div>
         </div>
 
-        {/* 🔹 Especialidades */}
+        {/* ESPECIALIDADES */}
         <div className="mb-6">
-          <h3 className="text-xl font-semibold text-black-700 flex items-center gap-2">
+          <h3 className="text-xl font-semibold flex items-center gap-2">
             <Star className="h-5 w-5" /> Especialidades
           </h3>
           <div className="flex flex-wrap gap-2 mt-2">
-            {categoria.especialidades?.length > 0 ? ( // Si hay especialidades
+            {categoria.especialidades?.length > 0 ? (
               categoria.especialidades.map((esp, i) => (
                 <span
                   key={i}
@@ -103,12 +100,13 @@ export function DetailCategoria() { // Componente principal de detalle de catego
           </div>
         </div>
 
-        {/* 🔹 SLA */}
+        {/* SLA */}
         <div className="mb-6">
-          <h3 className="text-xl font-semibold text-black-700 flex items-center gap-2">
+          <h3 className="text-xl font-semibold flex items-center gap-2">
             <Clock className="h-5 w-5" /> SLA
           </h3>
-          {categoria.sla?.length > 0 ? ( // Si hay datos SLA
+
+          {categoria.sla?.length > 0 ? (
             <div className="mt-2 space-y-1 text-gray-700">
               <p>
                 <strong>Tiempo máx. de respuesta:</strong>{" "}
@@ -124,15 +122,29 @@ export function DetailCategoria() { // Componente principal de detalle de catego
           )}
         </div>
 
-        {/* 🔹 Botón volver */}
-        <button
-          onClick={() => navigate("/categorias")} // Redirige al listado
-          className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-500 text-white px-6 py-3 rounded-md shadow-lg hover:scale-105 transition-all"
-        >
-          <ArrowLeftCircle className="h-5 w-5" /> {/* Ícono de regreso */}
-          Volver al listado
-        </button>
+        {/* BOTONES */}
+        <div className="flex gap-4 mt-6">
+
+          {/* VOLVER */}
+          <button
+            onClick={() => navigate("/categorias")}
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-500 text-white px-6 py-3 rounded-md shadow-lg hover:scale-105 transition"
+          >
+            <ArrowLeftCircle className="h-5 w-5" />
+            Volver al listado
+          </button>
+
+          {/* EDITAR */}
+          <button
+            onClick={() => navigate(`/categoria/edit/${categoria.id}`)}
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-md shadow-lg hover:scale-105 transition"
+          >
+            <Pencil className="h-5 w-5" />
+            Editar categoría
+          </button>
+
+        </div>
       </div>
-    </div> 
+    </div>
   );
 }

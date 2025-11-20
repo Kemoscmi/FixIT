@@ -25,6 +25,29 @@ class CategoriaService {
         throw new Error("No se pudo obtener la categoría");
       });
   }
+
+   // Crear categoría
+  createCategoria(data) {
+    return axios
+      .post(BASE_URL, data)
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al crear categoría:", err);
+        throw new Error(err.response?.data?.message || "Error al crear categoría");
+      });
+  }
+
+  // Actualizar categoría
+  updateCategoria(id, data) {
+    return axios
+      .put(`${BASE_URL}/${id}`, data)
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al actualizar categoría:", err);
+        throw new Error(err.response?.data?.message || "Error al actualizar categoría");
+      });
+  }
+
 }
 
 // Exporta una instancia del servicio lista para usar en cualquier componente

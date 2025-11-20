@@ -22,6 +22,8 @@ import { FormTecnico } from './components/Tecnico/FormTecnico';
 // Módulo Categorías
 import { ListCategoria } from './components/Categoria/ListCategoria';
 import { DetailCategoria } from './components/Categoria/DetailCategoria';
+import { FormCategoria } from './components/Categoria/FormCategoria';
+
 
 // Módulo Tickets
 import TableTickets from './components/Ticket/TableTickets';
@@ -54,6 +56,8 @@ const rutas = createBrowserRouter([
           { path: 'categoria/:id', element: <DetailCategoria /> },
           { path: 'tecnico/create', element: <FormTecnico /> },
           { path: 'tecnico/edit/:id', element: <FormTecnico /> },
+          { path: "categoria/create", element: <FormCategoria /> },
+          { path: "categoria/edit/:id", element: <FormCategoria /> },
 
           // Tickets
           { path: 'tickets', element: <ListTickets /> },

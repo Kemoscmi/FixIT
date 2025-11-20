@@ -22,7 +22,8 @@ export function FormTecnico() {
     observaciones: "",
     disponibilidad: "Disponible",
     activo: 1,
-    especialidades: []
+    especialidades: [],
+     carga_trabajo: 0 
   });
 
   const generarCorreo = (nombre, apellido) => {
@@ -63,6 +64,7 @@ export function FormTecnico() {
           especialidades: especialidadesLimpias.map(
             (e) => e.id ?? e.especialidad_id
           ),
+          carga_trabajo: tecnico.carga_trabajo ?? 0,
         });
       }
 
@@ -77,18 +79,38 @@ export function FormTecnico() {
 }, [id]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    let nuevo = { ...form, [name]: value };
+  const { name, value } = e.target;
 
-    if (name === "nombre" || name === "apellido") {
-      nuevo.correo = generarCorreo(
-        name === "nombre" ? value : form.nombre,
-        name === "apellido" ? value : form.apellido
-      );
-    }
+  // 🔹 VALIDACIÓN nombres y apellidos — SOLO LETRAS  
+  if ((name === "nombre" || name === "apellido") && !/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]*$/.test(value)) {
+    toast.error("Solo se permiten letras en el nombre y apellido");
+    return;
+  }
 
-    setForm(nuevo);
-  };
+  // 🔹 VALIDACIÓN teléfono — SOLO NÚMEROS
+  if (name === "telefono" && !/^[0-9]*$/.test(value)) {
+    toast.error("El teléfono solo puede contener números");
+    return;
+  }
+
+  // 🔹 VALIDACIÓN correo — DEBE TERMINAR EN @fixit.cr
+  if (name === "correo" && value !== "" && !value.endsWith("@fixit.cr")) {
+    toast.error("El correo debe terminar en @fixit.cr");
+  }
+
+  // 🔹 Generar correo automáticamente si nombre/apellido cambian
+  let nuevo = { ...form, [name]: value };
+
+  if (name === "nombre" || name === "apellido") {
+    nuevo.correo = generarCorreo(
+      name === "nombre" ? value : form.nombre,
+      name === "apellido" ? value : form.apellido
+    );
+  }
+
+  setForm(nuevo);
+};
+
 
   const toggleEspecialidad = (id) => {
     const selected = form.especialidades.includes(id);
@@ -109,6 +131,12 @@ export function FormTecnico() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const payload = { ...form, activo: 1 };
+
+if (!form.correo.endsWith("@fixit.cr")) {
+  toast.error("El correo debe terminar en @fixit.cr");
+  return;
+}
+
 
     if (id) {
       TecnicoService.updateTecnico(id, payload).then(() => {
@@ -223,35 +251,19 @@ export function FormTecnico() {
                 );
               })}
             </div>
-
-            {/* Chips seleccionadas */}
-            <div className="flex flex-wrap gap-2">
-              {form.especialidades.length > 0 ? (
-                form.especialidades.map((id) => {
-                  const esp = especialidades.find((e) => e.id === id);
-                  return (
-                    <span
-                      key={id}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-2"
-                    >
-                      {esp?.nombre}
-                      <button
-                        type="button"
-                        onClick={() => toggleEspecialidad(id)}
-                        className="text-blue-700 hover:text-red-600 font-bold"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  );
-                })
-              ) : (
-                <p className="text-gray-500 text-sm italic">
-                  No has seleccionado especialidades.
-                </p>
-              )}
-            </div>
           </div>
+
+          {/* CARGA DE TRABAJO */}
+          <div>
+            <label className="font-semibold block mb-2">Carga actual:</label>
+            <input
+              type="number"
+              value={form.carga_trabajo}
+              readOnly
+              className="p-3 border rounded-lg w-full bg-gray-100 text-gray-600 cursor-not-allowed"
+            />
+          </div>
+
 
           {/* DISPONIBILIDAD */}
           <div>

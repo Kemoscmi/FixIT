@@ -27,7 +27,7 @@ export function CategoriaListCard({ categoria }) { // Recibe una categoría como
         >
           Ver detalle
         </Link>
-      </div>
+      </div> 
     </div>
   );
 }
