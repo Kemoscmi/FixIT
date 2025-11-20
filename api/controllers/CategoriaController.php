@@ -40,8 +40,40 @@ class Categoria
         try {
             $data = json_decode(file_get_contents("php://input"), true);
 
-            $model = new CategoriaModel();
-            $result = $model->create($data);
+            if (!$data) {
+                $response->toJSON(null, "Datos inválidos", 400);
+                return;
+            }
+
+            $categoriaModel = new CategoriaModel();
+            $slaModel = new SlaModel();
+
+            // ============================================
+            // 1. SI VIENE NEW_SLA → CREAR EL SLA PRIMERO
+            // ============================================
+            if (isset($data["new_sla"])) {
+                $newSlaData = $data["new_sla"];
+
+                $slaId = $slaModel->create([
+                    "nombre" => $newSlaData["nombre"],
+                    "tiempo_max_respuesta_min" => $newSlaData["tiempo_max_respuesta_min"],
+                    "tiempo_max_resolucion_min" => $newSlaData["tiempo_max_resolucion_min"]
+                ]);
+
+                $data["sla_id"] = $slaId; // Forzar el SLA recién creado
+                unset($data["new_sla"]);
+            }
+
+            // Validar SLA obligatorio
+            if (!isset($data["sla_id"]) || empty($data["sla_id"])) {
+                $response->toJSON(null, "El SLA es obligatorio", 400);
+                return;
+            }
+
+            // ============================================
+            // 2. CREAR LA CATEGORÍA
+            // ============================================
+            $result = $categoriaModel->create($data);
 
             $response->toJSON($result, "Categoría creada correctamente", 201);
 
@@ -51,10 +83,9 @@ class Categoria
         }
     }
 
-
-    /* ============================
-       PUT /categoria/{id}
-       ============================ */
+    // =====================================================
+    // PUT /api/categoria/{id}
+    // =====================================================
     public function update($id)
     {
         $response = new Response();
@@ -62,8 +93,40 @@ class Categoria
         try {
             $data = json_decode(file_get_contents("php://input"), true);
 
-            $model = new CategoriaModel();
-            $result = $model->update($id, $data);
+            if (!$data) {
+                $response->toJSON(null, "Datos inválidos", 400);
+                return;
+            }
+
+            $categoriaModel = new CategoriaModel();
+            $slaModel = new SlaModel();
+
+            // ============================================
+            // 1. SI EDITA Y QUIERE CREAR SLA NUEVO
+            // ============================================
+            if (isset($data["new_sla"])) {
+                $newSlaData = $data["new_sla"];
+
+                $slaId = $slaModel->create([
+                    "nombre" => $newSlaData["nombre"],
+                    "tiempo_max_respuesta_min" => $newSlaData["tiempo_max_respuesta_min"],
+                    "tiempo_max_resolucion_min" => $newSlaData["tiempo_max_resolucion_min"]
+                ]);
+
+                $data["sla_id"] = $slaId;
+                unset($data["new_sla"]);
+            }
+
+            // SLA requerido
+            if (!isset($data["sla_id"]) || empty($data["sla_id"])) {
+                $response->toJSON(null, "El SLA es obligatorio", 400);
+                return;
+            }
+
+            // ============================================
+            // 2. ACTUALIZAR CATEGORÍA
+            // ============================================
+            $result = $categoriaModel->update($id, $data);
 
             $response->toJSON($result, "Categoría actualizada correctamente", 200);
 
