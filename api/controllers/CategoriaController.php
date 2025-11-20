@@ -31,5 +31,46 @@ class Categoria
             handleException($e);
         }
     }
+
+
+     public function create()
+    {
+        $response = new Response();
+
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            $model = new CategoriaModel();
+            $result = $model->create($data);
+
+            $response->toJSON($result, "Categoría creada correctamente", 201);
+
+        } catch (Throwable $e) {
+            handleException($e);
+            $response->toJSON(null, "Error al crear categoría", 500);
+        }
+    }
+
+
+    /* ============================
+       PUT /categoria/{id}
+       ============================ */
+    public function update($id)
+    {
+        $response = new Response();
+
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            $model = new CategoriaModel();
+            $result = $model->update($id, $data);
+
+            $response->toJSON($result, "Categoría actualizada correctamente", 200);
+
+        } catch (Throwable $e) {
+            handleException($e);
+            $response->toJSON(null, "Error al actualizar categoría", 500);
+        }
+    }
 }
 ?>
