@@ -106,7 +106,7 @@ export function CreateTicket() {
 
   if (error) return <p className="text-red-600 text-center">{error}</p>;
 
-  // ⛔ ESTE ES EL NUEVO DISEÑO (como técnicos)
+  // 
   return (
     <div className="min-h-screen py-10 px-6 bg-white">
       <div className="max-w-3xl mx-auto bg-white/80 border shadow-xl rounded-2xl p-8">
@@ -145,21 +145,27 @@ export function CreateTicket() {
                 name="prioridad_id"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    value={field.value ? String(field.value) : ""}
-                    onValueChange={(val) => field.onChange(parseInt(val))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione prioridad" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {prioridades.map((p) => (
-                        <SelectItem key={p.id} value={String(p.id)}>
-                          {p.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+               <Select
+  value={field.value ? String(field.value) : ""}
+  onValueChange={(val) => field.onChange(parseInt(val))}
+>
+  <SelectTrigger className="bg-white border border-gray-300">
+    <SelectValue placeholder="Seleccione prioridad" />
+  </SelectTrigger>
+
+  <SelectContent className="bg-white border border-gray-300 shadow-lg">
+    {prioridades.map((p) => (
+      <SelectItem
+        key={p.id}
+        value={String(p.id)}
+        className="bg-white hover:bg-gray-100"
+      >
+        {p.nombre}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
                 )}
               />
               {errors.prioridad_id && (
@@ -175,21 +181,27 @@ export function CreateTicket() {
                 name="categoria_id"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    value={field.value ? String(field.value) : ""}
-                    onValueChange={(val) => field.onChange(parseInt(val))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccione categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categorias.map((c) => (
-                        <SelectItem key={c.id} value={String(c.id)}>
-                          {c.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+               <Select
+  value={field.value ? String(field.value) : ""}
+  onValueChange={(val) => field.onChange(parseInt(val))}
+>
+  <SelectTrigger className="bg-white border border-gray-300">
+    <SelectValue placeholder="Seleccione categoría" />
+  </SelectTrigger>
+
+  <SelectContent className="bg-white border border-gray-300 shadow-lg">
+    {categorias.map((c) => (
+      <SelectItem
+        key={c.id}
+        value={String(c.id)}
+        className="bg-white hover:bg-gray-100"
+      >
+        {c.nombre}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
                 )}
               />
               {errors.categoria_id && (
