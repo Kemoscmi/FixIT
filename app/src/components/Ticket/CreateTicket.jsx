@@ -6,11 +6,10 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuthStore from "../../auth/store/auth.store";
 
-//  Componentes UI (solo los necesarios)
+// UI
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Card } from "../ui/card";
 import {
   Select,
   SelectContent,
@@ -18,26 +17,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Save, ArrowLeftCircle } from "lucide-react";
 
-//  Iconos
-import { Save, ArrowLeft } from "lucide-react";
-
-//  Servicios
+// Servicios
 import TicketService from "../../services/TicketService";
 import axios from "axios";
 
 export function CreateTicket() {
   const navigate = useNavigate();
 
-  // Estados locales
   const [prioridades, setPrioridades] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState("");
 
- const { user } = useAuthStore();
-const usuario_id = user?.id || user?.id_usuario;
-const rol_id = user?.rol_id;
-  //  Validación Yup
+  // Datos del usuario
+  const { user } = useAuthStore();
+  const usuario_id = user?.id || user?.id_usuario;
+  const rol_id = user?.rol_id;
+
+  // Validación Yup
   const schema = yup.object({
     titulo: yup
       .string()
@@ -47,14 +45,8 @@ const rol_id = user?.rol_id;
       .string()
       .required("La descripción es obligatoria")
       .min(5, "Debe tener al menos 5 caracteres"),
-    prioridad_id: yup
-      .number()
-      .typeError("Seleccione una prioridad")
-      .required("Seleccione una prioridad"),
-    categoria_id: yup
-      .number()
-      .typeError("Seleccione una categoría")
-      .required("Seleccione una categoría"),
+    prioridad_id: yup.number().required("Seleccione una prioridad"),
+    categoria_id: yup.number().required("Seleccione una categoría"),
   });
 
   const {
@@ -72,36 +64,26 @@ const rol_id = user?.rol_id;
     },
   });
 
-  // 🔹 Cargar prioridades y categorías
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const [pri, cat] = await Promise.all([
-        axios.get(import.meta.env.VITE_BASE_URL + "prioridadcontroller"),
-        axios.get(import.meta.env.VITE_BASE_URL + "categoria"),
-      ]);
+  // Cargar listas
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [pri, cat] = await Promise.all([
+          axios.get(import.meta.env.VITE_BASE_URL + "prioridadcontroller"),
+          axios.get(import.meta.env.VITE_BASE_URL + "categoria"),
+        ]);
 
-      const prioridadesData = Array.isArray(pri.data.data?.data)
-        ? pri.data.data.data
-        : pri.data.data || [];
+        setPrioridades(pri.data.data?.data || []);
+        setCategorias(cat.data.data || []);
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar listas desde la API");
+      }
+    };
+    fetchData();
+  }, []);
 
-      const categoriasData = Array.isArray(cat.data.data)
-        ? cat.data.data
-        : cat.data.data || [];
-
-      setPrioridades(prioridadesData);
-      setCategorias(categoriasData);
-    } catch (err) {
-      console.error(err);
-      setError("Error al cargar listas desde la API");
-    }
-  };
-  fetchData();
-}, []);
-
-
-
-  //  Enviar ticket
+  // Submit ticket
   const onSubmit = async (data) => {
     try {
       const res = await TicketService.createTicket(
@@ -110,10 +92,7 @@ useEffect(() => {
       );
 
       if (res.data.success) {
-        toast.success("Ticket creado correctamente", {
-          duration: 3000,
-          position: "top-center",
-        });
+        toast.success("Ticket creado correctamente");
         reset();
         navigate("/tickets");
       } else {
@@ -121,28 +100,35 @@ useEffect(() => {
       }
     } catch (err) {
       console.error(err);
-      toast.error(" Error en el servidor al crear ticket");
+      toast.error("Error en el servidor");
     }
   };
 
   if (error) return <p className="text-red-600 text-center">{error}</p>;
 
-  //  Diseño tipo “Crear Película”
+  // ⛔ ESTE ES EL NUEVO DISEÑO (como técnicos)
   return (
-    <Card className="p-6 max-w-4xl mx-auto mt-10 border border-gray-200 shadow-md rounded-2xl bg-background">
-      <h2 className="text-2xl font-bold mb-8 text-center">Crear Ticket</h2>
+    <div className="min-h-screen py-10 px-6 bg-white">
+      <div className="max-w-3xl mx-auto bg-white/80 border shadow-xl rounded-2xl p-8">
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* 🔹 GRID DE CAMPOS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {/* Título */}
+        <h2 className="text-3xl font-extrabold text-blue-800 mb-6 text-center">
+          Crear Ticket
+        </h2>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
+          {/* TÍTULO */}
           <div>
-            <Label htmlFor="titulo">Título</Label>
+            <Label className="font-semibold">Título</Label>
             <Controller
               name="titulo"
               control={control}
               render={({ field }) => (
-                <Input {...field} id="titulo" placeholder="Ingrese el título" />
+                <Input
+                  {...field}
+                  placeholder="Ingrese el título"
+                  className="p-3 rounded-lg"
+                />
               )}
             />
             {errors.titulo && (
@@ -150,81 +136,82 @@ useEffect(() => {
             )}
           </div>
 
-          {/* Prioridad */}
-          <div>
-            <Label htmlFor="prioridad_id">Prioridad</Label>
-            <Controller
-              name="prioridad_id"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value ? String(field.value) : ""}
-                  onValueChange={(val) => field.onChange(parseInt(val))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccione una prioridad" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {prioridades.map((p) => (
-                      <SelectItem key={p.id} value={String(p.id)}>
-                        {p.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {/* PRIORIDAD Y CATEGORÍA */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div>
+              <Label className="font-semibold">Prioridad</Label>
+              <Controller
+                name="prioridad_id"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value ? String(field.value) : ""}
+                    onValueChange={(val) => field.onChange(parseInt(val))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione prioridad" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {prioridades.map((p) => (
+                        <SelectItem key={p.id} value={String(p.id)}>
+                          {p.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.prioridad_id && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.prioridad_id.message}
+                </p>
               )}
-            />
-            {errors.prioridad_id && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.prioridad_id.message}
-              </p>
-            )}
+            </div>
+
+            <div>
+              <Label className="font-semibold">Categoría</Label>
+              <Controller
+                name="categoria_id"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value ? String(field.value) : ""}
+                    onValueChange={(val) => field.onChange(parseInt(val))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione categoría" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categorias.map((c) => (
+                        <SelectItem key={c.id} value={String(c.id)}>
+                          {c.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.categoria_id && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.categoria_id.message}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Categoría */}
+          {/* DESCRIPCIÓN */}
           <div>
-            <Label htmlFor="categoria_id">Categoría</Label>
-            <Controller
-              name="categoria_id"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value ? String(field.value) : ""}
-                  onValueChange={(val) => field.onChange(parseInt(val))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccione una categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categorias.map((c) => (
-                      <SelectItem key={c.id} value={String(c.id)}>
-                        {c.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.categoria_id && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.categoria_id.message}
-              </p>
-            )}
-          </div>
-
-          {/* Descripción */}
-          <div className="sm:col-span-2">
-            <Label htmlFor="descripcion">Descripción</Label>
+            <Label className="font-semibold">Descripción</Label>
             <Controller
               name="descripcion"
               control={control}
               render={({ field }) => (
                 <textarea
                   {...field}
-                  id="descripcion"
+                  rows={4}
+                  className="p-3 w-full border rounded-lg"
                   placeholder="Describa el problema o solicitud..."
-                  rows={5}
-                  className="w-full border border-input rounded-md p-2 text-sm focus-visible:ring-1 focus-visible:ring-primary"
                 />
               )}
             />
@@ -234,26 +221,29 @@ useEffect(() => {
               </p>
             )}
           </div>
-        </div>
 
-        {/* 🔹 BOTONES */}
-        <div className="flex justify-between gap-4 mt-8">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Regresar
-          </Button>
+          {/* BOTONES */}
+          <div className="flex justify-between mt-8">
+            <button
+              type="button"
+              onClick={() => navigate("/tickets")}
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300"
+            >
+              <ArrowLeftCircle className="h-5 w-5" />
+              Volver
+            </button>
 
-          <Button type="submit" className="flex items-center gap-2">
-            <Save className="w-4 h-4" />
-            Guardar Ticket
-          </Button>
-        </div>
-      </form>
-    </Card>
+            <button
+              type="submit"
+              className="flex items-center gap-2 px-6 py-3 rounded-md bg-blue-700 text-white shadow hover:scale-105 transition"
+            >
+              <Save className="h-5 w-5" />
+              Guardar Ticket
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
   );
 }

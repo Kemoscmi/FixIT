@@ -15,7 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Edit, Eye, Trash2, ArrowLeft } from "lucide-react";
+import { Edit, Eye, Trash2, ArrowLeft, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import TicketService from "@/services/TicketService";
 import { LoadingGrid } from "../ui/custom/LoadingGrid";
@@ -78,23 +78,17 @@ export default function TableTickets() {
         <h1 className="text-3xl font-bold tracking-tight">
           Listado General de Tickets
         </h1>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                asChild
-                variant="outline"
-                size="icon"
-                className="text-primary"
-              >
-                <Link to="/tickets/create">
-                  <Eye className="h-4 w-4" />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Crear nuevo ticket</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+
+        {/* 🔥 Nuevo botón (reemplaza el ojo) */}
+        <Button
+          asChild
+          className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90"
+        >
+          <Link to="/tickets/create">
+            <Plus className="w-4 h-4" />
+            Crear Ticket
+          </Link>
+        </Button>
       </div>
 
       {/* Tabla principal */}
@@ -132,7 +126,9 @@ export default function TableTickets() {
                   </span>
                 </TableCell>
                 <TableCell>
-                  {row.prioridad || <span className="text-muted-foreground">N/A</span>}
+                  {row.prioridad || (
+                    <span className="text-muted-foreground">N/A</span>
+                  )}
                 </TableCell>
 
                 {/* Botones de acciones */}
