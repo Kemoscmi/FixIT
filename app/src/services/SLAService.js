@@ -19,6 +19,11 @@ class SlaService {
         return [];
       });
   }
+
+  createSla(data) {
+  return axios.post(BASE_URL, data);
+}
+
 }
 
 export default new SlaService();
