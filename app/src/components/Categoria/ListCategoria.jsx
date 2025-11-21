@@ -39,13 +39,10 @@ export function ListCategoria() {
   return (
    <div className="min-h-screen bg-white py-12 px-6">
 
-      {/* CABECERA CON GRID → TÍTULO CENTRADO + BOTÓN DERECHA */}
       <div className="max-w-6xl mx-auto grid grid-cols-3 items-center mb-6">
 
-        {/* columna izquierda vacía (para equilibrar el grid) */}
         <div></div>
 
-        {/* TÍTULO */}
       <h2 className="text-4xl font-extrabold text-center bg-gradient-to-r from-sky-600 to-blue-700 bg-clip-text text-transparent">
           Categorías de Soporte
         </h2>
@@ -68,7 +65,9 @@ export function ListCategoria() {
 
       {/* GRID de categorías */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+    {/* El ? es como un if, si si hay algo hago, si no no */}
         {categorias?.length > 0 ? (
+      //map() sirve para recorrer un arreglo y renderizar algo por cada elemento.
           categorias.map((categoria) => (
             <CategoriaListCard key={categoria.id} categoria={categoria} />
           ))

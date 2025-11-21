@@ -48,9 +48,7 @@ class Categoria
             $categoriaModel = new CategoriaModel();
             $slaModel = new SlaModel();
 
-            // ============================================
-            // 1. SI VIENE NEW_SLA → CREAR EL SLA PRIMERO
-            // ============================================
+            // 1. SI VIENE NEW_SLA, primero CREAR EL SLA 
             if (isset($data["new_sla"])) {
                 $newSlaData = $data["new_sla"];
 
@@ -70,9 +68,7 @@ class Categoria
                 return;
             }
 
-            // ============================================
             // 2. CREAR LA CATEGORÍA
-            // ============================================
             $result = $categoriaModel->create($data);
 
             $response->toJSON($result, "Categoría creada correctamente", 201);
@@ -83,9 +79,7 @@ class Categoria
         }
     }
 
-    // =====================================================
-    // PUT /api/categoria/{id}
-    // =====================================================
+    // Editaaaar PUT /api/categoria/{id}
     public function update($id)
     {
         $response = new Response();
@@ -101,9 +95,7 @@ class Categoria
             $categoriaModel = new CategoriaModel();
             $slaModel = new SlaModel();
 
-            // ============================================
             // 1. SI EDITA Y QUIERE CREAR SLA NUEVO
-            // ============================================
             if (isset($data["new_sla"])) {
                 $newSlaData = $data["new_sla"];
 
@@ -123,10 +115,8 @@ class Categoria
                 return;
             }
 
-            // ============================================
             // 2. ACTUALIZAR CATEGORÍA
-            // ============================================
-            $result = $categoriaModel->update($id, $data);
++            $result = $categoriaModel->update($id, $data);
 
             $response->toJSON($result, "Categoría actualizada correctamente", 200);
 
