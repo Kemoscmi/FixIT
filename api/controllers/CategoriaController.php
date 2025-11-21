@@ -116,7 +116,7 @@ class Categoria
             }
 
             // 2. ACTUALIZAR CATEGORÍA
-+            $result = $categoriaModel->update($id, $data);
+            $result = $categoriaModel->update($id, $data);
 
             $response->toJSON($result, "Categoría actualizada correctamente", 200);
 

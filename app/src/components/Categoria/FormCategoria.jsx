@@ -156,23 +156,29 @@ export function FormCategoria() {
 
     //Esto para enviar un nombre base de SLA A LA BD
     payload.new_sla.nombre = `SLA automático (${resp} / ${reso})`;
-
     payload.sla_id = null;
   }
+
+  if (form.sla_mode === "existing" && payload.new_sla) {
+  delete payload.new_sla;
+}
+
 
   //Le quitamos el nombre base
   delete payload.sla_mode;
 
   //Notificacion con toast
   if (id) {
-    await CategoriaService.updateCategoria(id, payload);
+  CategoriaService.updateCategoria(id, payload).then(() => {
     toast.success("Categoría actualizada correctamente");
-  } else {
-    await CategoriaService.createCategoria(payload);
+    navigate("/categorias");
+  });
+} else {
+  CategoriaService.createCategoria(payload).then(() => {
     toast.success("Categoría creada correctamente");
-  }
-
-  navigate("/categorias");
+    navigate("/categorias");
+  });
+}
 };
 
 
