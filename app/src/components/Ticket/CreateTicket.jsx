@@ -41,11 +41,25 @@ export function CreateTicket() {
 
   // Validación Yup
   const schema = yup.object({
-    titulo: yup.string().required().min(3),
-    descripcion: yup.string().required().min(5),
-    prioridad_id: yup.number().required(),
-    categoria_id: yup.number().required(),
-  });
+  titulo: yup
+    .string()
+    .required("El título es obligatorio")
+    .min(3, "El título debe tener al menos 3 caracteres"),
+
+  descripcion: yup
+    .string()
+    .required("La descripción es obligatoria")
+    .min(5, "La descripción debe tener al menos 5 caracteres"),
+
+  prioridad_id: yup
+    .number()
+    .required("Debe seleccionar una prioridad"),
+
+  categoria_id: yup
+    .number()
+    .required("Debe seleccionar una categoría válida"),
+});
+
 
   const {
     control,
@@ -126,7 +140,7 @@ export function CreateTicket() {
     console.log("ID FINAL ENCONTRADO:", categoriaID);
 
     if (!categoriaID || isNaN(categoriaID)) {
-      console.warn("❌ ID inválido recibido:", res.data);
+      console.warn(" ID inválido recibido:", res.data);
       return;
     }
 
