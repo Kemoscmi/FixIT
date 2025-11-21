@@ -156,23 +156,29 @@ export function FormCategoria() {
 
     //Esto para enviar un nombre base de SLA A LA BD
     payload.new_sla.nombre = `SLA automático (${resp} / ${reso})`;
-
     payload.sla_id = null;
   }
+
+  if (form.sla_mode === "existing" && payload.new_sla) {
+  delete payload.new_sla;
+}
+
 
   //Le quitamos el nombre base
   delete payload.sla_mode;
 
   //Notificacion con toast
   if (id) {
-    await CategoriaService.updateCategoria(id, payload);
+  CategoriaService.updateCategoria(id, payload).then(() => {
     toast.success("Categoría actualizada correctamente");
-  } else {
-    await CategoriaService.createCategoria(payload);
+    navigate("/categorias");
+  });
+} else {
+  CategoriaService.createCategoria(payload).then(() => {
     toast.success("Categoría creada correctamente");
-  }
-
-  navigate("/categorias");
+    navigate("/categorias");
+  });
+}
 };
 
 
@@ -188,25 +194,32 @@ export function FormCategoria() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          
           {/* NOMBRE */}
-          <input
-            name="nombre"
-            value={form.nombre}
-            onChange={handleChange}
-            placeholder="Nombre de la categoría"
-            className="p-3 border rounded-lg w-full"
-            required
-          />
+          <div>
+            <label className="font-semibold mb-1 block">Nombre</label>
+            <input
+              name="nombre"
+              value={form.nombre}
+              onChange={handleChange}
+              placeholder="Nombre de la categoría"
+              className="p-3 border rounded-lg w-full"
+              required
+            />
+          </div>
 
           {/* DESCRIPCIÓN */}
-          <textarea
-            name="descripcion"
-            value={form.descripcion}
-            onChange={handleChange}
-            placeholder="Descripción"
-            rows="3"
-            className="p-3 border rounded-lg w-full"
-          />
+          <div>
+            <label className="font-semibold mb-1 block">Descripción</label>
+            <textarea
+              name="descripcion"
+              value={form.descripcion}
+              onChange={handleChange}
+              placeholder="Descripción"
+              rows="3"
+              className="p-3 border rounded-lg w-full"
+            />
+          </div>
 
           {/* SELECCIÓN DE SLA */}
           <div>
@@ -275,7 +288,7 @@ export function FormCategoria() {
             </div>
           )}
 
-          {/* Nueva SLA */}
+          {/* NUEVO SLA */}
           {form.sla_mode === "new" && (
             <div className="grid grid-cols-1 gap-4 border p-4 rounded-xl shadow-sm bg-white">
               <h3 className="font-bold text-blue-800 text-lg mb-2">
