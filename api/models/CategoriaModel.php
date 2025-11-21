@@ -54,7 +54,7 @@ public function get($id)
     return $categoria;
 }
 
-
+ 
  public function create($data)
     {
         // Insert en tabla categorías

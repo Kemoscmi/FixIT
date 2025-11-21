@@ -1,3 +1,5 @@
+
+//Importamos todo lo que vamos a usar aca
 import { useEffect, useState } from "react";
 import TecnicoService from "@/services/TecnicoService";
 import EspecialidadService from "@/services/EspecialidadService";
@@ -7,12 +9,17 @@ import toast from "react-hot-toast";
 
 
 export function FormTecnico() {
-  const navigate = useNavigate();
+  //Esto lo que hace es que cuando el tecnico se crea, nos lleva al listado, para evitar dobles inserts
+  const navigate = useNavigate(); 
+
+  //Esto nos sirve para decir que, si viene con id es editar, si no, es crear
   const { id } = useParams();
 
+  //Aca lo que hacemos es cargar las especialidades desde el backend, para luego poder usarlas
   const [especialidades, setEspecialidades] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  //Esto carga la base de las entradas
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
@@ -30,7 +37,7 @@ export function FormTecnico() {
     if (!nombre || !apellido) return "";
     return `${(nombre + "." + apellido)
       .toLowerCase()
-      .replace(/\s+/g, "")}@fixit.cr`;
+      .replace(/\s+/g, "")}@fixit.cr`; //Elimina todos los espacios en blanco, y pone el dominio
   };
 
   useEffect(() => {
@@ -40,13 +47,12 @@ export function FormTecnico() {
       const dataEspecialidades = await EspecialidadService.getEspecialidades();
       setEspecialidades(dataEspecialidades || []);
 
-      // 2. Si es edición → cargar técnico
+      // 2. Si es edición cargar al técnico
       if (id) {
         const resp = await TecnicoService.getTecnicoById(id);
         console.log("RESP TECNICO:", resp);
 
-        // 👇 aquí está el técnico REAL
-        const tecnico = resp.data || resp; // soporta ambas formas
+        const tecnico = resp.data || resp; //Esto para que no falle, dependiendo como viene la data
 
         const especialidadesLimpias = Array.isArray(tecnico.especialidades)
           ? tecnico.especialidades
@@ -60,7 +66,7 @@ export function FormTecnico() {
           observaciones: tecnico.observaciones ?? "",
           disponibilidad: tecnico.disponibilidad ?? "Disponible",
           activo: 1,
-          contrasena: "", // no se edita aquí
+          contrasena: "", 
           especialidades: especialidadesLimpias.map(
             (e) => e.id ?? e.especialidad_id
           ),
@@ -81,24 +87,24 @@ export function FormTecnico() {
   const handleChange = (e) => {
   const { name, value } = e.target;
 
-  // 🔹 VALIDACIÓN nombres y apellidos — SOLO LETRAS  
+  //  VALIDACIÓN nombres y apellidos — SOLO LETRAS  
   if ((name === "nombre" || name === "apellido") && !/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]*$/.test(value)) {
     toast.error("Solo se permiten letras en el nombre y apellido");
     return;
   }
 
-  // 🔹 VALIDACIÓN teléfono — SOLO NÚMEROS
+  //  VALIDACIÓN teléfono — SOLO NÚMEROS
   if (name === "telefono" && !/^[0-9]*$/.test(value)) {
     toast.error("El teléfono solo puede contener números");
     return;
   }
 
-  // 🔹 VALIDACIÓN correo — DEBE TERMINAR EN @fixit.cr
+  //  VALIDACIÓN correo — DEBE TERMINAR EN @fixit.cr
   if (name === "correo" && value !== "" && !value.endsWith("@fixit.cr")) {
     toast.error("El correo debe terminar en @fixit.cr");
   }
 
-  // 🔹 Generar correo automáticamente si nombre/apellido cambian
+  //  Generar correo automáticamente si nombre/apellido cambian
   let nuevo = { ...form, [name]: value };
 
   if (name === "nombre" || name === "apellido") {
@@ -111,7 +117,8 @@ export function FormTecnico() {
   setForm(nuevo);
 };
 
-
+//Para las especialidades, si ya esta seleccionada una, se le pregunta al array de ids
+//Y sisi, la quitamos y si no, se agrega
   const toggleEspecialidad = (id) => {
     const selected = form.especialidades.includes(id);
 
@@ -128,14 +135,15 @@ export function FormTecnico() {
     }
   };
 
+  //Prevencion antes de enviar
   const handleSubmit = (e) => {
     e.preventDefault();
     const payload = { ...form, activo: 1 };
 
-if (!form.correo.endsWith("@fixit.cr")) {
-  toast.error("El correo debe terminar en @fixit.cr");
-  return;
-}
+    if (!form.correo.endsWith("@fixit.cr")) {
+      toast.error("El correo debe terminar en @fixit.cr");
+      return;
+    }
 
 
     if (id) {
@@ -154,6 +162,7 @@ if (!form.correo.endsWith("@fixit.cr")) {
   if (loading)
     return <p className="text-center p-10 text-blue-600">Cargando...</p>;
 
+  //Maquetado
   return (
     <div className="min-h-screen py-10 px-6 bg-white">
       <div className="max-w-3xl mx-auto bg-white/80 border shadow-xl rounded-2xl p-8">
