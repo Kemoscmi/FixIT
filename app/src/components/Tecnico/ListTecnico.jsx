@@ -20,17 +20,17 @@ export function ListTecnico() { // Componente principal para listar técnicos
         setError(error.message); // Guarda el mensaje de error
         setLoading(false); // Detiene el estado de carga
       });
-  }, []); // Solo se ejecuta una vez al inicio
+  }, []);
 
-  if (loading) // Si está cargando, muestra el spinner
+  if (loading) // Para cuando esta cargando
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] text-blue-700">
-        <Loader2 className="animate-spin h-10 w-10 mb-4" /> {/* Ícono animado */}
-        <p className="text-lg font-medium">Cargando técnicos...</p> {/* Texto de carga */}
+        <Loader2 className="animate-spin h-10 w-10 mb-4" /> {/* Iconito de cargando */}
+        <p className="text-lg font-medium">Cargando técnicos...</p> 
       </div>
     );
 
-  if (error) // Si hay error, muestra el mensaje
+  if (error) 
     return (
       <p className="text-center text-red-500 text-lg mt-8">
         Error: {error}
@@ -40,20 +40,17 @@ export function ListTecnico() { // Componente principal para listar técnicos
 return (
   <div className="min-h-screen bg-white py-12 px-6">
 
-    {/* 🔵 FILA CON GRID: TITULO CENTRADO + BOTÓN DERECHA */}
     <div className="max-w-6xl mx-auto grid grid-cols-3 items-center mb-6">
 
-      {/* Columna izquierda vacía (para compensar el botón) */}
       <div></div>
 
-      {/* TÍTULO CENTRADO */}
       <h2 className="text-4xl font-extrabold text-center bg-gradient-to-r from-sky-600 to-blue-700 bg-clip-text text-transparent">
         Nuestros Técnicos
       </h2>
 
       {/* BOTÓN EN LA DERECHA */}
       <div className="flex justify-end">
-        <Link
+        <Link 
           to="/tecnico/create"
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-700 text-white rounded-lg shadow hover:scale-105 transition"
         >
