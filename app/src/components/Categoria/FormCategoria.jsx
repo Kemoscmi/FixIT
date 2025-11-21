@@ -188,25 +188,32 @@ export function FormCategoria() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          
           {/* NOMBRE */}
-          <input
-            name="nombre"
-            value={form.nombre}
-            onChange={handleChange}
-            placeholder="Nombre de la categoría"
-            className="p-3 border rounded-lg w-full"
-            required
-          />
+          <div>
+            <label className="font-semibold mb-1 block">Nombre</label>
+            <input
+              name="nombre"
+              value={form.nombre}
+              onChange={handleChange}
+              placeholder="Nombre de la categoría"
+              className="p-3 border rounded-lg w-full"
+              required
+            />
+          </div>
 
           {/* DESCRIPCIÓN */}
-          <textarea
-            name="descripcion"
-            value={form.descripcion}
-            onChange={handleChange}
-            placeholder="Descripción"
-            rows="3"
-            className="p-3 border rounded-lg w-full"
-          />
+          <div>
+            <label className="font-semibold mb-1 block">Descripción</label>
+            <textarea
+              name="descripcion"
+              value={form.descripcion}
+              onChange={handleChange}
+              placeholder="Descripción"
+              rows="3"
+              className="p-3 border rounded-lg w-full"
+            />
+          </div>
 
           {/* SELECCIÓN DE SLA */}
           <div>
@@ -275,7 +282,7 @@ export function FormCategoria() {
             </div>
           )}
 
-          {/* Nueva SLA */}
+          {/* NUEVO SLA */}
           {form.sla_mode === "new" && (
             <div className="grid grid-cols-1 gap-4 border p-4 rounded-xl shadow-sm bg-white">
               <h3 className="font-bold text-blue-800 text-lg mb-2">

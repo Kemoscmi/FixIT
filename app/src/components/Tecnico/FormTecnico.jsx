@@ -1,4 +1,3 @@
-
 //Importamos todo lo que vamos a usar aca
 import { useEffect, useState } from "react";
 import TecnicoService from "@/services/TecnicoService";
@@ -30,7 +29,7 @@ export function FormTecnico() {
     disponibilidad: "Disponible",
     activo: 1,
     especialidades: [],
-     carga_trabajo: 0 
+    carga_trabajo: 0 
   });
 
   const generarCorreo = (nombre, apellido) => {
@@ -174,66 +173,85 @@ export function FormTecnico() {
           
           {/* NOMBRE Y APELLIDO */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="font-semibold mb-1 block">Nombre</label>
+              <input
+                name="nombre"
+                value={form.nombre}
+                onChange={handleChange}
+                placeholder="Nombre"
+                className="p-3 border rounded-lg"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="font-semibold mb-1 block">Apellido</label>
+              <input
+                name="apellido"
+                value={form.apellido}
+               onChange={handleChange}
+                placeholder="Apellido"
+                className="p-3 border rounded-lg"
+                required
+              />
+            </div>
+          </div>
+
+          {/* CORREO */}
+          <div>
+            <label className="font-semibold mb-1 block">Correo</label>
             <input
-              name="nombre"
-              value={form.nombre}
+              name="correo"
+              type="email"
+              value={form.correo}
               onChange={handleChange}
-              placeholder="Nombre"
-              className="p-3 border rounded-lg"
-              required
-            />
-            <input
-              name="apellido"
-              value={form.apellido}
-              onChange={handleChange}
-              placeholder="Apellido"
-              className="p-3 border rounded-lg"
+              placeholder="Correo"
+              className="p-3 border rounded-lg w-full"
               required
             />
           </div>
 
-          {/* CORREO */}
-          <input
-            name="correo"
-            type="email"
-            value={form.correo}
-            onChange={handleChange}
-            placeholder="Correo"
-            className="p-3 border rounded-lg w-full"
-            required
-          />
-
           {/* CONTRASEÑA SOLO EN CREAR */}
           {!id && (
-            <input
-              name="contrasena"
-              type="password"
-              value={form.contrasena}
-              onChange={handleChange}
-              placeholder="Contraseña"
-              className="p-3 border rounded-lg w-full"
-              required
-            />
+            <div>
+              <label className="font-semibold mb-1 block">Contraseña</label>
+              <input
+                name="contrasena"
+                type="password"
+                value={form.contrasena}
+                onChange={handleChange}
+                placeholder="Contraseña"
+                className="p-3 border rounded-lg w-full"
+                required
+              />
+            </div>
           )}
 
           {/* TELÉFONO */}
-          <input
-            name="telefono"
-            value={form.telefono}
-            onChange={handleChange}
-            placeholder="Teléfono"
-            className="p-3 border rounded-lg w-full"
-          />
+          <div>
+            <label className="font-semibold mb-1 block">Teléfono</label>
+            <input
+              name="telefono"
+              value={form.telefono}
+              onChange={handleChange}
+              placeholder="Teléfono"
+              className="p-3 border rounded-lg w-full"
+            />
+          </div>
 
           {/* OBSERVACIONES */}
-          <textarea
-            name="observaciones"
-            value={form.observaciones}
-            onChange={handleChange}
-            placeholder="Observaciones"
-            className="p-3 border rounded-lg w-full"
-            rows="3"
-          />
+          <div>
+            <label className="font-semibold mb-1 block">Observaciones</label>
+            <textarea
+              name="observaciones"
+              value={form.observaciones}
+              onChange={handleChange}
+              placeholder="Observaciones"
+              className="p-3 border rounded-lg w-full"
+              rows="3"
+            />
+          </div>
 
           {/* ESPECIALIDADES */}
           <div>
@@ -272,7 +290,6 @@ export function FormTecnico() {
               className="p-3 border rounded-lg w-full bg-gray-100 text-gray-600 cursor-not-allowed"
             />
           </div>
-
 
           {/* DISPONIBILIDAD */}
           <div>
