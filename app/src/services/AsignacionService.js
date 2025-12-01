@@ -1,14 +1,10 @@
 //  services/AsignacionService.js
 // -------------------------------------------------------------
-// Este servicio maneja las peticiones HTTP relacionadas con las
-// asignaciones (para técnicos y administradores).
-// Utiliza la ruta del backend: /AsignacionController/semana
-//
-// Comportamiento del endpoint:
-//  - Si se envía “date” → obtiene asignaciones de esa semana.
-//  - Si NO se envía “date” → obtiene todas las asignaciones.
-//  - Si el rol es 1 (admin) → ve todas las asignaciones.
-//  - Si el rol es 2 (técnico) → ve solo sus asignaciones.
+// Servicio para manejar asignaciones de tickets:
+// - Listado semanal (admin / técnico)
+// - Asignación automática de un ticket
+// - Listado de técnicos compatibles para asignación manual
+// - Asignación manual
 // -------------------------------------------------------------
 
 import axios from "axios";
@@ -16,21 +12,66 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_BASE_URL + "AsignacionController";
 
 class AsignacionService {
-  // Obtener asignaciones (todas o por semana)
-  // Si no se pasa “date”, devuelve todas.
-  // GET -> /AsignacionController/semana?rol_id=2&user_id=3
   // GET -> /AsignacionController/semana?rol_id=2&user_id=3&date=YYYY-MM-DD
   getAsignaciones({ rolId, userId, date }) {
     if (!rolId || !userId)
       return Promise.reject("Faltan parámetros obligatorios: rolId y userId");
 
-    // Solo agrega el parámetro “date” si fue enviado
     const params = date
       ? { rol_id: rolId, user_id: userId, date }
       : { rol_id: rolId, user_id: userId };
 
     return axios.get(`${BASE_URL}/semana`, { params });
   }
+
+  // GET -> /AsignacionController/auto?ticket_id=123
+  asignarAuto(ticketId) {
+    if (!ticketId) return Promise.reject("Ticket no válido");
+    return axios.get(`${BASE_URL}/auto`, {
+      params: { ticket_id: ticketId },
+    });
+  }
+// GET → Asignación automática de TODOS los tickets pendientes
+// /AsignacionController/asignarPendientes
+asignarPendientes() {
+  return axios.get(`${BASE_URL}/asignarPendientes`);
+}
+
+
+
+getTecnicosByTicket(ticketId) {
+  return axios.get(`${BASE_URL}/tecnicos`, {
+    params: { ticket_id: ticketId }
+  });
+}
+
+
+  // GET -> /AsignacionController/tecnicos?ticket_id=123
+  getTecnicosManual(ticketId) {
+    if (!ticketId) return Promise.reject("Ticket no válido");
+    return axios.get(`${BASE_URL}/tecnicos`, {
+      params: { ticket_id: ticketId },
+    });
+  }
+
+  // POST -> /AsignacionController/manual
+  // Body (FormData o x-www-form-urlencoded):
+  //  ticket_id, tecnico_id, justificacion
+  asignarManual({ ticket_id, tecnico_id, justificacion }) {
+    if (!ticket_id || !tecnico_id || !justificacion) {
+      return Promise.reject("Datos incompletos para asignación manual");
+    }
+
+    const formData = new FormData();
+    formData.append("ticket_id", ticket_id);
+    formData.append("tecnico_id", tecnico_id);
+    formData.append("justificacion", justificacion);
+
+    return axios.post(`${BASE_URL}/manual`, formData);
+  }
+  getTicketsPendientes(filters = {}) {
+  return axios.get(`${BASE_URL}/pendientes`, { params: filters });
+}
 }
 
 export default new AsignacionService();
