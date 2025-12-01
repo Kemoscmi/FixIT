@@ -1,4 +1,4 @@
-// ============================================================
+ // ============================================================
 // COMPONENTE: DetailTicket.jsx
 // Descripción:
 //   Muestra la información detallada de un ticket específico.
