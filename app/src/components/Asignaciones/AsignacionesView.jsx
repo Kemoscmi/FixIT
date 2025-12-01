@@ -1,36 +1,58 @@
 // ============================================================
 //  COMPONENTE: AsignacionesView.jsx
+// ------------------------------------------------------------
+// Este componente muestra las asignaciones semanales del t茅cnico o administrador
+// en forma de calendario (lunes a domingo). Permite filtrar por semana,
+// calcular el avance del SLA de cada ticket y ver detalles individuales.
 // ============================================================
 
-import React, { useEffect, useState } from "react";
-import AsignacionService from "../../services/AsignacionService";
+//  Importaciones principales de React
+import React, { useEffect, useState } from "react"; // useState y useEffect son hooks
+import AsignacionService from "../../services/AsignacionService"; // servicio que obtiene las asignaciones desde la API
 
+//  Componentes UI reutilizables (dise帽o de tarjeta, botones, badges, etc.)
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+// Navegaci贸n interna y autenticaci贸n del usuario
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../auth/store/auth.store";
+import useAuth from "../../auth/store/auth.store"; // almac茅n de datos del usuario autenticado
 
-import { LoadingGrid } from "../ui/custom/LoadingGrid";
-import { ErrorAlert } from "../ui/custom/ErrorAlert";
+//  Componentes de estado visual
+import { LoadingGrid } from "../ui/custom/LoadingGrid"; // muestra carga animada
+import { ErrorAlert } from "../ui/custom/ErrorAlert"; // muestra errores
 
-import { useI18n } from "@/hooks/useI18n"; // ✅ AGREGADO
-
+// ============================================================
+// Componente principal: AsignacionesView
+// ============================================================
 export default function AsignacionesView() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { t, lang } = useI18n();
 
+  //  Hook para redirigir entre vistas
+  const navigate = useNavigate();
+
+  // Extrae los datos del usuario autenticado
+  const { user } = useAuth();
+
+  // ============================================================
+  // Estados internos del componente
+  // ============================================================
   const [data, setData] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState("");
 
+  // 馃數 Estado para ejecutar asignaci贸n autom谩tica
+ 
+
+  // Extrae rol e ID
   const rolId = user?.rol_id;
   const userId = user?.id;
 
+  // ============================================================
+  //  Colores de estado
+  // ============================================================
   const estadoColors = {
     Pendiente: "border-yellow-400 bg-yellow-50 text-yellow-800",
     Asignado: "border-blue-400 bg-blue-50 text-blue-800",
@@ -40,14 +62,14 @@ export default function AsignacionesView() {
   };
 
   // ============================================================
-  // CARGA DE ASIGNACIONES
+  // Cargar asignaciones
   // ============================================================
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await AsignacionService.getAsignaciones({ rolId, userId });
-        const raw = response.data?.data?.asignaciones;
 
+        const raw = response.data?.data?.asignaciones;
         let all = [];
 
         if (Array.isArray(raw)) {
@@ -66,26 +88,29 @@ export default function AsignacionesView() {
               fecha_asignacion:
                 fecha === "Sin fecha"
                   ? null
-                  : new Date(fecha.replace(" ", "T") + "Z").toISOString().split("T")[0],
+                  : new Date(fecha.replace(" ", "T") + "Z")
+                      .toISOString()
+                      .split("T")[0],
             }))
           );
         }
 
         setData(all);
         setFiltered(all);
-     // eslint-disable-next-line no-unused-vars
-      } catch (err) {
-        setError(t("alerts.loadError"));
+      } catch  {
+        setError("Error al cargar las asignaciones.");
       } finally {
         setLoading(false);
       }
     };
 
     if (rolId && userId) fetchData();
-  }, [rolId, userId, t]);
+  }, [rolId, userId]);
+
+ 
 
   // ============================================================
-  // FILTRAR POR SEMANA
+  // Filtro por semana
   // ============================================================
   const handleFilterWeek = (value) => {
     setSelectedWeek(value);
@@ -98,9 +123,7 @@ export default function AsignacionesView() {
 
     const firstDayOfYear = new Date(year, 0, 1);
     const firstWeekStart = new Date(firstDayOfYear);
-    firstWeekStart.setDate(
-      firstDayOfYear.getDate() - firstDayOfYear.getDay() + 1 + (week - 1) * 7
-    );
+    firstWeekStart.setDate(firstDayOfYear.getDate() - firstDayOfYear.getDay() + 1 + (week - 1) * 7);
 
     const lastWeekEnd = new Date(firstWeekStart);
     lastWeekEnd.setDate(firstWeekStart.getDate() + 6);
@@ -109,8 +132,8 @@ export default function AsignacionesView() {
       if (!a.fecha_asignacion) return false;
       const fecha = new Date(a.fecha_asignacion + "T00:00:00");
       return (
-        fecha >= new Date(firstWeekStart.setHours(0, 0, 0, 0)) &&
-        fecha <= new Date(lastWeekEnd.setHours(23, 59, 59, 999))
+        fecha.getTime() >= firstWeekStart.setHours(0, 0, 0, 0) &&
+        fecha.getTime() <= lastWeekEnd.setHours(23, 59, 59, 999)
       );
     });
 
@@ -118,10 +141,10 @@ export default function AsignacionesView() {
   };
 
   if (loading) return <LoadingGrid />;
-  if (error) return <ErrorAlert title={t("alerts.error")} message={error} />;
+  if (error) return <ErrorAlert title="Error" message={error} />;
 
   // ============================================================
-  // SEMANA BASE
+  // Semana base
   // ============================================================
   const baseDate = selectedWeek
     ? (() => {
@@ -138,19 +161,16 @@ export default function AsignacionesView() {
         return monday;
       })();
 
-const locale = lang === "en" ? "en-US" : "es-CR";
-
-  // ============================================================
-  // DÍAS DE LA SEMANA
-  // ============================================================
   const diasSemana = Array.from({ length: 7 }).map((_, i) => {
     const fecha = new Date(baseDate);
     fecha.setDate(baseDate.getDate() + i);
-
+    const fechaISO = fecha.toLocaleDateString("sv-SE");
     return {
-      nombre: fecha.toLocaleDateString(locale, { weekday: "long" }),
-      fechaISO: fecha.toLocaleDateString("sv-SE"),
-      fechaMostrar: `${fecha.getDate()} ${fecha.toLocaleString(locale, { month: "short" })}`,
+      nombre: fecha.toLocaleDateString("es-CR", { weekday: "long" }),
+      fechaISO,
+      fechaMostrar: `${fecha.getDate()} ${fecha.toLocaleString("es-CR", {
+        month: "short",
+      })}`,
     };
   });
 
@@ -158,7 +178,6 @@ const locale = lang === "en" ? "en-US" : "es-CR";
     const fecha = asignacion.fecha_asignacion
       ? new Date(asignacion.fecha_asignacion).toISOString().split("T")[0]
       : "Sin fecha";
-
     if (!acc[fecha]) acc[fecha] = [];
     acc[fecha].push(asignacion);
     return acc;
@@ -173,31 +192,45 @@ const locale = lang === "en" ? "en-US" : "es-CR";
   return (
     <div className="max-w-7xl mx-auto p-6">
 
+    
+      {/* T铆tulo */}
       <h1 className="text-3xl font-bold mb-2 text-blue-900">
-        {rolId === 1
-          ? t("assignmentsView.titleAdmin")
-          : t("assignmentsView.titleTech")}
+        {rolId === 1 ? "Asignaciones Generales" : "Mis Asignaciones Semanales"}
       </h1>
 
-      <p className="text-gray-600 mb-2">{t("assignmentsView.description")}</p>
-
-      <p className="text-sm text-gray-700 italic mb-6">
-        {t("assignmentsView.weekRange", { start: inicioSemana, end: finSemana })}
+      <p className="text-gray-600 mb-2">
+        Vista tipo calendario semanal (lunes a domingo), con agrupaci贸n diaria.
       </p>
 
-      <div className="flex items-center gap-3 mb-8">
-        <label className="text-sm font-medium text-gray-700">
-          {t("assignmentsView.filterWeek")}
-        </label>
+      <p className="text-sm text-gray-700 italic mb-6">
+        Semana del <b>{inicioSemana}</b> al <b>{finSemana}</b>
+      </p>
 
+      {/* 馃數 Bot贸n + Filtro */}
+      <div className="flex items-center gap-4 mb-8">
+
+        {/* 馃數 Bot贸n ASIGNACI脫N AUTOM脕TICA */}
+      <Button
+  onClick={() => navigate("/asignaciones/autotriage")}
+  className="bg-indigo-600 text-white hover:bg-indigo-700"
+>
+  Asignaci贸n Autom谩tica
+</Button>
+
+
+        {/* Filtro */}
+        <label className="text-sm font-medium text-gray-700">
+          Filtrar por semana:
+        </label>
         <input
           type="week"
           value={selectedWeek}
           onChange={(e) => handleFilterWeek(e.target.value)}
-          className="border p-2 rounded-md shadow-sm"
+          className="border p-2 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
+      {/* Calendario */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
         {diasSemana.map((dia) => {
           const asignacionesDelDia = asignacionesPorFecha[dia.fechaISO] || [];
@@ -205,7 +238,7 @@ const locale = lang === "en" ? "en-US" : "es-CR";
           return (
             <Card
               key={dia.fechaISO}
-              className="border border-blue-100 shadow-md rounded-xl hover:shadow-lg transition-all"
+              className="border border-blue-100 shadow-md rounded-xl hover:shadow-lg transition-all bg-white/90 backdrop-blur-sm"
             >
               <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-t-xl">
                 <CardTitle className="flex justify-between items-center">
@@ -214,67 +247,76 @@ const locale = lang === "en" ? "en-US" : "es-CR";
                 </CardTitle>
               </CardHeader>
 
-              <CardContent className="space-y-3 p-4 min-h-[160px]">
+              <CardContent className="space-y-3 bg-white rounded-b-xl min-h-[160px] p-4">
                 {asignacionesDelDia.length > 0 ? (
                   asignacionesDelDia.map((a, idx) => {
-                    const inicio = new Date(a.fecha_creacion);
-                    const limite = new Date(a.sla_resol_limite);
+                    const parseToLocalDate = (str) => {
+                      if (!str) return null;
+                      return new Date(str.replace(" ", "T"));
+                    };
+
+                    const fechaInicio = parseToLocalDate(a.fecha_creacion);
+                    const fechaLimite = parseToLocalDate(a.sla_resol_limite);
                     const ahora = new Date();
 
-                    const totalMs = limite - inicio;
-                    const transMs = ahora - inicio;
+                    const totalMs = fechaLimite - fechaInicio;
+                    const transcurridoMs = ahora - fechaInicio;
 
-                    let slaProgress = 100 - (transMs / totalMs) * 100;
-                    slaProgress = Math.max(0, Math.min(100, slaProgress));
+                    let slaProgress = 100 - (transcurridoMs / totalMs) * 100;
+                    if (slaProgress < 0) slaProgress = 0;
+                    if (slaProgress > 100) slaProgress = 100;
 
-                    const slaStatus =
-                      ahora > limite
-                        ? t("assignmentsView.slaExpired")
-                        : t("assignmentsView.slaInProgress");
+                    const slaStatus = ahora > fechaLimite ? "Vencido" : "En curso";
 
                     return (
                       <div
                         key={idx}
                         className={`p-3 rounded-lg border-l-4 ${
                           estadoColors[a.estado] || "border-gray-300"
-                        } shadow-sm`}
+                        } shadow-sm hover:shadow-md transition`}
                       >
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <p className="font-semibold text-sm">
-                              #{a.ticket_id} — {a.titulo}
+                            <p className="font-semibold text-gray-900 text-sm">
+                              #{a.ticket_id} 鈥� {a.titulo}
                             </p>
-
                             <p className="text-xs text-gray-600">
-                              {t("assignmentsView.ticketCategory")}{" "}
-                              <strong>{a.categoria}</strong>
+                              Categor铆a: <strong>{a.categoria}</strong>
                             </p>
-
                             <p
                               className={`text-xs font-medium ${
-                                slaStatus === t("assignmentsView.slaExpired")
-                                  ? "text-red-600"
+                                slaStatus === "Vencido"
+                                  ? "text-black-600"
                                   : "text-gray-500"
                               }`}
                             >
-                              {t("assignmentsView.sla")} {slaStatus} (
-                              {Math.round(slaProgress)}%)
+                              SLA: {slaStatus} ({Math.round(slaProgress)}%)
                             </p>
                           </div>
 
-                          <Badge>
+                          <Badge
+                            className={`${
+                              estadoColors[a.estado] ||
+                              "bg-gray-200 text-gray-700 border-gray-300"
+                            } px-3 py-1 text-xs font-medium rounded-full shadow-sm`}
+                          >
                             {a.estado}
                           </Badge>
                         </div>
 
-                        <div className="w-full bg-gray-200 h-2 rounded-full mb-2">
+                        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-2">
                           <div
-                            className={`h-2 ${
-                              slaStatus === t("assignmentsView.slaExpired")
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              slaStatus === "Vencido"
                                 ? "bg-red-600"
                                 : "bg-green-500"
                             }`}
-                            style={{ width: `${slaProgress}%` }}
+                            style={{
+                              width: `${
+                                slaStatus === "Vencido" ? 100 : slaProgress
+                              }%`,
+                              opacity: slaStatus === "Vencido" ? 1 : 0.9,
+                            }}
                           ></div>
                         </div>
 
@@ -284,7 +326,7 @@ const locale = lang === "en" ? "en-US" : "es-CR";
                             className="bg-blue-600 text-white hover:bg-blue-700 text-xs"
                             onClick={() => navigate(a.ver_detalle)}
                           >
-                            {t("assignmentsView.btnViewDetail")}
+                            Ver detalle
                           </Button>
                         </div>
                       </div>
@@ -292,7 +334,7 @@ const locale = lang === "en" ? "en-US" : "es-CR";
                   })
                 ) : (
                   <p className="text-sm text-gray-400 text-center italic mt-8">
-                    {t("assignmentsView.noAssignments")}
+                    鈥� Sin asignaciones 鈥�
                   </p>
                 )}
               </CardContent>
