@@ -1,7 +1,7 @@
 // ============================================================
 //  COMPONENTE: AsignacionesView.jsx
 // ------------------------------------------------------------
-// Este componente muestra las asignaciones semanales del t茅cnico o administrador
+// Este componente muestra las asignaciones semanales del técnico o administrador
 // en forma de calendario (lunes a domingo). Permite filtrar por semana,
 // calcular el avance del SLA de cada ticket y ver detalles individuales.
 // ============================================================
@@ -10,14 +10,14 @@
 import React, { useEffect, useState } from "react"; // useState y useEffect son hooks
 import AsignacionService from "../../services/AsignacionService"; // servicio que obtiene las asignaciones desde la API
 
-//  Componentes UI reutilizables (dise帽o de tarjeta, botones, badges, etc.)
+//  Componentes UI reutilizables (diseño de tarjeta, botones, badges, etc.)
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-// Navegaci贸n interna y autenticaci贸n del usuario
+// Navegación interna y autenticación del usuario
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../auth/store/auth.store"; // almac茅n de datos del usuario autenticado
+import useAuth from "../../auth/store/auth.store"; // almacén de datos del usuario autenticado
 
 //  Componentes de estado visual
 import { LoadingGrid } from "../ui/custom/LoadingGrid"; // muestra carga animada
@@ -43,7 +43,7 @@ export default function AsignacionesView() {
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState("");
 
-  // 馃數 Estado para ejecutar asignaci贸n autom谩tica
+  // 🔵 Estado para ejecutar asignación automática
  
 
   // Extrae rol e ID
@@ -193,28 +193,28 @@ export default function AsignacionesView() {
     <div className="max-w-7xl mx-auto p-6">
 
     
-      {/* T铆tulo */}
+      {/* Título */}
       <h1 className="text-3xl font-bold mb-2 text-blue-900">
         {rolId === 1 ? "Asignaciones Generales" : "Mis Asignaciones Semanales"}
       </h1>
 
       <p className="text-gray-600 mb-2">
-        Vista tipo calendario semanal (lunes a domingo), con agrupaci贸n diaria.
+        Vista tipo calendario semanal (lunes a domingo), con agrupación diaria.
       </p>
 
       <p className="text-sm text-gray-700 italic mb-6">
         Semana del <b>{inicioSemana}</b> al <b>{finSemana}</b>
       </p>
 
-      {/* 馃數 Bot贸n + Filtro */}
+      {/* 🔵 Botón + Filtro */}
       <div className="flex items-center gap-4 mb-8">
 
-        {/* 馃數 Bot贸n ASIGNACI脫N AUTOM脕TICA */}
+        {/* 🔵 Botón ASIGNACIÓN AUTOMÁTICA */}
       <Button
   onClick={() => navigate("/asignaciones/autotriage")}
   className="bg-indigo-600 text-white hover:bg-indigo-700"
 >
-  Asignaci贸n Autom谩tica
+  Asignación Automática
 </Button>
 
 
@@ -278,10 +278,10 @@ export default function AsignacionesView() {
                         <div className="flex justify-between items-start mb-2">
                           <div>
                             <p className="font-semibold text-gray-900 text-sm">
-                              #{a.ticket_id} 鈥� {a.titulo}
+                              #{a.ticket_id} — {a.titulo}
                             </p>
                             <p className="text-xs text-gray-600">
-                              Categor铆a: <strong>{a.categoria}</strong>
+                              Categoría: <strong>{a.categoria}</strong>
                             </p>
                             <p
                               className={`text-xs font-medium ${
@@ -334,7 +334,7 @@ export default function AsignacionesView() {
                   })
                 ) : (
                   <p className="text-sm text-gray-400 text-center italic mt-8">
-                    鈥� Sin asignaciones 鈥�
+                    — Sin asignaciones —
                   </p>
                 )}
               </CardContent>
