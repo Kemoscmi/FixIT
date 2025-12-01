@@ -358,7 +358,3 @@ export function CreateTicket() {
 }
 
 
-
-const storedLang = localStorage.getItem("lang") || "es";
-
-
