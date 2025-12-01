@@ -17,7 +17,6 @@ import {
   User,
   Home,
   Users2,
-  Bell,
 } from "lucide-react";
 
 import {
@@ -27,15 +26,20 @@ import {
   MenubarContent,
   MenubarItem,
 } from "@/components/ui/menubar";
+
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import useAuth from "../../auth/store/auth.store";
 import Logo from "../../assets/Logo.png";
 
+// ⭐ IMPORTANTE
+import { useI18n } from "@/hooks/useI18n";
+import { LanguageSelector } from "../LanguageSelector";
+
 export default function Header() {
+  const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
-
-  const { user, isAuthenticated, logout } = useAuth();
+  const { t } = useI18n();
 
   const handleLogout = () => {
     logout();
@@ -45,37 +49,33 @@ export default function Header() {
   const rolId = user?.rol_id;
   const rol = user?.rol;
 
-  // ✅ Condiciones de rol
   const isAdmin = rol === "Administrador" || rolId === 1;
   const isTecnico = rol === "Técnico" || rolId === 2;
 
-  useEffect(() => {
-    if (!user?.id) return;
+  const userName = user?.nombre || user?.correo || t("navbar.guest");
 
-  }, [user?.id]);
-
-  // ✅ Ítems visibles según rol
+  // 🔵 NAV ITEMS traducidos
   const navItems = [
-    { title: "Inicio", href: "Principal", icon: <Home className="h-4 w-4" /> },
-    { title: "Mis Tickets", href: "/tickets", icon: <Ticket className="h-4 w-4" /> },
+    { title: t("navbar.home"), href: "Principal", icon: <Home className="h-4 w-4" /> },
+    { title: t("navbar.tickets"), href: "/tickets", icon: <Ticket className="h-4 w-4" /> },
     ...(isAdmin || isTecnico
-      ? [{ title: "Asignaciones", href: "/asignaciones", icon: <ClipboardList className="h-4 w-4" /> }]
+      ? [{ title: t("navbar.assignments"), href: "/asignaciones", icon: <ClipboardList className="h-4 w-4" /> }]
       : []),
   ];
 
+  // 🔵 ADMIN ITEMS traducidos
   const mantItems = [
-    { title: "Tickets", href: "/tickets/table", icon: <Wrench className="h-4 w-4" /> },
-    { title: "Usuarios", href: "/usuarios", icon: <Users className="h-4 w-4" /> },
-    { title: "Técnicos", href: "/tecnicos", icon: <Users2 className="h-4 w-4" /> },
-    { title: "Categorías", href: "/categorias", icon: <Layers className="h-4 w-4" /> },
+    { title: t("navbar.tickets"), href: "/tickets/table", icon: <Wrench className="h-4 w-4" /> },
+    { title: t("navbar.users"), href: "/usuarios", icon: <Users className="h-4 w-4" /> },
+    { title: t("navbar.technicians"), href: "/tecnicos", icon: <Users2 className="h-4 w-4" /> },
+    { title: t("navbar.categories"), href: "/categorias", icon: <Layers className="h-4 w-4" /> },
   ];
 
+  // 🔵 VISITANTES traducidos
   const guestItems = [
-    { title: "Iniciar Sesión", href: "/login", icon: <LogIn className="h-4 w-4" /> },
-    { title: "Registrarse", href: "/user/create", icon: <UserPlus className="h-4 w-4" /> },
+    { title: t("navbar.login"), href: "/login", icon: <LogIn className="h-4 w-4" /> },
+    { title: t("navbar.register"), href: "/user/create", icon: <UserPlus className="h-4 w-4" /> },
   ];
-
-  const userName = user?.nombre || user?.correo || "Invitado";
 
   return (
     <header className="fixed top-0 left-0 z-50 w-full bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md border-b border-white/10 shadow-lg transition-all duration-300">
@@ -89,6 +89,7 @@ export default function Header() {
         {/* NAV ESCRITORIO */}
         <div className="hidden md:flex flex-1 justify-center">
           <Menubar className="w-auto bg-transparent border-none shadow-none space-x-8">
+
             {navItems.map((item) => (
               <MenubarMenu key={item.href}>
                 <MenubarTrigger asChild>
@@ -102,14 +103,19 @@ export default function Header() {
               </MenubarMenu>
             ))}
 
-            {/* SOLO ADMIN VE ESTO */}
+            {/* SOLO ADMIN */}
             {isAdmin && (
               <DropdownMenu
-                title="Administración"
+                title={t("navbar.admin")}
                 icon={<Wrench className="h-4 w-4" />}
                 items={mantItems}
               />
             )}
+
+            {/* SELECTOR DE IDIOMA */}
+            <div className="flex items-center ml-4">
+              <LanguageSelector />
+            </div>
 
             {/* USUARIO */}
             <MenubarMenu>
@@ -117,14 +123,16 @@ export default function Header() {
                 <User className="h-4 w-4" /> {userName}
                 <ChevronDown className="h-3 w-3" />
               </MenubarTrigger>
+
               <MenubarContent className="bg-gradient-to-b from-blue-800 to-blue-950/90 backdrop-blur-md border border-white/10 rounded-md shadow-xl">
+
                 {isAuthenticated ? (
                   <MenubarItem asChild>
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-2 py-2 px-4 text-sm text-white hover:bg-white/10 transition"
                     >
-                      <LogOut className="h-4 w-4" /> Cerrar Sesión
+                      <LogOut className="h-4 w-4" /> {t("navbar.logout")}
                     </button>
                   </MenubarItem>
                 ) : (
@@ -157,11 +165,13 @@ export default function Header() {
             className="bg-gradient-to-b from-blue-900 via-blue-950 to-black/90 text-white backdrop-blur-lg w-72 p-6 border-r border-white/10"
           >
             <nav className="space-y-6">
+
               <div className="flex items-center gap-2 text-lg font-semibold mb-4">
                 <Ticket className="text-yellow-300" />
                 <span>FixIT</span>
               </div>
 
+              {/* ITEMS */}
               {navItems.map((item) => (
                 <button
                   key={item.href}
@@ -175,23 +185,29 @@ export default function Header() {
                 </button>
               ))}
 
-              {/* SOLO ADMIN VE ESTO */}
+              {/* SOLO ADMIN */}
               {isAdmin && (
                 <NavSection
-                  title="Administración"
+                  title={t("navbar.admin")}
                   items={mantItems}
                   setMobileOpen={setMobileOpen}
                   navigate={navigate}
                 />
               )}
 
+              {/* SELECTOR DE IDIOMA */}
+              <div className="mt-6">
+                <LanguageSelector />
+              </div>
+
+              {/* USUARIO */}
               <NavSection
                 title={userName}
                 items={
                   isAuthenticated
                     ? [
                         {
-                          title: "Cerrar Sesión",
+                          title: t("navbar.logout"),
                           href: "#",
                           icon: <LogOut className="h-4 w-4" />,
                           action: handleLogout,
@@ -205,12 +221,13 @@ export default function Header() {
             </nav>
           </SheetContent>
         </Sheet>
+
       </div>
     </header>
   );
 }
 
-/* --- Dropdown reutilizable --- */
+/* DROPDOWN */
 function DropdownMenu({ title, icon, items }) {
   return (
     <MenubarMenu>
@@ -235,13 +252,14 @@ function DropdownMenu({ title, icon, items }) {
   );
 }
 
-/* --- Sección del menú móvil --- */
+/* SECCIÓN DEL MENÚ MÓVIL */
 function NavSection({ title, items, setMobileOpen, navigate }) {
   return (
     <div>
       <h4 className="mb-2 text-lg font-semibold flex items-center gap-2 text-yellow-300 border-b border-white/10 pb-1">
         {title}
       </h4>
+
       {items.map((item) => (
         <button
           key={item.href}

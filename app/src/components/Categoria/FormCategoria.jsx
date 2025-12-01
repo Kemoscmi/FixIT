@@ -6,25 +6,29 @@ import EtiquetaService from "@/services/EtiquetaService";
 import SLAService from "@/services/SLAService";
 import { Save, ArrowLeftCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import { useI18n } from "@/hooks/useI18n";
 
 export function FormCategoria() {
-//Esto lo que hace es que cuando el tecnico se crea, nos lleva al listado, para evitar dobles inserts
   const navigate = useNavigate();
-
-  //Esto nos sirve para decir que, si viene con id es editar, si no, es crear
   const { id } = useParams();
+  const { t } = useI18n();
 
-  //Aca lo que hacemos es cargar las cosas desde el backend, para luego poder usarlas
   const [especialidades, setEspecialidades] = useState([]);
   const [etiquetas, setEtiquetas] = useState([]);
   const [slas, setSlas] = useState([]);
   const [loading, setLoading] = useState(true);
- 
- //Esto carga la base de las entradas
+
+  const [errors, setErrors] = useState({
+    nombre: "",
+    slaExisting: "",
+    slaResponse: "",
+    slaResolution: ""
+  });
+
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
-    sla_mode: "existing", 
+    sla_mode: "existing",
     sla_id: "",
     new_sla: {
       tiempo_max_respuesta_min: "",
@@ -34,38 +38,34 @@ export function FormCategoria() {
     etiquetas: [],
   });
 
-  // CARGAR los DATOS
+  // =========================
+  //   CARGAR DATOS
+  // =========================
   useEffect(() => {
     async function cargarTodo() {
       try {
-        //Llamamos a todos los servicios de un solo, para no perder tiempo en uno por uno
         const [esp, etq, sla] = await Promise.all([
           EspecialidadService.getEspecialidades(),
           EtiquetaService.getEtiquetasFixit(),
           SLAService.getSlas(),
         ]);
 
-        //Convierte las especialidades en un formato limpio, solo con id y nombre
         setEspecialidades((esp || []).map((e) => ({
           id: Number(e.id),
           nombre: e.nombre,
         })));
 
-        //Convierte las etiquetas en un formato limpio, solo con id y nombre
         setEtiquetas((etq || []).map((e) => ({
           id: Number(e.id),
           nombre: e.nombre,
         })));
 
-       //Guarda los SLAs en un array, facil pq ya vienen listos
         setSlas(sla || []);
 
-        //Si trae ID, es editar , entonces cargamos datos
         if (id) {
           const resp = await CategoriaService.getCategoriaById(id);
           const categoria = resp.data || resp;
 
-        //Cargamos los datos basicos
           setForm((prev) => ({
             ...prev,
             nombre: categoria.nombre,
@@ -87,14 +87,60 @@ export function FormCategoria() {
     cargarTodo();
   }, [id]);
 
-  // HANDLERS
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  // =========================
+  // VALIDACIONES
+  // =========================
+  const validateField = (name, value) => {
+    let msg = "";
+
+    if (name === "nombre") {
+      if (!value.trim()) msg = t("categories.form.errors.required");
+    }
+
+    if (name === "slaExisting") {
+      if (form.sla_mode === "existing" && !form.sla_id)
+        msg = t("categories.form.errors.slaRequired");
+    }
+
+    if (name === "slaResponse") {
+      const v = Number(value);
+      if (form.sla_mode === "new" && v <= 0)
+        msg = t("categories.form.errors.slaResponseGreaterZero");
+    }
+
+    if (name === "slaResolution") {
+      const resp = Number(form.new_sla.tiempo_max_respuesta_min);
+      const reso = Number(value);
+      if (form.sla_mode === "new" && reso <= resp)
+        msg = t("categories.form.errors.slaResolutionGreater");
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: msg }));
   };
 
-  //Logica para funcionamiento de cada espacio
+  // =========================
+  // ONCHANGE
+  // =========================
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    validateField(e.target.name, e.target.value);
+  };
 
-  //Comportamiento tipo checkBox, si ya esta lo elimina, si no, lo agrega
+  const handleNewSlaChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      new_sla: {
+        ...prev.new_sla,
+        [field]: value,
+      },
+    }));
+
+    validateField(
+      field === "tiempo_max_respuesta_min" ? "slaResponse" : "slaResolution",
+      value
+    );
+  };
+
   const toggleEtiqueta = (id) => {
     setForm((prev) => ({
       ...prev,
@@ -104,7 +150,6 @@ export function FormCategoria() {
     }));
   };
 
-  //Comportamiento tipo checkBox, si ya esta lo elimina, si no, lo agrega
   const toggleEspecialidad = (id) => {
     setForm((prev) => ({
       ...prev,
@@ -114,116 +159,103 @@ export function FormCategoria() {
     }));
   };
 
-  //Maneja los imputs del nuevo SLA, actualiza el objeto new_sla
-  const handleNewSlaChange = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      new_sla: {
-        ...prev.new_sla,
-        [field]: value,
-      },
-    }));
+  // =========================
+  // SUBMIT
+  // =========================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    validateField("nombre", form.nombre);
+    validateField("slaExisting", form.sla_id);
+
+    if (form.sla_mode === "new") {
+      validateField("slaResponse", form.new_sla.tiempo_max_respuesta_min);
+      validateField("slaResolution", form.new_sla.tiempo_max_resolucion_min);
+    }
+
+    if (Object.values(errors).some((e) => e !== "")) {
+      return;
+    }
+
+    let payload = { ...form };
+
+    // Validación SLA mode
+    if (form.sla_mode === "new") {
+      payload.new_sla.nombre = `SLA (${form.new_sla.tiempo_max_respuesta_min}/${form.new_sla.tiempo_max_resolucion_min})`;
+      payload.sla_id = null;
+    } else {
+      delete payload.new_sla;
+    }
+
+    delete payload.sla_mode;
+
+    if (id) {
+      CategoriaService.updateCategoria(id, payload).then(() => {
+        toast.success(t("alerts.updated"));
+        navigate("/categorias");
+      });
+    } else {
+      CategoriaService.createCategoria(payload).then(() => {
+        toast.success(t("alerts.created"));
+        navigate("/categorias");
+      });
+    }
   };
 
-  // SUBMIT Prevencion antes de enviar
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!form.nombre.trim()) {
-    toast.error("El nombre es obligatorio");
-    return;
-  }
-
-  //payload es una copia del formulario que nos permite preparar los datos sin alterar el estado original.  
-  let payload = { ...form };
-
-  // VALIDACIONES PARA SLA NUEVO
-  if (form.sla_mode === "new") {
-    const resp = Number(form.new_sla.tiempo_max_respuesta_min);
-    const reso = Number(form.new_sla.tiempo_max_resolucion_min);
-
-    if (resp <= 0) {
-      toast.error("El tiempo de respuesta debe ser mayor a 0");
-      return;
-    }
-
-    if (reso <= resp) {
-      toast.error(
-        "El tiempo de resolución debe ser mayor que el tiempo de respuesta"
-      );
-      return;
-    }
-
-    //Esto para enviar un nombre base de SLA A LA BD
-    payload.new_sla.nombre = `SLA automático (${resp} / ${reso})`;
-    payload.sla_id = null;
-  }
-
-  if (form.sla_mode === "existing" && payload.new_sla) {
-  delete payload.new_sla;
-}
-
-
-  //Le quitamos el nombre base
-  delete payload.sla_mode;
-
-  //Notificacion con toast
-  if (id) {
-  CategoriaService.updateCategoria(id, payload).then(() => {
-    toast.success("Categoría actualizada correctamente");
-    navigate("/categorias");
-  });
-} else {
-  CategoriaService.createCategoria(payload).then(() => {
-    toast.success("Categoría creada correctamente");
-    navigate("/categorias");
-  });
-}
-};
-
-
   if (loading)
-    return <p className="text-center p-10 text-blue-600">Cargando formulario...</p>;
+    return (
+      <p className="text-center p-10 text-blue-600">
+        {t("categories.form.loading")}
+      </p>
+    );
 
-  // Maquetado
   return (
     <div className="min-h-screen py-10 px-6 bg-white">
       <div className="max-w-3xl mx-auto bg-white/80 border shadow-xl rounded-2xl p-8">
+
         <h2 className="text-3xl font-extrabold text-blue-800 mb-6">
-          {id ? "Editar Categoría" : "Registrar Categoría"}
+          {id ? t("categories.form.titleEdit") : t("categories.form.titleCreate")}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
+
           {/* NOMBRE */}
           <div>
-            <label className="font-semibold mb-1 block">Nombre</label>
+            <label className="font-semibold mb-1 block">
+              {t("categories.form.name")}
+            </label>
             <input
               name="nombre"
               value={form.nombre}
               onChange={handleChange}
-              placeholder="Nombre de la categoría"
+              placeholder={t("categories.form.placeholderName")}
               className="p-3 border rounded-lg w-full"
-              required
             />
+            {errors.nombre && (
+              <p className="text-red-600 text-sm mt-1">{errors.nombre}</p>
+            )}
           </div>
 
           {/* DESCRIPCIÓN */}
           <div>
-            <label className="font-semibold mb-1 block">Descripción</label>
+            <label className="font-semibold mb-1 block">
+              {t("categories.form.description")}
+            </label>
             <textarea
               name="descripcion"
               value={form.descripcion}
               onChange={handleChange}
-              placeholder="Descripción"
+              placeholder={t("categories.form.placeholderDescription")}
               rows="3"
               className="p-3 border rounded-lg w-full"
             />
           </div>
 
-          {/* SELECCIÓN DE SLA */}
+          {/* SLA */}
           <div>
-            <label className="font-semibold block mb-2">¿Cómo desea asignar el SLA?</label>
+            <label className="font-semibold block mb-2">
+              {t("categories.form.slaAssign")}
+            </label>
 
             <div className="flex gap-6 mb-4">
               <label className="flex items-center gap-2">
@@ -232,7 +264,7 @@ export function FormCategoria() {
                   name="sla_mode"
                   value="existing"
                   checked={form.sla_mode === "existing"}
-                  onChange={() =>
+                  onChange={() => {
                     setForm((prev) => ({
                       ...prev,
                       sla_mode: "existing",
@@ -240,10 +272,11 @@ export function FormCategoria() {
                         tiempo_max_respuesta_min: "",
                         tiempo_max_resolucion_min: "",
                       },
-                    }))
-                  }
+                    }));
+                    setErrors((prev) => ({ ...prev, slaResponse: "", slaResolution: "" }));
+                  }}
                 />
-                Usar SLA existente
+                {t("categories.form.slaExisting")}
               </label>
 
               <label className="flex items-center gap-2">
@@ -252,15 +285,16 @@ export function FormCategoria() {
                   name="sla_mode"
                   value="new"
                   checked={form.sla_mode === "new"}
-                  onChange={() =>
+                  onChange={() => {
                     setForm((prev) => ({
                       ...prev,
                       sla_mode: "new",
                       sla_id: "",
-                    }))
-                  }
+                    }));
+                    setErrors((prev) => ({ ...prev, slaExisting: "" }));
+                  }}
                 />
-                Crear nuevo SLA
+                {t("categories.form.slaNew")}
               </label>
             </div>
           </div>
@@ -269,22 +303,29 @@ export function FormCategoria() {
           {form.sla_mode === "existing" && (
             <div>
               <label className="font-semibold block mb-2">
-                Seleccione un SLA ya registrado
+                {t("categories.form.slaSelectExisting")}
               </label>
 
               <select
                 name="sla_id"
                 value={form.sla_id}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  validateField("slaExisting", e.target.value);
+                }}
                 className="p-3 border rounded-lg w-full"
               >
-                <option value="">Seleccione una opción</option>
+                <option value="">--</option>
                 {slas.map((s) => (
                   <option key={s.id} value={s.id}>
-                    Resp: {s.tiempo_max_respuesta_min} min • Resol: {s.tiempo_max_resolucion_min} min
+                    Resp: {s.tiempo_max_respuesta_min} min — Resol: {s.tiempo_max_resolucion_min} min
                   </option>
                 ))}
               </select>
+
+              {errors.slaExisting && (
+                <p className="text-red-600 text-sm mt-1">{errors.slaExisting}</p>
+              )}
             </div>
           )}
 
@@ -292,41 +333,45 @@ export function FormCategoria() {
           {form.sla_mode === "new" && (
             <div className="grid grid-cols-1 gap-4 border p-4 rounded-xl shadow-sm bg-white">
               <h3 className="font-bold text-blue-800 text-lg mb-2">
-                Crear nuevo SLA
+                {t("categories.form.newSlaTitle")}
               </h3>
 
-              {/* TIEMPO DE RESPUESTA */}
-              <div className="flex flex-col">
-                <label className="font-semibold text-sm mb-1 text-gray-700">
-                  Tiempo máximo de respuesta (min)
+              <div>
+                <label className="font-semibold text-sm mb-1">
+                  {t("categories.form.slaResponse")}
                 </label>
-
                 <input
                   type="number"
-                  placeholder="Ej: 30"
+                  placeholder="30"
                   value={form.new_sla.tiempo_max_respuesta_min}
                   onChange={(e) =>
                     handleNewSlaChange("tiempo_max_respuesta_min", e.target.value)
                   }
                   className="p-3 border rounded-lg w-full"
                 />
+
+                {errors.slaResponse && (
+                  <p className="text-red-600 text-sm mt-1">{errors.slaResponse}</p>
+                )}
               </div>
 
-              {/* TIEMPO DE RESOLUCIÓN */}
-              <div className="flex flex-col">
-                <label className="font-semibold text-sm mb-1 text-gray-700">
-                  Tiempo máximo de resolución (min)
+              <div>
+                <label className="font-semibold text-sm mb-1">
+                  {t("categories.form.slaResolution")}
                 </label>
-
                 <input
                   type="number"
-                  placeholder="Ej: 90"
+                  placeholder="90"
                   value={form.new_sla.tiempo_max_resolucion_min}
                   onChange={(e) =>
                     handleNewSlaChange("tiempo_max_resolucion_min", e.target.value)
                   }
                   className="p-3 border rounded-lg w-full"
                 />
+
+                {errors.slaResolution && (
+                  <p className="text-red-600 text-sm mt-1">{errors.slaResolution}</p>
+                )}
               </div>
             </div>
           )}
@@ -334,7 +379,7 @@ export function FormCategoria() {
           {/* ETIQUETAS */}
           <div>
             <label className="font-semibold block mb-3 text-blue-900 text-lg">
-              Etiquetas
+              {t("categories.form.tags")}
             </label>
 
             <div className="flex flex-wrap gap-3 mb-4">
@@ -361,7 +406,7 @@ export function FormCategoria() {
           {/* ESPECIALIDADES */}
           <div>
             <label className="font-semibold block mb-3 text-blue-900 text-lg">
-              Especialidades
+              {t("categories.form.specialties")}
             </label>
 
             <div className="flex flex-wrap gap-3 mb-4">
@@ -393,7 +438,7 @@ export function FormCategoria() {
               className="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300"
             >
               <ArrowLeftCircle className="h-5 w-5" />
-              Volver
+              {t("categories.form.back")}
             </button>
 
             <button
@@ -401,9 +446,10 @@ export function FormCategoria() {
               className="flex items-center gap-2 px-6 py-3 rounded-md bg-blue-700 text-white shadow hover:scale-105 transition"
             >
               <Save className="h-5 w-5" />
-              {id ? "Actualizar" : "Guardar"}
+              {id ? t("categories.form.update") : t("categories.form.save")}
             </button>
           </div>
+
         </form>
       </div>
     </div>

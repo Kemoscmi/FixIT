@@ -11,9 +11,13 @@ import useAuthStore from "../../auth/store/auth.store";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
+// ⭐ i18n
+import { useI18n } from "@/hooks/useI18n";
+
 export function ListTickets() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { t } = useI18n(); // 📌 Hook de traducción
 
   const rolId = user?.rol_id;
   const userId = user?.id_usuario || user?.id;
@@ -49,9 +53,13 @@ export function ListTickets() {
   }, [rolId, userId]);
 
   if (loading) return <LoadingGrid type="grid" />;
+
   if (error)
     return (
-      <ErrorAlert title="Error al cargar tickets" message={error.toString()} />
+      <ErrorAlert
+        title={t("tickets.list.errorLoading")}
+        message={error.toString()}
+      />
     );
 
   // Si no hay datos
@@ -59,7 +67,9 @@ export function ListTickets() {
     return (
       <div className="mx-auto max-w-7xl p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Mis Tickets</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("tickets.list.myTickets")}
+          </h1>
 
           {/*  Botón visible solo para admin o cliente */}
           {canCreate && (
@@ -68,12 +78,12 @@ export function ListTickets() {
               className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
             >
               <Plus className="w-4 h-4" />
-              Crear Ticket
+              {t("tickets.list.create")}
             </Button>
           )}
         </div>
 
-        <EmptyState message="No se encontraron tickets disponibles." />
+        <EmptyState message={t("tickets.list.empty")} />
       </div>
     );
 
@@ -81,7 +91,9 @@ export function ListTickets() {
   return (
     <div className="mx-auto max-w-7xl p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Mis Tickets</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t("tickets.list.myTickets")}
+        </h1>
 
         {/* Botón visible solo para admin o cliente */}
         {canCreate && (
@@ -90,7 +102,7 @@ export function ListTickets() {
             className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
           >
             <Plus className="w-4 h-4" />
-            Crear Ticket
+            {t("tickets.list.create")}
           </Button>
         )}
       </div>

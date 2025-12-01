@@ -1,12 +1,3 @@
-//  services/AsignacionService.js
-// -------------------------------------------------------------
-// Servicio para manejar asignaciones de tickets:
-// - Listado semanal (admin / técnico)
-// - Asignación automática de un ticket
-// - Listado de técnicos compatibles para asignación manual
-// - Asignación manual
-// -------------------------------------------------------------
-
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL + "AsignacionController";

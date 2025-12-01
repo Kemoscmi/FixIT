@@ -1,0 +1,382 @@
+{
+  "navbar": {
+    "home": "Home",
+    "tickets": "My Tickets",
+    "categories": "Categories",
+    "technicians": "Technicians",
+    "assignments": "Assignments",
+    "admin": "Administration",
+    "logout": "Log out",
+    "login": "Log in",
+    "register": "Register",
+    "users": "Users",
+    "guest": "Guest"
+  },
+
+  "common": {
+    "loading": "Loading..."
+  },
+
+  "tickets": {
+    "titleList": "Tickets List",
+    "titleCreate": "Create Ticket",
+    "titleEdit": "Edit Ticket",
+    "noTickets": "No tickets registered.",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "priority": "Priority",
+      "state": "State",
+      "createdAt": "Creation date",
+      "category": "Category",
+      "assignedTechnician": "Assigned Technician"
+    },
+
+     "list": {
+      "myTickets": "My Tickets",
+      "create": "Create Ticket",
+      "empty": "No tickets available.",
+      "errorLoading": "Error loading tickets"
+    },
+
+    "detail": {
+    "ticket": "Ticket",
+    "error": "Error retrieving ticket",
+    "notFound": "Ticket not found",
+    "noData": "No data available",
+    "unknownDate": "unknown date",
+
+    "requester": "Requester",
+    "resolutionDays": "Resolution days",
+
+    "slaMonitor": "SLA Monitoring",
+    "slaResp": "Hours remaining for response",
+    "slaResol": "Hours remaining for resolution",
+    "slaRespMet": "Response SLA met",
+    "slaResolMet": "Resolution SLA met",
+
+    "history": "Status History",
+    "noObservations": "No observations",
+    "noHistory": "No history recorded",
+
+    "rating": "Customer Rating",
+    "score": "Score",
+    "comment": "Comment",
+    "noComment": "No comment",
+
+    "updateState": "Update state",
+    "updateStateDesc": "Select a new state and add optional information.",
+    "selectState": "Select state",
+
+    "observations": "Observations",
+    "observationsPlaceholder": "Write an observation...",
+
+    "images": "Images",
+    "imagesHint": "You can upload screenshots or evidence.",
+
+    "mustSelectState": "You must select a state before confirming",
+    "stateUpdated": "State updated successfully",
+    "stateUpdateFail": "State update failed",
+
+    "confirm": "Confirm"
+  },
+
+  "create": {
+  "title": "Create Ticket",
+  "user": "Requester",
+  "email": "Email",
+  "titlePlaceholder": "Enter title",
+  "priorityPlaceholder": "Select a priority",
+  "tags": "Tags",
+  "category": "Associated category",
+  "selectTagFirst": "Select a tag first…",
+  "date": "Creation date",
+  "state": "State",
+  "defaultState": "Pending",
+  "descPlaceholder": "Describe the issue or request...",
+  "save": "Save Ticket",
+
+  "noName": "No name",
+  "errorLoading": "Error loading data",
+  "categoryError": "Could not load associated category",
+  "mustSelectTag": "You must select a tag before continuing",
+  "categoryMissing": "Could not retrieve associated category",
+  "invalidTitle": "The title contains invalid characters",
+  "descTooShort": "Description must have at least 5 characters",
+  "mustSelectPriority": "You must select a priority",
+  "internalCategoryError": "Internal error: no category assigned",
+  "success": "Ticket created successfully",
+  "errorCreate": "Error creating ticket",
+  "serverError": "Server error"
+},
+
+"table": {
+    "titleList": "General Tickets List",
+    "create": "Create Ticket",
+    "title": "Title",
+    "createdAt": "Creation Date",
+    "state": "Status",
+    "priority": "Priority",
+    "actions": "Actions",
+    "view": "View details",
+    "edit": "Edit ticket",
+    "delete": "Delete ticket",
+    "errorLoading": "Error loading tickets",
+    "empty": "No tickets found."
+  }
+
+},
+
+  "categories": {
+    "titleList": "Support Categories",
+    "buttonNew": "New Category",
+    "description": "Explore the different technical support areas available. Each category includes tags, specialties, and defined response times.",
+    "noCategories": "No categories registered.",
+     "viewDetail": "View details",
+
+    "detail": {
+    "tags": "Tags",
+    "noTags": "No tags registered.",
+    
+    "specialties": "Specialties",
+    "noSpecialties": "No specialties registered.",
+
+    "sla": "SLA",
+    "responseTime": "Max. response time",
+    "resolutionTime": "Max. resolution time",
+    "noSla": "SLA not available.",
+
+    "back": "Back to list",
+    "edit": "Edit category",
+
+    "notFound": "Category not found.",
+    "loading": "Loading details..."
+  },
+
+
+  "form": {
+  "titleCreate": "Register Category",
+  "titleEdit": "Edit Category",
+
+  "name": "Name",
+  "description": "Description",
+  "placeholderName": "Category name",
+  "placeholderDescription": "Description",
+
+  "slaAssign": "How would you like to assign the SLA?",
+  "slaExisting": "Use existing SLA",
+  "slaNew": "Create new SLA",
+  "slaSelectExisting": "Select a registered SLA",
+
+  "newSlaTitle": "Create new SLA",
+  "slaResponse": "Max. response time (min)",
+  "slaResolution": "Max. resolution time (min)",
+
+  "tags": "Tags",
+  "specialties": "Specialties",
+
+  "back": "Back",
+  "save": "Save",
+  "update": "Update",
+
+  "requiredName": "Name is mandatory",
+  "slaResponseGreaterZero": "Response time must be greater than 0",
+  "slaResolutionGreater": "Resolution time must be greater than response time",
+
+  "loading": "Loading form...",
+
+   "errors": {
+      "required": "This field is required.",
+      "slaRequired": "You must select an existing SLA or create a new one.",
+      "slaResponseGreaterZero": "Response time must be greater than 0.",
+      "slaResolutionGreater": "Resolution time must be greater than response time."
+    }
+}
+
+  },
+
+  "technicians": {
+    "titleList": "Our Technicians",
+    "buttonNew": "New Technician",
+    "subtitle": "Specialists trained in different technical support areas, always ready to help you.",
+    "noTechnicians": "No technicians found.",
+    "titleCreate": "Register Technician",
+    "titleEdit": "Edit Technician",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "workload": "Workload",
+      "specialties": "Specialties"
+    },
+
+    "detail": {
+    "email": "Email",
+    "phone": "Phone",
+    "workload": "Workload",
+    "availability": "Availability",
+    "specialties": "Specialties",
+    "back": "Back to list",
+    "edit": "Edit technician",
+    "noWorkload": "Not assigned"
+  }, 
+
+   "form": {
+    "titleCreate": "Register Technician",
+    "titleEdit": "Edit Technician",
+
+    "name": "Name",
+    "lastname": "Last name",
+    "email": "Email",
+    "password": "Password",
+    "phone": "Phone",
+    "notes": "Notes",
+    "specialties": "Specialties",
+    "workload": "Current workload",
+    "availability": "Availability",
+
+    "available": "Available",
+    "busy": "Busy",
+
+    "back": "Back",
+    "save": "Save",
+    "update": "Update",
+
+    "placeholderName": "Name",
+    "placeholderLastname": "Last name",
+    "placeholderEmail": "Email",
+    "placeholderPassword": "Password",
+    "placeholderPhone": "Phone",
+    "placeholderNotes": "Notes",
+
+     "errors": {
+      "nameLetters": "The name can only contain letters.",
+      "lastnameLetters": "The last name can only contain letters.",
+      "required": "This field is required.",
+      "emailDomain": "Email must end with @fixit.cr.",
+      "numbersOnly": "This field only accepts numbers."
+    }
+  }
+
+  },
+
+"assignmentsView": {
+  "titleAdmin": "General Assignments",
+  "titleTech": "My Weekly Assignments",
+  "description": "Weekly calendar view (Monday to Sunday) with daily grouping.",
+  "weekRange": "Week from {{start}} to {{end}}",
+
+  "filterWeek": "Filter by week:",
+
+  "noAssignments": "— No assignments —",
+
+  "ticketCategory": "Category:",
+  "sla": "SLA:",
+  "slaExpired": "Expired",
+  "slaInProgress": "In progress",
+
+  "btnViewDetail": "View detail"
+},
+
+
+  "assignments": {
+    "title": "Assignments",
+    "assigned": "Assigned",
+    "unassigned": "Unassigned"
+  },
+
+  "placeholders": {
+    "search": "Search...",
+    "categoryName": "Category name",
+    "categoryDescription": "Category description",
+    "ticketTitle": "Ticket title",
+    "ticketDescription": "Describe the issue...",
+    "technicianName": "Technician name"
+  },
+
+  "buttons": {
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "update": "Update",
+    "cancel": "Cancel",
+    "back": "Back",
+    "view": "View",
+    "assign": "Assign"
+  },
+
+  "validations": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email",
+    "minCharacters": "Must have at least {{min}} characters",
+    "slaResponseGreaterThanZero": "Response time must be greater than 0",
+    "slaResolutionGreater": "Resolution time must be greater than response time"
+  },
+
+  "alerts": {
+    "created": "Created successfully",
+    "updated": "Updated successfully",
+    "deleted": "Deleted successfully",
+    "error": "An error occurred",
+    "loadError": "Error loading data"
+  },
+
+   "principal": {
+    "welcome": "Welcome to FixIT",
+    "subtitle": "General panel for tracking and managing technical incidents.",
+
+    "summary": {
+      "active": "Active Tickets",
+      "assigned": "Assigned Tickets",
+      "pending": "Pending Resolution",
+      "closed": "Closed This Month"
+    },
+
+    "quickAccess": {
+      "title": "Quick Access",
+      "tickets": "View Tickets",
+      "assignments": "Assignments",
+      "technicians": "Technicians",
+      "reports": "Reports",
+      "sla": "SLA",
+      "history": "History"
+    },
+
+    "systemStatus": {
+      "title": "System Status Overview",
+      "operational": "The system is currently operational",
+      "resolved": "{{count}} incidents have been resolved in the last 48 hours",
+      "sla": "SLA compliance average of {{percent}}%"
+    },
+
+    "notifications": {
+      "title": "Recent Notifications",
+      "n1": "Ticket #125 'Web server error' was assigned to Juan Pérez.",
+      "n2": "Ticket #119 was successfully closed.",
+      "n3": "A new update is available for the Reports module."
+    },
+
+    "monthly": {
+      "title": "Monthly Summary",
+      "created": "Created tickets",
+      "resolved": "Resolved tickets",
+      "avgTime": "Avg. resolution time",
+      "satisfaction": "User satisfaction"
+    },
+
+    "footer": {
+      "developed": "Technical incident tracking system developed as part of the ISW-613 course at the National Technical University.",
+      "usefulLinks": "Useful Links",
+      "viewTickets": "View Tickets",
+      "reports": "Reports",
+      "sla": "SLA",
+      "contact": "Contact",
+      "contactUs": "Contact Us",
+      "university": "National Technical University",
+      "email": "support@fixit-utn.com",
+      "phone": "+506 2450 0000",
+      "rights": "All rights reserved"
+    }
+  }
+}
