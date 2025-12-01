@@ -33,6 +33,7 @@ import { CreateTicket } from './components/Ticket/CreateTicket';
 
 // Módulo Asignaciones
 import AsignacionesView from './components/Asignaciones/AsignacionesView';
+import AsignacionesAuto from './components/Asignaciones/AsignacionesAuto';
 
 // Autenticación
 import ProtectedRoute from './auth/ProtectedRoute';
@@ -67,6 +68,8 @@ const rutas = createBrowserRouter([
 
           // Asignaciones
           { path: 'asignaciones', element: <AsignacionesView /> },
+          { path: 'asignaciones/autotriage', element: <AsignacionesAuto /> },
+
 
           // Página 404
           { path: '*', element: <PageNotFound /> },
