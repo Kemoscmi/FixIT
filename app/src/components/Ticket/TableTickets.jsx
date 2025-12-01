@@ -22,22 +22,26 @@ import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 import { EmptyState } from "../ui/custom/EmptyState";
 
-// Columnas visibles de la tabla de tickets
-const ticketColumns = [
-  { key: "titulo", label: "Título" },
-  { key: "fecha_creacion", label: "Fecha de Creación" },
-  { key: "estado", label: "Estado" },
-  { key: "prioridad", label: "Prioridad" },
-  { key: "acciones", label: "Acciones" },
+// ⭐ i18n
+import { useI18n } from "@/hooks/useI18n";
+
+// Columnas traducidas
+const ticketColumnsKeys = [
+  { key: "titulo", labelKey: "tickets.table.title" },
+  { key: "fecha_creacion", labelKey: "tickets.table.createdAt" },
+  { key: "estado", labelKey: "tickets.table.state" },
+  { key: "prioridad", labelKey: "tickets.table.priority" },
+  { key: "acciones", labelKey: "tickets.table.actions" },
 ];
 
 export default function TableTickets() {
-  // Datos desde la API
+  const { t } = useI18n();
+
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Simulación de administrador autenticado
+  // Simular admin
   const rolId = 1;
   const userId = 1;
 
@@ -45,7 +49,6 @@ export default function TableTickets() {
     const fetchData = async () => {
       try {
         const response = await TicketService.getTickets({ rolId, userId });
-        console.log("Tickets admin:", response.data);
 
         if (!response.data.success) {
           setError(response.data.message);
@@ -62,46 +65,48 @@ export default function TableTickets() {
     fetchData();
   }, []);
 
-  // Estados de carga, error y vacíos
   if (loading) return <LoadingGrid type="grid" />;
   if (error)
     return (
-      <ErrorAlert title="Error al cargar tickets" message={error.toString()} />
+      <ErrorAlert
+        title={t("tickets.table.errorLoading")}
+        message={error.toString()}
+      />
     );
   if (!data || data.length === 0)
-    return <EmptyState message="No se encontraron tickets." />;
+    return <EmptyState message={t("tickets.table.empty")} />;
 
   return (
     <div className="container mx-auto py-8">
       {/* Encabezado */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold tracking-tight">
-          Listado General de Tickets
+          {t("tickets.table.titleList")}
         </h1>
 
-        {/* 🔥 Nuevo botón (reemplaza el ojo) */}
+        {/* Botón crear */}
         <Button
           asChild
           className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90"
         >
           <Link to="/tickets/create">
             <Plus className="w-4 h-4" />
-            Crear Ticket
+            {t("tickets.table.create")}
           </Link>
         </Button>
       </div>
 
-      {/* Tabla principal */}
+      {/* Tabla */}
       <div className="rounded-md border">
         <Table>
           <TableHeader className="bg-primary/10">
             <TableRow>
-              {ticketColumns.map((column) => (
+              {ticketColumnsKeys.map((column) => (
                 <TableHead
                   key={column.key}
                   className="text-left font-semibold text-primary"
                 >
-                  {column.label}
+                  {t(column.labelKey)}
                 </TableHead>
               ))}
             </TableRow>
@@ -112,6 +117,8 @@ export default function TableTickets() {
               <TableRow key={row.id} className="hover:bg-muted/50">
                 <TableCell className="font-medium">{row.titulo}</TableCell>
                 <TableCell>{row.fecha_creacion}</TableCell>
+
+                {/* ESTADO con colores */}
                 <TableCell>
                   <span
                     className={`px-2 py-1 rounded text-xs font-semibold ${
@@ -125,13 +132,15 @@ export default function TableTickets() {
                     {row.estado}
                   </span>
                 </TableCell>
+
+                {/* Prioridad */}
                 <TableCell>
                   {row.prioridad || (
                     <span className="text-muted-foreground">N/A</span>
                   )}
                 </TableCell>
 
-                {/* Botones de acciones */}
+                {/* Acciones */}
                 <TableCell className="flex justify-start items-center gap-2">
                   <TooltipProvider>
                     <Tooltip>
@@ -146,7 +155,7 @@ export default function TableTickets() {
                           </Link>
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Ver detalle</TooltipContent>
+                      <TooltipContent>{t("tickets.table.view")}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
 
@@ -161,7 +170,7 @@ export default function TableTickets() {
                           <Edit className="h-4 w-4 text-primary" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Editar ticket</TooltipContent>
+                      <TooltipContent>{t("tickets.table.edit")}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
 
@@ -176,7 +185,7 @@ export default function TableTickets() {
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Eliminar ticket</TooltipContent>
+                      <TooltipContent>{t("tickets.table.delete")}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </TableCell>
@@ -193,7 +202,7 @@ export default function TableTickets() {
         className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6"
       >
         <ArrowLeft className="w-4 h-4" />
-        Regresar
+        {t("buttons.back")}
       </Button>
     </div>
   );

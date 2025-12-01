@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CategoriaService from "@/services/CategoriaService";
 import { Layers, Tag, Star, Clock, ArrowLeftCircle, Pencil } from "lucide-react";
+import { useI18n } from "@/hooks/useI18n";
 
 export function DetailCategoria() {
   const { id } = useParams();
@@ -9,6 +10,7 @@ export function DetailCategoria() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   useEffect(() => {
     CategoriaService.getCategoriaById(id)
@@ -26,19 +28,21 @@ export function DetailCategoria() {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] text-indigo-600">
         <Clock className="animate-spin h-10 w-10 mb-4" />
-        <p className="text-lg font-medium">Cargando detalles...</p>
+        <p className="text-lg font-medium">{t("categories.detail.loading")}</p>
       </div>
     );
 
   if (error)
     return (
-      <p className="text-center text-red-500 text-lg mt-8">Error: {error}</p>
+      <p className="text-center text-red-500 text-lg mt-8">
+        {t("alerts.error")}: {error}
+      </p>
     );
 
   if (!categoria)
     return (
       <p className="text-center text-gray-500 text-lg mt-8">
-        Categoría no encontrada.
+        {t("categories.detail.notFound")}
       </p>
     );
 
@@ -51,18 +55,18 @@ export function DetailCategoria() {
           <div className="p-4 bg-gradient-to-br from-blue-100 to-pink-100 rounded-full shadow-sm">
             <Layers className="h-8 w-8 text-blue-700" />
           </div>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-1">
-              {categoria.nombre}
-            </h2>
-          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-1">
+            {categoria.nombre}
+          </h2>
         </div>
 
         {/* ETIQUETAS */}
         <div className="mb-6">
           <h3 className="text-xl font-semibold flex items-center gap-2">
-            <Tag className="h-5 w-5" /> Etiquetas
+            <Tag className="h-5 w-5" />
+            {t("categories.detail.tags")}
           </h3>
+
           <div className="flex flex-wrap gap-2 mt-2">
             {categoria.etiquetas?.length > 0 ? (
               categoria.etiquetas.map((etq, i) => (
@@ -74,7 +78,9 @@ export function DetailCategoria() {
                 </span>
               ))
             ) : (
-              <p className="text-gray-500 text-sm">Sin etiquetas registradas.</p>
+              <p className="text-gray-500 text-sm">
+                {t("categories.detail.noTags")}
+              </p>
             )}
           </div>
         </div>
@@ -82,8 +88,10 @@ export function DetailCategoria() {
         {/* ESPECIALIDADES */}
         <div className="mb-6">
           <h3 className="text-xl font-semibold flex items-center gap-2">
-            <Star className="h-5 w-5" /> Especialidades
+            <Star className="h-5 w-5" />
+            {t("categories.detail.specialties")}
           </h3>
+
           <div className="flex flex-wrap gap-2 mt-2">
             {categoria.especialidades?.length > 0 ? (
               categoria.especialidades.map((esp, i) => (
@@ -95,7 +103,9 @@ export function DetailCategoria() {
                 </span>
               ))
             ) : (
-              <p className="text-gray-500 text-sm">Sin especialidades registradas.</p>
+              <p className="text-gray-500 text-sm">
+                {t("categories.detail.noSpecialties")}
+              </p>
             )}
           </div>
         </div>
@@ -103,35 +113,38 @@ export function DetailCategoria() {
         {/* SLA */}
         <div className="mb-6">
           <h3 className="text-xl font-semibold flex items-center gap-2">
-            <Clock className="h-5 w-5" /> SLA
+            <Clock className="h-5 w-5" />
+            {t("categories.detail.sla")}
           </h3>
 
           {categoria.sla?.length > 0 ? (
             <div className="mt-2 space-y-1 text-gray-700">
               <p>
-                <strong>Tiempo máx. de respuesta:</strong>{" "}
+                <strong>{t("categories.detail.responseTime")}:</strong>{" "}
                 {categoria.sla[0].tiempo_max_respuesta_min} min
               </p>
               <p>
-                <strong>Tiempo máx. de resolución:</strong>{" "}
+                <strong>{t("categories.detail.resolutionTime")}:</strong>{" "}
                 {categoria.sla[0].tiempo_max_resolucion_min} min
               </p>
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">SLA no disponible.</p>
+            <p className="text-gray-500 text-sm">
+              {t("categories.detail.noSla")}
+            </p>
           )}
         </div>
 
         {/* BOTONES */}
         <div className="flex gap-4 mt-6">
-
+          
           {/* VOLVER */}
           <button
             onClick={() => navigate("/categorias")}
             className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-500 text-white px-6 py-3 rounded-md shadow-lg hover:scale-105 transition"
           >
             <ArrowLeftCircle className="h-5 w-5" />
-            Volver al listado
+            {t("categories.detail.back")}
           </button>
 
           {/* EDITAR */}
@@ -140,7 +153,7 @@ export function DetailCategoria() {
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-md shadow-lg hover:scale-105 transition"
           >
             <Pencil className="h-5 w-5" />
-            Editar categoría
+            {t("categories.detail.edit")}
           </button>
 
         </div>

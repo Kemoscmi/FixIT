@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuthStore from "../../auth/store/auth.store";
 
-
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import {
@@ -18,34 +17,46 @@ import {
 } from "../ui/select";
 import { Save, ArrowLeftCircle } from "lucide-react";
 
-// Servicios
 import TicketService from "../../services/TicketService";
 import EtiquetaService from "@/services/EtiquetaService";
 import axios from "axios";
 
+// ⭐ i18n
+import { useI18n } from "@/hooks/useI18n";
+
 export function CreateTicket() {
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const [prioridades, setPrioridades] = useState([]);
   const [etiquetas, setEtiquetas] = useState([]);
-
   const [etiquetaSeleccionada, setEtiquetaSeleccionada] = useState(null);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
-
   const [, setError] = useState("");
 
-  // Usuario
   const { user } = useAuthStore();
   const usuario_id = user?.id || user?.id_usuario;
   const rol_id = user?.rol_id;
 
-  // Validación Yup
   const schema = yup.object({
-    titulo: yup.string().required().min(3),
-    descripcion: yup.string().required().min(5),
-    prioridad_id: yup.number().required(),
-    categoria_id: yup.number().required(),
+    titulo: yup
+      .string()
+      .required(t("validations.required"))
+      .min(3, t("validations.minCharacters", { min: 3 })),
+    descripcion: yup
+      .string()
+      .required(t("validations.required"))
+      .min(5, t("validations.minCharacters", { min: 5 })),
+    prioridad_id: yup
+      .number()
+      .typeError(t("validations.required"))
+      .required(t("validations.required")),
+    categoria_id: yup
+      .number()
+      .typeError(t("validations.required"))
+      .required(t("validations.required")),
   });
+
 
   const {
     control,
@@ -64,9 +75,7 @@ export function CreateTicket() {
     },
   });
 
-
-  //     CARGAR DATOS INICIALES
- 
+  // CARGA INICIAL
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -79,194 +88,158 @@ export function CreateTicket() {
         setEtiquetas(etq || []);
       } catch (err) {
         console.error(err);
-        setError("Error al cargar datos desde la API");
+        setError(t("tickets.create.errorLoading"));
       }
     };
     fetchData();
-  }, []);
+  }, [t]);
 
-
- 
-  //      CARGAR CATEGORÍA
-
+  // CARGAR CATEGORIA
   const cargarCategoria = async (idEtiqueta) => {
-  try {
-    const res = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}EtiquetaController/categoria?id=${idEtiqueta}`
-    );
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}EtiquetaController/categoria?id=${idEtiqueta}`
+      );
 
-    console.log("API respondió categoría:", res.data);
+      let categoriaID = null;
 
-    // Buscar categoria_id en TODO el objeto
-    let categoriaID = null;
+      const buscarID = (obj) => {
+        if (categoriaID) return;
+        if (typeof obj !== "object" || obj === null) return;
 
-    const buscarID = (obj) => {
-      if (categoriaID) return;
+        for (const key of Object.keys(obj)) {
+          const val = obj[key];
 
-      if (typeof obj !== "object" || obj === null) return;
+          if (key.toLowerCase().includes("categoria") && !isNaN(val)) {
+            categoriaID = parseInt(val, 10);
+            return;
+          }
 
-      for (const key of Object.keys(obj)) {
-        const val = obj[key];
-
-        // Si la propiedad parece ser categoria_id -> usarla
-        if (key.toLowerCase().includes("categoria") && !isNaN(val)) {
-          categoriaID = parseInt(val, 10);
-          return;
+          if (typeof val === "object") buscarID(val);
         }
+      };
 
-        // Si es objeto -> buscar dentro
-        if (typeof val === "object") {
-          buscarID(val);
-        }
+      buscarID(res.data);
+
+      if (!categoriaID || isNaN(categoriaID)) {
+        return;
       }
-    };
 
-    buscarID(res.data); // Ejecutar búsqueda en todo el JSON
+      const nombre =
+        res.data.data?.data?.nombre ||
+        res.data?.nombre ||
+        res.data?.categoria?.nombre ||
+        t("tickets.create.noName");
 
-    console.log("ID FINAL ENCONTRADO:", categoriaID);
+      const nuevaCategoria = { id: categoriaID, nombre };
 
-    if (!categoriaID || isNaN(categoriaID)) {
-      console.warn("❌ ID inválido recibido:", res.data);
-      return;
+      setCategoriaSeleccionada(nuevaCategoria);
+      setValue("categoria_id", categoriaID);
+    } catch (error) {
+      console.error(error);
+      toast.error(t("tickets.create.categoryError"));
     }
-
-    // Nombre de la categoría
-    const nombre =
-      res.data.data.data.nombre||
-      res.data?.nombre ||
-      res.data?.categoria?.nombre ||
-      "Sin nombre";
-
-    const nuevaCategoria = {
-      id: categoriaID,
-      nombre,
-    };
-
-    setCategoriaSeleccionada(nuevaCategoria);
-    setValue("categoria_id", categoriaID);
-  } catch (error) {
-    console.error("Error en cargarCategoria:", error);
-    toast.error("No se pudo cargar la categoría asociada");
-  }
-};
-
-
-
-  //  SELECCIONAR ETIQUETA
+  };
 
   const seleccionarEtiqueta = async (id) => {
     setEtiquetaSeleccionada(id);
     await cargarCategoria(id);
   };
 
+  // SUBMIT
+  const onSubmit = async (data) => {
+    if (!etiquetaSeleccionada)
+      return toast.error(t("tickets.create.mustSelectTag"));
 
+    if (!categoriaSeleccionada?.id)
+      return toast.error(t("tickets.create.categoryMissing"));
 
-//          SUBMIT
+    if (!/^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s.,-]+$/.test(data.titulo))
+      return toast.error(t("tickets.create.invalidTitle"));
 
-const onSubmit = async (data) => {
-  
-  //  VALIDACIÓN — NO HAY ETIQUETA
-  if (!etiquetaSeleccionada) {
-    toast.error("Debe seleccionar una etiqueta antes de continuar");
-    return;
-  }
+    if (data.descripcion.trim().length < 5)
+      return toast.error(t("tickets.create.descTooShort"));
 
-  //  VALIDACIÓN — NO HAY CATEGORÍA
-  if (!categoriaSeleccionada || !categoriaSeleccionada.id) {
-    toast.error("No se pudo obtener la categoría asociada");
-    return;
-  }
+    if (!data.prioridad_id)
+      return toast.error(t("tickets.create.mustSelectPriority"));
 
-  //  VALIDACIÓN — TÍTULO SOLO LETRAS Y NÚMEROS
-  if (!/^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s.,-]+$/.test(data.titulo)) {
-    toast.error("El título contiene caracteres inválidos");
-    return;
-  }
+    if (!data.categoria_id)
+      return toast.error(t("tickets.create.internalCategoryError"));
 
-  //  VALIDACIÓN — DESCRIPCIÓN NO VACÍA
-  if (data.descripcion.trim().length < 5) {
-    toast.error("La descripción debe contener al menos 5 caracteres");
-    return;
-  }
+    try {
+      const res = await TicketService.createTicket(
+        {
+          ...data,
+          usuario_solicitante_id: usuario_id,
+          estado: "Pendiente",
+          fecha_creacion: new Date().toISOString().split("T")[0],
+          etiqueta_id: etiquetaSeleccionada,
+        },
+        { rolId: rol_id, userId: usuario_id }
+      );
 
-  //  VALIDACIÓN — PRIORIDAD VACÍA
-  if (!data.prioridad_id) {
-    toast.error("Debe seleccionar una prioridad");
-    return;
-  }
-
-  //  VALIDACIÓN — CATEGORÍA VACÍA
-  if (!data.categoria_id) {
-    toast.error("Error interno: la categoría no se asignó");
-    return;
-  }
-
-  try {
-    const res = await TicketService.createTicket(
-      {
-        ...data,
-        usuario_solicitante_id: usuario_id,
-        estado: "Pendiente",
-        fecha_creacion: new Date().toISOString().split("T")[0],
-        etiqueta_id: etiquetaSeleccionada,
-      },
-      { rolId: rol_id, userId: usuario_id }
-    );
-
-    if (res.data.success) {
-      toast.success("Ticket creado correctamente");
-      reset();
-      navigate("/tickets");
-    } else {
-      toast.error(res.data.message || "Error al crear ticket");
+      if (res.data.success) {
+        toast.success(t("tickets.create.success"));
+        reset();
+        navigate("/tickets");
+      } else {
+        toast.error(res.data.message || t("tickets.create.errorCreate"));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t("tickets.create.serverError"));
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Error en el servidor");
-  }
-};
-
-
-  //           HTML
+  };
 
   return (
     <div className="min-h-screen py-10 px-6 bg-white">
       <div className="max-w-3xl mx-auto bg-white/80 border shadow-xl rounded-2xl p-8">
-
         <h2 className="text-3xl font-extrabold text-blue-800 mb-6 text-center">
-          Crear Ticket
+          {t("tickets.create.title")}
         </h2>
 
         {/* USER INFO */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <Label>Usuario solicitante</Label>
+            <Label>{t("tickets.create.user")}</Label>
             <Input value={user?.nombre} disabled className="bg-gray-100" />
           </div>
           <div>
-            <Label>Correo</Label>
-            <Input value={user?.correo || user?.email} disabled className="bg-gray-100" />
+            <Label>{t("tickets.create.email")}</Label>
+            <Input
+              value={user?.correo || user?.email}
+              disabled
+              className="bg-gray-100"
+            />
           </div>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
           {/* TITULO */}
           <div>
-            <Label className="font-semibold">Título</Label>
+            <Label className="font-semibold">
+              {t("tickets.fields.title")}
+            </Label>
             <Controller
               name="titulo"
               control={control}
               render={({ field }) => (
-                <Input {...field} placeholder="Ingrese el título" />
+                <Input
+                  {...field}
+                  placeholder={t("tickets.create.titlePlaceholder")}
+                />
               )}
             />
-            {errors.titulo && <p className="text-red-600">{errors.titulo.message}</p>}
+            {errors.titulo && (
+              <p className="text-red-600">{errors.titulo.message}</p>
+            )}
           </div>
 
           {/* PRIORIDAD */}
           <div>
-            <Label className="font-semibold">Prioridad</Label>
+            <Label className="font-semibold">
+              {t("tickets.fields.priority")}
+            </Label>
             <Controller
               name="prioridad_id"
               control={control}
@@ -276,7 +249,9 @@ const onSubmit = async (data) => {
                   onValueChange={(val) => field.onChange(parseInt(val))}
                 >
                   <SelectTrigger className="bg-white border border-gray-300">
-                    <SelectValue placeholder="Seleccione prioridad" />
+                    <SelectValue
+                      placeholder={t("tickets.create.priorityPlaceholder")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {prioridades.map((p) => (
@@ -292,7 +267,7 @@ const onSubmit = async (data) => {
 
           {/* ETIQUETAS */}
           <div>
-            <Label className="font-semibold">Etiquetas</Label>
+            <Label className="font-semibold">{t("tickets.create.tags")}</Label>
             <div className="flex flex-wrap gap-3 mt-2">
               {etiquetas.map((et) => (
                 <button
@@ -313,9 +288,12 @@ const onSubmit = async (data) => {
 
           {/* CATEGORIA */}
           <div>
-            <Label className="font-semibold">Categoría asociada</Label>
+            <Label className="font-semibold">
+              {t("tickets.create.category")}
+            </Label>
             <div className="bg-gray-100 font-medium px-3 py-2 rounded-md border text-gray-700">
-              {categoriaSeleccionada?.nombre || "Seleccione una etiqueta…"}
+              {categoriaSeleccionada?.nombre ||
+                t("tickets.create.selectTagFirst")}
             </div>
             <input type="hidden" {...register("categoria_id")} />
           </div>
@@ -323,18 +301,18 @@ const onSubmit = async (data) => {
           {/* FECHA + ESTADO */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>Fecha de creación</Label>
+              <Label>{t("tickets.create.date")}</Label>
               <Input value={new Date().toISOString().split("T")[0]} disabled />
             </div>
             <div>
-              <Label>Estado</Label>
-              <Input value="Pendiente" disabled />
+              <Label>{t("tickets.create.state")}</Label>
+              <Input value={t("tickets.create.defaultState")} disabled />
             </div>
           </div>
 
           {/* DESCRIPCIÓN */}
           <div>
-            <Label>Descripción</Label>
+            <Label>{t("tickets.fields.description")}</Label>
             <Controller
               name="descripcion"
               control={control}
@@ -343,12 +321,14 @@ const onSubmit = async (data) => {
                   {...field}
                   rows={4}
                   className="p-3 w-full border rounded-lg"
-                  placeholder="Describa el problema o solicitud..."
+                  placeholder={t("tickets.create.descPlaceholder")}
                 />
               )}
             />
             {errors.descripcion && (
-              <p className="text-red-600 text-sm">{errors.descripcion.message}</p>
+              <p className="text-red-600 text-sm">
+                {errors.descripcion.message}
+              </p>
             )}
           </div>
 
@@ -360,7 +340,7 @@ const onSubmit = async (data) => {
               className="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
             >
               <ArrowLeftCircle className="h-5 w-5" />
-              Volver
+              {t("buttons.back")}
             </button>
 
             <button
@@ -368,12 +348,17 @@ const onSubmit = async (data) => {
               className="flex items-center gap-2 px-6 py-3 rounded-md bg-blue-700 text-white hover:scale-105 transition"
             >
               <Save className="h-5 w-5" />
-              Guardar Ticket
+              {t("tickets.create.save")}
             </button>
           </div>
-
         </form>
       </div>
     </div>
   );
 }
+
+
+
+const storedLang = localStorage.getItem("lang") || "es";
+
+

@@ -1,18 +1,13 @@
 // ============================================================
 // COMPONENTE: DetailTicket.jsx
-// Descripción:
-//   Muestra la información detallada de un ticket específico.
-//   Incluye descripción, historial de estados, monitoreo de SLA,
-//   valoración del cliente, y permite actualizar el estado
-//   (con observaciones e imágenes de evidencia).
 // ============================================================
 
-import React, { useEffect, useState } from "react"; // Importa React y hooks para estado y ciclo de vida
-import { useParams, useNavigate } from "react-router-dom"; // Permite acceder al parámetro :id de la URL y navegar
-import TicketService from "../../services/TicketService"; // Servicio encargado de las peticiones al backend
-import useAuthStore from "../../auth/store/auth.store"; // Hook global que contiene datos del usuario autenticado
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import TicketService from "../../services/TicketService";
+import useAuthStore from "../../auth/store/auth.store";
 import toast from "react-hot-toast";
-//  Importación de iconos visuales desde lucide-react
+
 import {
   FileText,
   User,
@@ -26,13 +21,12 @@ import {
   MessageCircle,
 } from "lucide-react";
 
-//  Componentes de interfaz reutilizables (botones, badges, alertas, etc.)
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LoadingGrid } from "../ui/custom/LoadingGrid"; // Pantalla de carga
-import { ErrorAlert } from "../ui/custom/ErrorAlert"; // Alerta de error
+import { LoadingGrid } from "../ui/custom/LoadingGrid";
+import { ErrorAlert } from "../ui/custom/ErrorAlert";
 
-//  Componentes de Dialog (ventana modal)
+// Dialog
 import {
   Dialog,
   DialogContent,
@@ -43,7 +37,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-//  Componentes de Select (lista desplegable)
+// Select
 import {
   Select,
   SelectTrigger,
@@ -52,66 +46,54 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
+// ⭐ i18n
+import { useI18n } from "@/hooks/useI18n";
+
 // ============================================================
-//  COMPONENTE PRINCIPAL: DetailTicket
+// COMPONENTE
 // ============================================================
 export function DetailTicket() {
-  // Extrae el parámetro "id" del ticket desde la URL
   const { id } = useParams();
-
-  // Permite volver a la página anterior o navegar a otra
   const navigate = useNavigate();
-
-  // Obtiene los datos del usuario actual desde el store global
   const { user } = useAuthStore();
+  const { t } = useI18n();
 
-  // Extrae el rol e ID del usuario logueado
   const rolId = user?.rol_id;
   const userId = user?.id;
 
-  // Estados locales del componente
-  const [data, setData] = useState(null); // Datos del ticket
-  const [loading, setLoading] = useState(true); // Estado de carga
-  const [error, setError] = useState(""); // Mensaje de error
-  const [openModal, setOpenModal] = useState(false); // Controla apertura del modal
-  const [nuevoEstado, setNuevoEstado] = useState(""); // Nuevo estado seleccionado
-  const [imagenes, setImagenes] = useState([]); // Imágenes a subir
-  const [observaciones, setObservaciones] = useState(""); // Observaciones escritas por el técnico o admin
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [nuevoEstado, setNuevoEstado] = useState("");
+  const [imagenes, setImagenes] = useState([]);
+  const [observaciones, setObservaciones] = useState("");
 
-  // ============================================================
-  //  useEffect: carga inicial del ticket
-  // ============================================================
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        // Solicita los datos del ticket al backend
         const res = await TicketService.getTicketById(id, { rolId, userId });
-        setData(res.data?.data || {}); // Guarda los datos si la respuesta es válida
+        setData(res.data?.data || {});
       } catch (err) {
-        console.error("Error al obtener ticket:", err);
-        setError("Error al obtener el detalle del ticket."); // Muestra error en pantalla
+        console.error(err);
+        setError(t("tickets.detail.error"));
       } finally {
-        setLoading(false); // Finaliza la carga
+        setLoading(false);
       }
     };
 
-    // Ejecuta la carga solo si todos los parámetros requeridos existen
     if (id && rolId && userId) fetchTicket();
-  }, [id, rolId, userId]); // Se vuelve a ejecutar si cambian los parámetros
+  }, [id, rolId, userId, t]);
 
-  // ============================================================
-  //  Render condicional: manejo de carga, errores y datos vacíos
-  // ============================================================
-  if (loading) return <LoadingGrid />; // Si está cargando, muestra animación
-  if (error) return <ErrorAlert title="Error" message={error} />; // Si hay error, muestra alerta
-  if (!data) return <ErrorAlert title="Sin datos" message="Ticket no encontrado." />;
+  if (loading) return <LoadingGrid />;
+  if (error) return <ErrorAlert title={t("alerts.error")} message={error} />;
+  if (!data)
+    return (
+      <ErrorAlert title={t("tickets.detail.notFound")} message={t("tickets.detail.noData")} />
+    );
 
-  // Desestructura el contenido del ticket
   const { basicos, sla, historial, valoracion } = data;
 
-  // ============================================================
-  //  Colores visuales según estado del ticket
-  // ============================================================
   const estadoColors = {
     Pendiente: "bg-blue-50 text-blue-800 border-blue-200",
     Asignado: "bg-sky-100 text-sky-800 border-sky-300",
@@ -120,80 +102,62 @@ export function DetailTicket() {
     Cerrado: "bg-rose-100 text-rose-800 border-rose-300",
   };
 
-  // ============================================================
-  //  Función: handleActualizarEstado
-  // Descripción:
-  //   Permite cambiar el estado del ticket, añadir observaciones
-  //   y subir imágenes al backend.
-  // ============================================================
-const handleActualizarEstado = async () => {
-  if (!nuevoEstado)
-    return toast.error("⚠️ Selecciona un estado antes de confirmar", {
-      position: "top-center",
-      duration: 3000,
-    });
-
-  try {
-    const formData = new FormData();
-    formData.append("ticket_id", basicos.id);
-    formData.append("nuevo_estado_id", getEstadoId(nuevoEstado));
-    formData.append("usuario_id", userId);
-    formData.append("observaciones", observaciones);
-    imagenes.forEach((file) => formData.append("imagenes[]", file));
-
-    const res = await TicketService.updateEstado(formData);
-
-    if (res.data?.success) {
-      const refreshed = await TicketService.getTicketById(id, { rolId, userId });
-      setData(refreshed.data?.data || {});
-      setOpenModal(false);
-      setImagenes([]);
-      setObservaciones("");
-      setNuevoEstado("");
-
-      toast.success(" Estado actualizado correctamente", {
+  const handleActualizarEstado = async () => {
+    if (!nuevoEstado)
+      return toast.error(t("tickets.detail.mustSelectState"), {
         position: "top-center",
         duration: 3000,
       });
-    } else {
-      toast.error(" No se pudo actualizar el estado del ticket", {
-        position: "top-center",
-        duration: 3000,
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    toast.error(" Error al actualizar el estado del ticket", {
-      position: "top-center",
-      duration: 3000,
-    });
-  }
-};
 
+    try {
+      const formData = new FormData();
+      formData.append("ticket_id", basicos.id);
+      formData.append("nuevo_estado_id", getEstadoId(nuevoEstado));
+      formData.append("usuario_id", userId);
+      formData.append("observaciones", observaciones);
+      imagenes.forEach((file) => formData.append("imagenes[]", file));
 
-  // ============================================================
-  //  Función auxiliar: getEstadoId
-  // Convierte nombre del estado en su identificador numérico.
-  // ============================================================
-  const getEstadoId = (estado) => {
-    switch (estado) {
-      case "Pendiente": return 1;
-      case "Asignado": return 2;
-      case "En Proceso": return 3;
-      case "Resuelto": return 4;
-      case "Cerrado": return 5;
-      default: return 1;
+      const res = await TicketService.updateEstado(formData);
+
+      if (res.data?.success) {
+        const refreshed = await TicketService.getTicketById(id, { rolId, userId });
+        setData(refreshed.data?.data || {});
+        setOpenModal(false);
+        setImagenes([]);
+        setObservaciones("");
+        setNuevoEstado("");
+
+        toast.success(t("tickets.detail.stateUpdated"));
+      } else {
+        toast.error(t("tickets.detail.stateUpdateFail"));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t("tickets.detail.stateUpdateFail"));
     }
   };
 
-  // ============================================================
-  //  Renderización visual del componente
-  // ============================================================
+  const getEstadoId = (estado) => {
+    switch (estado) {
+      case "Pendiente":
+        return 1;
+      case "Asignado":
+        return 2;
+      case "En Proceso":
+        return 3;
+      case "Resuelto":
+        return 4;
+      case "Cerrado":
+        return 5;
+      default:
+        return 1;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 py-12">
       <div className="max-w-5xl mx-auto bg-white/70 backdrop-blur-md shadow-xl rounded-2xl overflow-hidden border border-blue-100">
-
-        {/*  Encabezado superior con icono y nombre del ticket */}
+        {/* ENCABEZADO */}
         <div className="relative h-40 bg-gradient-to-r from-blue-700 to-blue-900">
           <div className="absolute bottom-0 left-8 translate-y-[20%] flex items-center gap-4">
             <div className="w-28 h-28 bg-white border-4 border-blue-800 rounded-full flex items-center justify-center shadow-lg">
@@ -201,74 +165,110 @@ const handleActualizarEstado = async () => {
             </div>
             <div className="flex flex-col">
               <h2 className="text-3xl font-bold text-white drop-shadow">
-                Ticket #{basicos?.id}
+                {t("tickets.detail.ticket")} #{basicos?.id}
               </h2>
               <p className="text-blue-100 italic">
-                {basicos?.titulo || "Sin título"}
+                {basicos?.titulo || t("tickets.fields.title")}
               </p>
             </div>
           </div>
         </div>
 
-        {/*  Cuerpo principal del ticket */}
+        {/* CONTENIDO */}
         <div className="p-8 mt-6 space-y-8">
-
-          {/* Estado actual del ticket */}
+          {/* Estado */}
           <div className="flex justify-between items-center">
             <Badge
-              className={`${estadoColors[basicos?.estado] ||
-                "bg-gray-200 text-gray-700 border-gray-300"
-                } border font-semibold text-base px-4 py-1.5`}
+              className={`${
+                estadoColors[basicos?.estado] || "bg-gray-200 text-gray-700 border-gray-300"
+              } border font-semibold text-base px-4 py-1.5`}
             >
               {basicos?.estado}
             </Badge>
+
             <p className="text-gray-500 text-sm">
-              Creado el{" "}
+              {t("tickets.fields.createdAt")}{" "}
               {basicos?.fecha_creacion
-                ? new Date(basicos.fecha_creacion).toLocaleString("es-CR")
-                : "fecha desconocida"}
+                ? new Date(basicos.fecha_creacion).toLocaleString()
+                : t("tickets.detail.unknownDate")}
             </p>
           </div>
 
-          {/*  Información básica */}
+          {/* Información básica */}
           <div className="grid md:grid-cols-2 gap-6 text-gray-700">
-            <p><strong className="text-blue-900">Descripción:</strong> {basicos?.descripcion}</p>
-            <p><strong className="text-blue-900">Categoría:</strong> {basicos?.categoria}</p>
-            <p><strong className="text-blue-900">Prioridad:</strong> {basicos?.prioridad}</p>
-            <p><strong className="text-blue-900">Solicitante:</strong> {basicos?.solicitante}</p>
-            <p><strong className="text-blue-900">Días de resolución:</strong> {basicos?.dias_resolucion ?? "—"}</p>
+            <p>
+              <strong>{t("tickets.fields.description")}:</strong> {basicos?.descripcion}
+            </p>
+
+            <p>
+              <strong>{t("tickets.fields.category")}:</strong> {basicos?.categoria}
+            </p>
+
+            <p>
+              <strong>{t("tickets.fields.priority")}:</strong> {basicos?.prioridad}
+            </p>
+
+            <p>
+              <strong>{t("tickets.detail.requester")}:</strong> {basicos?.solicitante}
+            </p>
+
+            <p>
+              <strong>{t("tickets.detail.resolutionDays")}:</strong>{" "}
+              {basicos?.dias_resolucion ?? "—"}
+            </p>
           </div>
 
-          {/* ⏱ Sección de monitoreo SLA */}
+          {/* SLA */}
           <div className="bg-blue-50 rounded-lg p-6 shadow-inner border border-blue-100">
             <h3 className="text-xl font-semibold text-blue-700 mb-3 flex items-center gap-2">
-              <Clock className="text-blue-600" /> Monitoreo SLA
+              <Clock className="text-blue-600" /> {t("tickets.detail.slaMonitor")}
             </h3>
+
             <div className="grid md:grid-cols-2 gap-4 text-gray-700">
-              <p><strong>Horas restantes para respuesta:</strong> {sla?.hrs_resp_restantes ?? "N/A"} h</p>
-              <p><strong>Horas restantes para resolución:</strong> {sla?.hrs_resol_restantes ?? "N/A"} h</p>
-              <p><strong>Cumplió SLA de respuesta:</strong> {basicos?.cumplio_sla_respuesta ? "✅ Sí" : "❌ No"}</p>
-              <p><strong>Cumplió SLA de resolución:</strong> {basicos?.cumplio_sla_resolucion ? "✅ Sí" : "❌ No"}</p>
+              <p>
+                <strong>{t("tickets.detail.slaResp")}: </strong>
+                {sla?.hrs_resp_restantes ?? "N/A"} h
+              </p>
+
+              <p>
+                <strong>{t("tickets.detail.slaResol")}: </strong>
+                {sla?.hrs_resol_restantes ?? "N/A"} h
+              </p>
+
+              <p>
+                <strong>{t("tickets.detail.slaRespMet")}: </strong>
+                {basicos?.cumplio_sla_respuesta ? "✅" : "❌"}
+              </p>
+
+              <p>
+                <strong>{t("tickets.detail.slaResolMet")}: </strong>
+                {basicos?.cumplio_sla_resolucion ? "✅" : "❌"}
+              </p>
             </div>
           </div>
 
-          {/*  Historial de cambios de estado */}
+          {/* Historial */}
           <div className="bg-indigo-50 rounded-lg p-6 shadow-inner border border-indigo-100">
             <h3 className="text-xl font-semibold text-indigo-700 mb-3 flex items-center gap-2">
-              <MessageSquare className="text-indigo-600" /> Historial de Estados
+              <MessageSquare className="text-indigo-600" /> {t("tickets.detail.history")}
             </h3>
+
             {historial && historial.length > 0 ? (
               <div className="relative border-l-4 border-indigo-400 ml-4 space-y-6">
                 {historial.map((h, i) => (
                   <div key={i} className="ml-6 relative">
                     <span className="absolute -left-3 top-1.5 w-5 h-5 rounded-full bg-indigo-500 border-2 border-white shadow"></span>
+
                     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-500">
-                          {new Date(h.fecha).toLocaleString("es-CR")}
+                          {new Date(h.fecha).toLocaleString()}
                         </span>
+
                         <Badge
-                          className={`${estadoColors[h.estado] || "bg-gray-300"} text-white`}
+                          className={`${
+                            estadoColors[h.estado] || "bg-gray-300"
+                          } text-white`}
                         >
                           {h.estado}
                         </Badge>
@@ -279,10 +279,9 @@ const handleActualizarEstado = async () => {
                       </p>
 
                       <p className="mt-2 text-gray-600 text-sm italic">
-                        “{h.observaciones || "Sin observaciones"}”
+                        “{h.observaciones || t("tickets.detail.noObservations")}”
                       </p>
 
-                      {/*  Imágenes del historial */}
                       {h.imagenes && h.imagenes.length > 0 && (
                         <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                           {h.imagenes.map((img, idx) => (
@@ -292,7 +291,7 @@ const handleActualizarEstado = async () => {
                             >
                               <img
                                 src={`http://localhost:81/Proyecto/${img.ruta}`}
-                                alt={img.descripcion || "Evidencia"}
+                                alt="Evidencia"
                                 onError={(e) => (e.target.src = "/no-image.png")}
                                 className="object-cover w-full h-28"
                               />
@@ -305,53 +304,59 @@ const handleActualizarEstado = async () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm italic">Sin historial registrado.</p>
+              <p className="text-gray-500 text-sm italic">{t("tickets.detail.noHistory")}</p>
             )}
           </div>
 
-          {/*  Valoración del cliente */}
+          {/* Valoración */}
           {valoracion && (
             <div className="bg-yellow-50 rounded-lg p-6 shadow-inner border border-yellow-100">
               <h3 className="text-xl font-semibold text-yellow-700 mb-3 flex items-center gap-2">
-                <Star className="text-yellow-500" /> Valoración del Cliente
+                <Star className="text-yellow-500" /> {t("tickets.detail.rating")}
               </h3>
-              <p><strong>Puntaje:</strong> {valoracion.puntaje} / 5 ⭐</p>
-              <p><strong>Comentario:</strong> {valoracion.comentario || "Sin comentario"}</p>
+
+              <p>
+                <strong>{t("tickets.detail.score")}:</strong> {valoracion.puntaje}/5 ⭐
+              </p>
+
+              <p>
+                <strong>{t("tickets.detail.comment")}:</strong>{" "}
+                {valoracion.comentario || t("tickets.detail.noComment")}
+              </p>
             </div>
           )}
 
-          {/*  Botones finales */}
+          {/* BOTONES */}
           <div className="flex justify-between mt-6">
-            {/* Botón para volver a la lista */}
             <Button
               variant="outline"
               className="flex items-center gap-2 bg-gradient-to-r from-gray-100 to-gray-200 hover:scale-105 transition-all shadow-sm"
               onClick={() => navigate(-1)}
             >
-              <ArrowLeftCircle className="h-5 w-5 text-blue-700" /> Volver
+              <ArrowLeftCircle className="h-5 w-5 text-blue-700" /> {t("buttons.back")}
             </Button>
 
-            {/*  Modal para actualizar estado */}
+            {/* MODAL */}
             <Dialog open={openModal} onOpenChange={setOpenModal}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-blue-700 to-blue-900 text-white flex items-center gap-2 hover:scale-105 transition-all shadow">
-                  <RefreshCcw className="w-4 h-4" /> Actualizar estado
+                  <RefreshCcw className="w-4 h-4" /> {t("tickets.detail.updateState")}
                 </Button>
               </DialogTrigger>
+
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Actualizar estado del Ticket</DialogTitle>
+                  <DialogTitle>{t("tickets.detail.updateState")}</DialogTitle>
                   <DialogDescription>
-                    Selecciona un nuevo estado, agrega observaciones y evidencias opcionalmente.
+                    {t("tickets.detail.updateStateDesc")}
                   </DialogDescription>
                 </DialogHeader>
 
-                {/* Formulario dentro del modal */}
                 <div className="space-y-4 py-2">
-                  {/* Selector de estado */}
+                  {/* Estado */}
                   <Select onValueChange={(value) => setNuevoEstado(value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccione un nuevo estado" />
+                      <SelectValue placeholder={t("tickets.detail.selectState")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Pendiente">Pendiente</SelectItem>
@@ -362,25 +367,27 @@ const handleActualizarEstado = async () => {
                     </SelectContent>
                   </Select>
 
-                  {/* Campo de observaciones */}
+                  {/* Observaciones */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
-                      <MessageCircle className="w-4 h-4" /> Observaciones
+                      <MessageCircle className="w-4 h-4" /> {t("tickets.detail.observations")}
                     </label>
+
                     <textarea
                       rows="3"
                       value={observaciones}
                       onChange={(e) => setObservaciones(e.target.value)}
                       className="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Agrega una observación o comentario (opcional)"
+                      placeholder={t("tickets.detail.observationsPlaceholder")}
                     ></textarea>
                   </div>
 
-                  {/* Subida de imágenes */}
+                  {/* Imágenes */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
-                      <ImageIcon className="w-4 h-4" /> Imágenes del estado (opcional)
+                      <ImageIcon className="w-4 h-4" /> {t("tickets.detail.images")}
                     </label>
+
                     <input
                       type="file"
                       accept="image/*"
@@ -388,22 +395,24 @@ const handleActualizarEstado = async () => {
                       onChange={(e) => setImagenes([...e.target.files])}
                       className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+
                     <p className="text-xs text-gray-400">
-                      Puedes subir capturas o evidencias del estado actual del ticket.
+                      {t("tickets.detail.imagesHint")}
                     </p>
                   </div>
                 </div>
 
-                {/* Footer del modal */}
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpenModal(false)}>
-                    Cancelar
+                    {t("buttons.cancel")}
                   </Button>
+
                   <Button
                     className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2"
                     onClick={handleActualizarEstado}
                   >
-                    <CheckCircle className="w-4 h-4" /> Confirmar
+                    <CheckCircle className="w-4 h-4" />
+                    {t("tickets.detail.confirm")}
                   </Button>
                 </DialogFooter>
               </DialogContent>
