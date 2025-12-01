@@ -140,4 +140,161 @@ class AsignacionController
             ]);
         }
     }
+
+    public function tecnicos()
+{
+    header('Content-Type: application/json');
+
+    $ticketId = intval($_GET['ticket_id'] ?? 0);
+
+    if (!$ticketId) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Ticket no válido"
+        ]);
+        return;
+    }
+
+    try {
+        $model = new AsignacionModel();
+        $rows  = $model->getTecnicosPorTicket($ticketId);
+
+        echo json_encode([
+            "success" => true,
+            "data"    => $rows
+        ]);
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        echo json_encode([
+            "success" => false,
+            "message" => "Error en el servidor",
+            "error"   => $e->getMessage()
+        ]);
+    }
+}
+
+    public function auto()
+{
+    header('Content-Type: application/json');
+
+    $ticketId = intval($_GET['ticket_id'] ?? 0);
+
+    if (!$ticketId) {
+        echo json_encode(["success" => false, "message" => "Ticket no válido"]);
+        return;
+    }
+
+    $model = new AsignacionModel();
+    $tec = $model->asignarAutomaticamente($ticketId);
+
+    if (!$tec) {
+        echo json_encode(["success" => false, "message" => "No se pudo asignar automáticamente"]);
+        return;
+    }
+
+  echo json_encode([
+    "success" => true,
+    "message" => "Asignado automáticamente",
+    "tecnico" => [
+        "id" => $tec->tecnico_id,
+        "nombre" => $tec->nombre,
+        "puntaje" => $tec->puntaje,
+        "regla_id" => $tec->regla_id,
+        "regla_nombre" => $tec->regla_nombre
+    ]
+]);
+
+}
+public function manual()
+{
+    header('Content-Type: application/json');
+
+    try {
+        $ticketId  = intval($_POST['ticket_id'] ?? 0);
+        $tecnicoId = intval($_POST['tecnico_id'] ?? 0);
+        $just      = trim($_POST['justificacion'] ?? '');
+
+        if (!$ticketId || !$tecnicoId) {
+            http_response_code(400);
+            echo json_encode([
+                "success" => false,
+                "message" => "Faltan parámetros"
+            ]);
+            return;
+        }
+
+        $model = new AsignacionModel();
+        $ok = $model->asignarManual($ticketId, $tecnicoId);
+
+        echo json_encode([
+            "success" => true,
+            "message" => "Asignación manual realizada correctamente"
+        ]);
+
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        echo json_encode([
+            "success" => false,
+            "message" => "Error interno",
+            "error" => $e->getMessage()
+        ]);
+    }
+}
+
+
+
+
+
+public function asignarPendientes()
+{
+    try {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $model = new AsignacionModel();
+        $result = $model->asignarTodosPendientes();
+
+        echo json_encode([
+            "success" => true,
+            "message" => "Asignación automática completada",
+            "data"    => $result
+        ]);
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        echo json_encode([
+            "success" => false,
+            "message" => "Error en el servidor",
+            "error"   => $e->getMessage()
+        ]);
+    }
+}
+
+public function pendientes()
+{
+    header('Content-Type: application/json; charset=utf-8');
+
+    try {
+        $model = new AsignacionModel();
+        $data  = $model->listPendientes();
+
+        echo json_encode([
+            "success" => true,
+            "data"    => $data
+        ]);
+        return;
+
+    } catch (Throwable $e) {
+
+        http_response_code(500);
+        echo json_encode([
+            "success" => false,
+            "message" => "Error cargando los tickets pendientes",
+            "error"   => $e->getMessage()
+        ]);
+        return;
+    }
+}
+
+
+
+
 }

@@ -204,123 +204,130 @@ class TicketController
         }
     }
 
-    // ============================================================
-    // ACTUALIZAR ESTADO DE UN TICKET (con imagen y descripción)
-    // ============================================================
-    // Este método recibe un formulario (FormData) enviado por POST
-    // y actualiza el estado del ticket. También puede guardar imágenes
-    // de evidencia con su descripción.
-    //
-    // Ejemplo de uso:
-    // POST -> http://localhost:81/Proyecto/api/TicketController/updateEstado
-    //
-    // Datos esperados:
-    //   - ticket_id        → ID del ticket
-    //   - nuevo_estado_id  → ID del nuevo estado
-    //   - usuario_id       → ID del usuario que realiza el cambio
-    //   - observaciones    → texto opcional con la observación del cambio
-    //   - imagenes[]       → archivo(s) opcional(es) de evidencia
-    //   - descripcion[]    → descripción opcional de cada imagen
-    // ============================================================
-    public function updateEstado()
-    {
-        $response = new Response();
-        try {
-            header('Content-Type: application/json; charset=utf-8');
+   public function updateEstado()
+{
+    $response = new Response();
+    try {
+        header('Content-Type: application/json; charset=utf-8');
 
-            //  Se obtienen los valores enviados por POST (formulario)
-            $ticketId       = isset($_POST['ticket_id']) ? intval($_POST['ticket_id']) : 0;
-            $nuevoEstado    = isset($_POST['nuevo_estado_id']) ? intval($_POST['nuevo_estado_id']) : 0;
-            $usuarioId      = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : 0;
-            $observaciones  = isset($_POST['observaciones']) ? trim($_POST['observaciones']) : "Cambio de estado manual";
+        // 🔹 Captura de datos enviados por POST
+        $ticketId   = isset($_POST['ticket_id']) ? intval($_POST['ticket_id']) : 0;
+        $nuevoEstado = isset($_POST['nuevo_estado_id']) ? intval($_POST['nuevo_estado_id']) : 0;
+        $usuarioId   = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : 0;
+        $observaciones = isset($_POST['observaciones']) ? trim($_POST['observaciones']) : "";
 
-            // Si falta algún dato obligatorio, se devuelve error 400
-            if (!$ticketId || !$nuevoEstado || !$usuarioId) {
+        // 🔹 Validación de datos obligatorios
+        if (!$ticketId || !$nuevoEstado || !$usuarioId || $observaciones === "") {
+            http_response_code(400);
+            $response->toJSON(null, "Debe enviar: ticket_id, nuevo_estado_id, usuario_id y observaciones.", 400);
+            return;
+        }
+
+        // 🔹 Cargar modelo
+        $model = new TicketModel();
+
+        // 🔹 Obtener datos del ticket actual
+        $ticket = $model->getById($ticketId);
+        if (!$ticket) {
+            http_response_code(404);
+            $response->toJSON(null, "El ticket no existe.", 404);
+            return;
+        }
+
+        $estadoActual = intval($ticket["basicos"]->estado_id);
+
+        // 🔹 Validación del flujo correcto (no saltarse estados)
+        if ($nuevoEstado !== $estadoActual + 1) {
+            http_response_code(400);
+            $response->toJSON(null, "Flujo inválido: no puede saltarse etapas.", 400);
+            return;
+        }
+
+        // 🔹 Validar que el ticket tenga técnico asignado (excepto pasar de Pendiente → Asignado)
+        if ($estadoActual > 1) {
+            $sqlAsig = "
+                SELECT 1 FROM asignaciones 
+                WHERE ticket_id = $ticketId 
+                  AND vigente = 1 
+                LIMIT 1
+            ";
+            $asignado = $model->enlace->ExecuteSQL($sqlAsig);
+
+            if (empty($asignado)) {
                 http_response_code(400);
-                $response->toJSON(null, "Faltan parámetros obligatorios", 400);
+                $response->toJSON(null, "No se puede avanzar el estado: no hay técnico asignado.", 400);
                 return;
             }
+        }
 
-            //  Se crea una instancia del modelo para acceder a la base de datos
-            $model = new TicketModel();
+        // 🔹 Registrar el cambio en historial_estados
+        $sqlHist = "
+            INSERT INTO historial_estados (ticket_id, estado_id, usuario_id, fecha, observaciones)
+            VALUES ($ticketId, $nuevoEstado, $usuarioId, NOW(), '" . addslashes($observaciones) . "')
+        ";
+        $historialId = $model->enlace->executeSQL_DML_last($sqlHist);
 
-            // Se inserta un nuevo registro en la tabla historial_estados
-            // Esta tabla guarda todos los cambios de estado que ha tenido un ticket
-            $sqlHist = "
-                INSERT INTO historial_estados (ticket_id, estado_id, usuario_id, fecha, observaciones)
-                VALUES ($ticketId, $nuevoEstado, $usuarioId, NOW(), '" . addslashes($observaciones) . "')
+        // 🔹 Procesar imagen (si existe)
+        // 🔹 Procesar imágenes (si existen)
+if (!empty($_FILES['imagenes']['name'])) {
+    $uploadDir = "../uploads/estados/";
+
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $names = $_FILES['imagenes']['name'];
+    $tmp   = $_FILES['imagenes']['tmp_name'];
+
+    // Normalizar en caso de un solo archivo
+    if (!is_array($names)) {
+        $names = [$names];
+        $tmp   = [$tmp];
+    }
+
+    foreach ($names as $idx => $nombreOriginal) {
+        if (!$nombreOriginal) continue;
+
+        // Limpia el nombre de caracteres raros
+        $nombreArchivo = time() . "_" . preg_replace('/[^A-Za-z0-9._-]/', '_', $nombreOriginal);
+        $rutaDestino   = $uploadDir . $nombreArchivo;
+
+        if (move_uploaded_file($tmp[$idx], $rutaDestino)) {
+            $rutaRel = "uploads/estados/" . $nombreArchivo;
+
+            $sqlImg = "
+                INSERT INTO imagenes_estado (historial_id, ruta, descripcion)
+                VALUES ($historialId, '$rutaRel', 'Evidencia del cambio de estado')
             ";
-            // addslashes() escapa comillas y caracteres especiales para evitar errores SQL
-            $historialId = $model->enlace->executeSQL_DML_last($sqlHist);
-
-            //  Se actualiza el estado del ticket en la tabla principal
-            $sqlUpdate = "
-                UPDATE tickets
-                SET estado_id = $nuevoEstado,
-                    actualizado_en = NOW()
-                WHERE id = $ticketId
-            ";
-            // executeSQL_DML ejecuta la consulta sin esperar retorno de filas
-            $model->enlace->executeSQL_DML($sqlUpdate);
-
-            //  Si se enviaron imágenes, se procesan una por una
-            if (!empty($_FILES['imagenes']['name'][0])) {
-                // Carpeta donde se guardarán las imágenes subidas
-                $uploadDir = "../uploads/estados/";
-                // Si la carpeta no existe, se crea con permisos 0777 (lectura y escritura)
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                // Se recorren todos los archivos subidos
-                foreach ($_FILES['imagenes']['tmp_name'] as $i => $tmpName) {
-                    // Verifica que realmente se haya subido el archivo
-                    if (!is_uploaded_file($tmpName)) continue;
-
-                    // Obtiene el nombre original del archivo
-                    $nombreOriginal = basename($_FILES['imagenes']['name'][$i]);
-                    // Genera un nombre único usando la hora actual + nombre original
-                    $nombreArchivo = time() . "_" . $nombreOriginal;
-                    // Ruta de destino final donde se guardará el archivo
-                    $rutaDestino = $uploadDir . $nombreArchivo;
-
-                    // move_uploaded_file() mueve el archivo desde la carpeta temporal hasta la ruta final
-                    if (move_uploaded_file($tmpName, $rutaDestino)) {
-                        // Se crea una ruta relativa (para guardar en BD)
-                        $rutaRelativa = "uploads/estados/" . $nombreArchivo;
-
-                        // Si el usuario envió una descripción personalizada, se usa; si no, se usa un texto por defecto
-                        $descImg = isset($_POST['descripcion'][$i]) && $_POST['descripcion'][$i] != ""
-                            ? addslashes($_POST['descripcion'][$i])
-                            : "Evidencia del cambio de estado";
-
-                        // Se inserta la información de la imagen en la tabla imagenes_estado
-                        $sqlImg = "
-                            INSERT INTO imagenes_estado (historial_id, ruta, descripcion)
-                            VALUES ($historialId, '$rutaRelativa', '$descImg')
-                        ";
-                        // Se ejecuta la consulta para registrar la imagen
-                        $model->enlace->executeSQL_DML($sqlImg);
-                    }
-                }
-            }
-
-            // Respuesta final si todo se ejecutó correctamente
-            $response->toJSON([
-                "success" => true,
-                "ticket_id" => $ticketId,
-                "historial_id" => $historialId
-            ], "Estado actualizado correctamente", 200);
-        } catch (Exception $e) {
-            http_response_code(500);
-            $response->toJSON(null, "Error al actualizar el estado", 500);
-            handleException($e);
-        } catch (\Throwable $e) {
-            http_response_code(500);
-            $response->toJSON(null, "Error inesperado", 500);
-            handleException($e);
+            $model->enlace->executeSQL_DML($sqlImg);
         }
     }
+}
+
+
+        $sqlUpdate = "
+            UPDATE tickets
+            SET estado_id = $nuevoEstado,
+                actualizado_en = NOW()
+            WHERE id = $ticketId
+        ";
+        $model->enlace->executeSQL_DML($sqlUpdate);
+
+     
+        $response->toJSON([
+            "success" => true,
+            "ticket_id" => $ticketId,
+            "historial_id" => $historialId
+        ], "Estado actualizado correctamente.", 200);
+
+    } catch (Throwable $e) {
+        http_response_code(500);
+        $response->toJSON(null, "Error inesperado: " . $e->getMessage(), 500);
+        handleException($e);
+    }
+}
+
+
    public function create()
 {
     $response = new Response();
@@ -329,7 +336,7 @@ class TicketController
         $request = new Request();
         $data = $request->getJSON();
 
-        // 🔹 Convertir el objeto stdClass a un arreglo asociativo
+        //  Convertir el objeto stdClass a un arreglo asociativo
         $dataArray = json_decode(json_encode($data), true);
 
         // Instanciar el modelo y llamar al método create
@@ -348,6 +355,5 @@ class TicketController
         handleException($e);
     }
 }
-
 
 }
