@@ -37,6 +37,7 @@ const cargarPendientes = async () => {
   try {
     const res = await AsignacionService.getTicketsPendientes();
     setPendientes(res.data?.data || []);
+    console.log("🔥 Tickets pendientes:", res.data?.data);
   } catch (err) {
     console.error("❌ Error cargando pendientes:", err);
     setError("Error cargando los tickets pendientes.");
@@ -56,11 +57,24 @@ useEffect(() => {
   // FILTRO DE TICKETS
   // ============================================================
 
-  const filtrados = pendientes.filter((t) => {
-    if (filtro.prioridad && String(t.prioridad) !== filtro.prioridad) return false;
-    if (filtro.categoria && t.categoria !== filtro.categoria) return false;
-    return true;
-  });
+const filtrados = pendientes.filter((t) => {
+  const p = String(t.prioridad).toLowerCase();  // "alta", "media", "baja"
+
+  // Convertir texto a número real del select
+  let prioridadTicket = "";
+
+  if (p.includes("alta")) prioridadTicket = "1";
+  else if (p.includes("media")) prioridadTicket = "2";
+  else if (p.includes("baja")) prioridadTicket = "3";
+
+  // Aplicar filtro solo si el usuario seleccionó algo
+  if (filtro.prioridad && prioridadTicket !== filtro.prioridad) return false;
+
+  if (filtro.categoria && t.categoria !== filtro.categoria) return false;
+
+  return true;
+});
+
 
   // ============================================================
   // EJECUTAR AUTOTRIAGE

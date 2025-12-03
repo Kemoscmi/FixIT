@@ -352,7 +352,7 @@ export function DetailTicket() {
   </Button>
 
   {/* ⭐⭐⭐ ASIGNACIÓN MANUAL — SOLO SI EL TICKET ESTÁ PENDIENTE ⭐⭐⭐ */}
-  {basicos?.estado === "Pendiente" && (
+{rolId !== 3 && basicos?.estado === "Pendiente" && (
     <Dialog open={modalManual} onOpenChange={setModalManual}>
       <DialogTrigger asChild>
         <Button
@@ -455,6 +455,8 @@ export function DetailTicket() {
   )}
 
   {/* Actualizar estado */}
+ {/* Actualizar estado — oculto para clientes */}
+{rolId !== 3 && (
   <Dialog open={openModal} onOpenChange={setOpenModal}>
     <DialogTrigger asChild>
       <Button className="bg-gradient-to-r from-blue-700 to-blue-900 text-white flex items-center gap-2 hover:scale-105 transition-all shadow">
@@ -525,6 +527,8 @@ export function DetailTicket() {
       </DialogFooter>
     </DialogContent>
   </Dialog>
+)}
+
 
 </div>
 
