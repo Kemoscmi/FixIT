@@ -32,27 +32,25 @@ export default function AsignacionesAuto() {
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState("");
 
+  
+const cargarPendientes = async () => {
+  try {
+    const res = await AsignacionService.getTicketsPendientes();
+    setPendientes(res.data?.data || []);
+  } catch (err) {
+    console.error("❌ Error cargando pendientes:", err);
+    setError("Error cargando los tickets pendientes.");
+  }
+};
+
   // ============================================================
   // CARGA INICIAL → Obtener tickets PENDIENTES
   // ============================================================
- useEffect(() => {
-  const cargarPendientes = async () => {
-    try {
-      // Usamos el servicio correcto: AsignacionService
-      const res = await AsignacionService.getTicketsPendientes();
-
-      // La API de AsignacionController/pendientes devuelve { success, data }
-      setPendientes(res.data?.data || []);
-    } catch (err) {
-      console.error("❌ Error cargando pendientes:", err);
-      setError("Error cargando los tickets pendientes.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  cargarPendientes();
+useEffect(() => {
+  setLoading(true);
+  cargarPendientes().finally(() => setLoading(false));
 }, []);
+
 
   // ============================================================
   // FILTRO DE TICKETS
@@ -82,6 +80,8 @@ export default function AsignacionesAuto() {
       }
 
       setResult(response.data.data);
+await cargarPendientes();
+
     } catch (err) {
       console.error("❌ Error:", err);
       setError("Error al procesar la asignación automática.");
@@ -268,7 +268,8 @@ export default function AsignacionesAuto() {
 
                 <div className="mt-3 text-sm">
                   <p><b>Puntaje:</b> {item.puntaje}</p>
-                  <p><b>Regla aplicada:</b> {item.regla}</p>
+                  <p><b>Regla aplicada:</b> {item.regla_aplicada}</p>
+
 
                   <p className="mt-2">
                     <b>Justificación:</b><br/>
