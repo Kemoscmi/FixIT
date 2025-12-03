@@ -35,6 +35,11 @@ import { CreateTicket } from './components/Ticket/CreateTicket';
 import AsignacionesView from './components/Asignaciones/AsignacionesView';
 import AsignacionesAuto from './components/Asignaciones/AsignacionesAuto';
 
+//Notificaciones 
+import { NotificationProvider } from "./components/Notificaciones/NotificationProvider";
+import HistorialNotificaciones from './components/Notificaciones/HistorialNotificaciones';
+
+
 // Autenticación
 import ProtectedRoute from './auth/ProtectedRoute';
 
@@ -70,6 +75,8 @@ const rutas = createBrowserRouter([
           { path: 'asignaciones', element: <AsignacionesView /> },
           { path: 'asignaciones/autotriage', element: <AsignacionesAuto /> },
 
+          //Notiiiss
+          { path: 'historial', element: <HistorialNotificaciones /> },
 
           // Página 404
           { path: '*', element: <PageNotFound /> },
@@ -85,6 +92,8 @@ const rutas = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+
+     <NotificationProvider> 
     <RouterProvider router={rutas} />
    <Toaster 
       position="top-right"
@@ -93,6 +102,9 @@ createRoot(document.getElementById('root')).render(
         style: { fontSize: "15px" }
       }}
     />
+
+  </NotificationProvider>
+
 
   </StrictMode>,
 );

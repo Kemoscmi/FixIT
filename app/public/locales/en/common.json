@@ -32,7 +32,7 @@
       "assignedTechnician": "Assigned Technician"
     },
 
-     "list": {
+    "list": {
       "myTickets": "My Tickets",
       "create": "Create Ticket",
       "empty": "No tickets available.",
@@ -40,159 +40,154 @@
     },
 
     "detail": {
-    "ticket": "Ticket",
-    "error": "Error retrieving ticket",
-    "notFound": "Ticket not found",
-    "noData": "No data available",
-    "unknownDate": "unknown date",
+      "ticket": "Ticket",
+      "error": "Error retrieving ticket",
+      "notFound": "Ticket not found",
+      "noData": "No data available",
+      "unknownDate": "unknown date",
 
-    "requester": "Requester",
-    "resolutionDays": "Resolution days",
+      "requester": "Requester",
+      "resolutionDays": "Resolution days",
 
-    "slaMonitor": "SLA Monitoring",
-    "slaResp": "Hours remaining for response",
-    "slaResol": "Hours remaining for resolution",
-    "slaRespMet": "Response SLA met",
-    "slaResolMet": "Resolution SLA met",
+      "slaMonitor": "SLA Monitoring",
+      "slaResp": "Hours remaining for response",
+      "slaResol": "Hours remaining for resolution",
+      "slaRespMet": "Response SLA met",
+      "slaResolMet": "Resolution SLA met",
 
-    "history": "Status History",
-    "noObservations": "No observations",
-    "noHistory": "No history recorded",
+      "history": "Status History",
+      "noObservations": "No observations",
+      "noHistory": "No history recorded",
 
-    "rating": "Customer Rating",
-    "score": "Score",
-    "comment": "Comment",
-    "noComment": "No comment",
+      "rating": "Customer Rating",
+      "score": "Score",
+      "comment": "Comment",
+      "noComment": "No comment",
 
-    "updateState": "Update state",
-    "updateStateDesc": "Select a new state and add optional information.",
-    "selectState": "Select state",
+      "updateState": "Update state",
+      "updateStateDesc": "Select a new state and add optional information.",
+      "selectState": "Select state",
 
-    "observations": "Observations",
-    "observationsPlaceholder": "Write an observation...",
+      "observations": "Observations",
+      "observationsPlaceholder": "Write an observation...",
 
-    "images": "Images",
-    "imagesHint": "You can upload screenshots or evidence.",
+      "images": "Images",
+      "imagesHint": "You can upload screenshots or evidence.",
 
-    "mustSelectState": "You must select a state before confirming",
-    "stateUpdated": "State updated successfully",
-    "stateUpdateFail": "State update failed",
+      "mustSelectState": "You must select a state before confirming",
+      "stateUpdated": "State updated successfully",
+      "stateUpdateFail": "State update failed",
 
-    "confirm": "Confirm"
+      "confirm": "Confirm"
+    },
+
+    "create": {
+      "title": "Create Ticket",
+      "user": "Requester",
+      "email": "Email",
+      "titlePlaceholder": "Enter title",
+      "priorityPlaceholder": "Select a priority",
+      "tags": "Tags",
+      "category": "Associated category",
+      "selectTagFirst": "Select a tag first…",
+      "date": "Creation date",
+      "state": "State",
+      "defaultState": "Pending",
+      "descPlaceholder": "Describe the issue or request...",
+      "save": "Save Ticket",
+
+      "noName": "No name",
+      "errorLoading": "Error loading data",
+      "categoryError": "Could not load associated category",
+      "mustSelectTag": "You must select a tag before continuing",
+      "categoryMissing": "Could not retrieve associated category",
+      "invalidTitle": "The title contains invalid characters",
+      "descTooShort": "Description must have at least 5 characters",
+      "mustSelectPriority": "You must select a priority",
+      "internalCategoryError": "Internal error: no category assigned",
+      "success": "Ticket created successfully",
+      "errorCreate": "Error creating ticket",
+      "serverError": "Server error"
+    },
+
+    "table": {
+      "titleList": "General Tickets List",
+      "create": "Create Ticket",
+      "title": "Title",
+      "createdAt": "Creation Date",
+      "state": "Status",
+      "priority": "Priority",
+      "actions": "Actions",
+      "view": "View details",
+      "edit": "Edit ticket",
+      "delete": "Delete ticket",
+      "errorLoading": "Error loading tickets",
+      "empty": "No tickets found."
+    }
   },
-
-  "create": {
-  "title": "Create Ticket",
-  "user": "Requester",
-  "email": "Email",
-  "titlePlaceholder": "Enter title",
-  "priorityPlaceholder": "Select a priority",
-  "tags": "Tags",
-  "category": "Associated category",
-  "selectTagFirst": "Select a tag first…",
-  "date": "Creation date",
-  "state": "State",
-  "defaultState": "Pending",
-  "descPlaceholder": "Describe the issue or request...",
-  "save": "Save Ticket",
-
-  "noName": "No name",
-  "errorLoading": "Error loading data",
-  "categoryError": "Could not load associated category",
-  "mustSelectTag": "You must select a tag before continuing",
-  "categoryMissing": "Could not retrieve associated category",
-  "invalidTitle": "The title contains invalid characters",
-  "descTooShort": "Description must have at least 5 characters",
-  "mustSelectPriority": "You must select a priority",
-  "internalCategoryError": "Internal error: no category assigned",
-  "success": "Ticket created successfully",
-  "errorCreate": "Error creating ticket",
-  "serverError": "Server error"
-},
-
-"table": {
-    "titleList": "General Tickets List",
-    "create": "Create Ticket",
-    "title": "Title",
-    "createdAt": "Creation Date",
-    "state": "Status",
-    "priority": "Priority",
-    "actions": "Actions",
-    "view": "View details",
-    "edit": "Edit ticket",
-    "delete": "Delete ticket",
-    "errorLoading": "Error loading tickets",
-    "empty": "No tickets found."
-  }
-
-},
 
   "categories": {
     "titleList": "Support Categories",
     "buttonNew": "New Category",
     "description": "Explore the different technical support areas available. Each category includes tags, specialties, and defined response times.",
     "noCategories": "No categories registered.",
-     "viewDetail": "View details",
+    "viewDetail": "View details",
 
     "detail": {
-    "tags": "Tags",
-    "noTags": "No tags registered.",
-    
-    "specialties": "Specialties",
-    "noSpecialties": "No specialties registered.",
+      "tags": "Tags",
+      "noTags": "No tags registered.",
+      "specialties": "Specialties",
+      "noSpecialties": "No specialties registered.",
+      "sla": "SLA",
+      "responseTime": "Max. response time",
+      "resolutionTime": "Max. resolution time",
+      "noSla": "SLA not available.",
 
-    "sla": "SLA",
-    "responseTime": "Max. response time",
-    "resolutionTime": "Max. resolution time",
-    "noSla": "SLA not available.",
+      "back": "Back to list",
+      "edit": "Edit category",
 
-    "back": "Back to list",
-    "edit": "Edit category",
+      "notFound": "Category not found.",
+      "loading": "Loading details..."
+    },
 
-    "notFound": "Category not found.",
-    "loading": "Loading details..."
-  },
+    "form": {
+      "titleCreate": "Register Category",
+      "titleEdit": "Edit Category",
 
+      "name": "Name",
+      "description": "Description",
+      "placeholderName": "Category name",
+      "placeholderDescription": "Description",
 
-  "form": {
-  "titleCreate": "Register Category",
-  "titleEdit": "Edit Category",
+      "slaAssign": "How would you like to assign the SLA?",
+      "slaExisting": "Use existing SLA",
+      "slaNew": "Create new SLA",
+      "slaSelectExisting": "Select a registered SLA",
 
-  "name": "Name",
-  "description": "Description",
-  "placeholderName": "Category name",
-  "placeholderDescription": "Description",
+      "newSlaTitle": "Create new SLA",
+      "slaResponse": "Max. response time (min)",
+      "slaResolution": "Max. resolution time (min)",
 
-  "slaAssign": "How would you like to assign the SLA?",
-  "slaExisting": "Use existing SLA",
-  "slaNew": "Create new SLA",
-  "slaSelectExisting": "Select a registered SLA",
+      "tags": "Tags",
+      "specialties": "Specialties",
 
-  "newSlaTitle": "Create new SLA",
-  "slaResponse": "Max. response time (min)",
-  "slaResolution": "Max. resolution time (min)",
+      "back": "Back",
+      "save": "Save",
+      "update": "Update",
 
-  "tags": "Tags",
-  "specialties": "Specialties",
+      "requiredName": "Name is mandatory",
+      "slaResponseGreaterZero": "Response time must be greater than 0",
+      "slaResolutionGreater": "Resolution time must be greater than response time",
 
-  "back": "Back",
-  "save": "Save",
-  "update": "Update",
+      "loading": "Loading form...",
 
-  "requiredName": "Name is mandatory",
-  "slaResponseGreaterZero": "Response time must be greater than 0",
-  "slaResolutionGreater": "Resolution time must be greater than response time",
-
-  "loading": "Loading form...",
-
-   "errors": {
-      "required": "This field is required.",
-      "slaRequired": "You must select an existing SLA or create a new one.",
-      "slaResponseGreaterZero": "Response time must be greater than 0.",
-      "slaResolutionGreater": "Resolution time must be greater than response time."
+      "errors": {
+        "required": "This field is required.",
+        "slaRequired": "You must select an existing SLA or create a new one.",
+        "slaResponseGreaterZero": "Response time must be greater than 0.",
+        "slaResolutionGreater": "Resolution time must be greater than 0."
+      }
     }
-}
-
   },
 
   "technicians": {
@@ -202,6 +197,7 @@
     "noTechnicians": "No technicians found.",
     "titleCreate": "Register Technician",
     "titleEdit": "Edit Technician",
+
     "fields": {
       "name": "Name",
       "email": "Email",
@@ -211,73 +207,70 @@
     },
 
     "detail": {
-    "email": "Email",
-    "phone": "Phone",
-    "workload": "Workload",
-    "availability": "Availability",
-    "specialties": "Specialties",
-    "back": "Back to list",
-    "edit": "Edit technician",
-    "noWorkload": "Not assigned"
-  }, 
+      "email": "Email",
+      "phone": "Phone",
+      "workload": "Workload",
+      "availability": "Availability",
+      "specialties": "Specialties",
+      "back": "Back to list",
+      "edit": "Edit technician",
+      "noWorkload": "Not assigned"
+    },
 
-   "form": {
-    "titleCreate": "Register Technician",
-    "titleEdit": "Edit Technician",
+    "form": {
+      "titleCreate": "Register Technician",
+      "titleEdit": "Edit Technician",
 
-    "name": "Name",
-    "lastname": "Last name",
-    "email": "Email",
-    "password": "Password",
-    "phone": "Phone",
-    "notes": "Notes",
-    "specialties": "Specialties",
-    "workload": "Current workload",
-    "availability": "Availability",
+      "name": "Name",
+      "lastname": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "phone": "Phone",
+      "notes": "Notes",
+      "specialties": "Specialties",
+      "workload": "Current workload",
+      "availability": "Availability",
 
-    "available": "Available",
-    "busy": "Busy",
+      "available": "Available",
+      "busy": "Busy",
 
-    "back": "Back",
-    "save": "Save",
-    "update": "Update",
+      "back": "Back",
+      "save": "Save",
+      "update": "Update",
 
-    "placeholderName": "Name",
-    "placeholderLastname": "Last name",
-    "placeholderEmail": "Email",
-    "placeholderPassword": "Password",
-    "placeholderPhone": "Phone",
-    "placeholderNotes": "Notes",
+      "placeholderName": "Name",
+      "placeholderLastname": "Last name",
+      "placeholderEmail": "Email",
+      "placeholderPassword": "Password",
+      "placeholderPhone": "Phone",
+      "placeholderNotes": "Notes",
 
-     "errors": {
-      "nameLetters": "The name can only contain letters.",
-      "lastnameLetters": "The last name can only contain letters.",
-      "required": "This field is required.",
-      "emailDomain": "Email must end with @fixit.cr.",
-      "numbersOnly": "This field only accepts numbers."
+      "errors": {
+        "nameLetters": "The name can only contain letters.",
+        "lastnameLetters": "The last name can only contain letters.",
+        "required": "This field is required.",
+        "emailDomain": "Email must end with @fixit.cr.",
+        "numbersOnly": "This field only accepts numbers."
+      }
     }
-  }
-
   },
 
-"assignmentsView": {
-  "titleAdmin": "General Assignments",
-  "titleTech": "My Weekly Assignments",
-  "description": "Weekly calendar view (Monday to Sunday) with daily grouping.",
-  "weekRange": "Week from {{start}} to {{end}}",
+  "assignmentsView": {
+    "titleAdmin": "General Assignments",
+    "titleTech": "My Weekly Assignments",
+    "description": "Weekly calendar view (Monday to Sunday), with daily grouping.",
+    "weekRange": "Week from {{start}} to {{end}}",
 
-  "filterWeek": "Filter by week:",
+    "filterWeek": "Filter by week:",
+    "noAssignments": "— No assignments —",
 
-  "noAssignments": "— No assignments —",
+    "ticketCategory": "Category:",
+    "sla": "SLA:",
+    "slaExpired": "Expired",
+    "slaInProgress": "In progress",
 
-  "ticketCategory": "Category:",
-  "sla": "SLA:",
-  "slaExpired": "Expired",
-  "slaInProgress": "In progress",
-
-  "btnViewDetail": "View detail"
-},
-
+    "btnViewDetail": "View detail"
+  },
 
   "assignments": {
     "title": "Assignments",
@@ -322,7 +315,22 @@
     "loadError": "Error loading data"
   },
 
-   "principal": {
+  "notifications": {
+  "title": "Notifications",
+  "empty": "No notifications",
+  "markAll": "Mark all",
+  "viewHistory": "View history",
+  "viewTicket": "View ticket",
+  "markRead": "Mark as read",
+
+  "newMessage": "New notification",
+
+  "login": "User {{user}} logged in",
+  "ticketStateChanged": "Ticket #{{id}} changed to {{state}}"
+
+  },
+
+  "principal": {
     "welcome": "Welcome to FixIT",
     "subtitle": "General panel for tracking and managing technical incidents.",
 
@@ -378,5 +386,38 @@
       "phone": "+506 2450 0000",
       "rights": "All rights reserved"
     }
-  }
+  },
+
+  
+  "notificationsHistory": {
+  "title": "Activity history",
+
+  "filters": {
+    "date": "Date filter",
+    "all": "All",
+    "today": "Today",
+    "last7": "Last 7 days",
+    "last30": "Last 30 days",
+    "thisMonth": "This month",
+    "thisYear": "This year",
+
+    "type": "Type filter",
+    "types": {
+      "all": "All",
+      "stateChanges": "State changes",
+      "logins": "Logins"
+    }
+  },
+
+  "empty": "No activity registered.",
+  "loading": "Loading...",
+
+  "states": {
+    "read": "Read",
+    "unread": "Unread"
+  },
+
+  "by": "Performed by:",
+  "viewTicket": "View ticket"
+}
 }

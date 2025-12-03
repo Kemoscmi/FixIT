@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import {
   Layers,
   Wrench,
@@ -28,14 +29,27 @@ import {
 } from "@/components/ui/menubar";
 
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
+
+// AUTH
 import useAuth from "../../auth/store/auth.store";
+
+// LOGO
 import Logo from "../../assets/Logo.png";
 
-// ⭐ IMPORTANTE
+// IDIOMA
 import { useI18n } from "@/hooks/useI18n";
 import { LanguageSelector } from "../LanguageSelector";
 
+// 🔔 NOTIFICACIONES
+import NotificationBell from "../Notificaciones/NotificationBell";
+import NotificationPanel from "../Notificaciones/NotificationPanel";
+
+
+// =============================================================
+// ⭐ COMPONENTE PRINCIPAL
+// =============================================================
 export default function Header() {
+
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
@@ -54,7 +68,6 @@ export default function Header() {
 
   const userName = user?.nombre || user?.correo || t("navbar.guest");
 
-  // 🔵 NAV ITEMS traducidos
   const navItems = [
     { title: t("navbar.home"), href: "Principal", icon: <Home className="h-4 w-4" /> },
     { title: t("navbar.tickets"), href: "/tickets", icon: <Ticket className="h-4 w-4" /> },
@@ -63,7 +76,6 @@ export default function Header() {
       : []),
   ];
 
-  // 🔵 ADMIN ITEMS traducidos
   const mantItems = [
     { title: t("navbar.tickets"), href: "/tickets/table", icon: <Wrench className="h-4 w-4" /> },
     { title: t("navbar.users"), href: "/usuarios", icon: <Users className="h-4 w-4" /> },
@@ -71,12 +83,15 @@ export default function Header() {
     { title: t("navbar.categories"), href: "/categorias", icon: <Layers className="h-4 w-4" /> },
   ];
 
-  // 🔵 VISITANTES traducidos
   const guestItems = [
     { title: t("navbar.login"), href: "/login", icon: <LogIn className="h-4 w-4" /> },
     { title: t("navbar.register"), href: "/user/create", icon: <UserPlus className="h-4 w-4" /> },
   ];
 
+
+  // =============================================================
+  // ⭐ RENDER
+  // =============================================================
   return (
     <header className="fixed top-0 left-0 z-50 w-full bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md border-b border-white/10 shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between px-6 py-3 max-w-[1280px] mx-auto text-white">
@@ -112,9 +127,10 @@ export default function Header() {
               />
             )}
 
-            {/* SELECTOR DE IDIOMA */}
-            <div className="flex items-center ml-4">
+            {/* IDIOMA + NOTIFICACIONES */}
+            <div className="flex items-center ml-4 gap-4">
               <LanguageSelector />
+              <NotificationBell />
             </div>
 
             {/* USUARIO */}
@@ -125,7 +141,6 @@ export default function Header() {
               </MenubarTrigger>
 
               <MenubarContent className="bg-gradient-to-b from-blue-800 to-blue-950/90 backdrop-blur-md border border-white/10 rounded-md shadow-xl">
-
                 {isAuthenticated ? (
                   <MenubarItem asChild>
                     <button
@@ -149,6 +164,7 @@ export default function Header() {
                 )}
               </MenubarContent>
             </MenubarMenu>
+
           </Menubar>
         </div>
 
@@ -171,7 +187,6 @@ export default function Header() {
                 <span>FixIT</span>
               </div>
 
-              {/* ITEMS */}
               {navItems.map((item) => (
                 <button
                   key={item.href}
@@ -185,7 +200,6 @@ export default function Header() {
                 </button>
               ))}
 
-              {/* SOLO ADMIN */}
               {isAdmin && (
                 <NavSection
                   title={t("navbar.admin")}
@@ -195,24 +209,22 @@ export default function Header() {
                 />
               )}
 
-              {/* SELECTOR DE IDIOMA */}
               <div className="mt-6">
                 <LanguageSelector />
               </div>
 
-              {/* USUARIO */}
               <NavSection
                 title={userName}
                 items={
                   isAuthenticated
                     ? [
-                        {
-                          title: t("navbar.logout"),
-                          href: "#",
-                          icon: <LogOut className="h-4 w-4" />,
-                          action: handleLogout,
-                        },
-                      ]
+                      {
+                        title: t("navbar.logout"),
+                        href: "#",
+                        icon: <LogOut className="h-4 w-4" />,
+                        action: handleLogout,
+                      },
+                    ]
                     : guestItems
                 }
                 setMobileOpen={setMobileOpen}
@@ -220,14 +232,21 @@ export default function Header() {
               />
             </nav>
           </SheetContent>
-        </Sheet>
 
+        </Sheet>
       </div>
+
+      <NotificationPanel />
     </header>
   );
 }
 
-/* DROPDOWN */
+
+
+// =============================================================
+// ⭐ COMPONENTES SECUNDARIOS
+// =============================================================
+
 function DropdownMenu({ title, icon, items }) {
   return (
     <MenubarMenu>
@@ -252,7 +271,8 @@ function DropdownMenu({ title, icon, items }) {
   );
 }
 
-/* SECCIÓN DEL MENÚ MÓVIL */
+
+
 function NavSection({ title, items, setMobileOpen, navigate }) {
   return (
     <div>

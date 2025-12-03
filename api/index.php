@@ -28,6 +28,9 @@ require_once "models/PrioridadModel.php";
 require_once "models/EtiquetaModel.php";
 require_once "models/EspecialidadModel.php";
 require_once "models/SlaModel.php";
+require_once "models/NotificacionModel.php";
+
+
 
     
 // Controladores
@@ -40,6 +43,8 @@ require_once "controllers/PrioridadController.php";
 require_once "controllers/EtiquetaController.php";
 require_once "controllers/EspecialidadController.php";
 require_once "controllers/SLAController.php";
+require_once "controllers/NotificacionController.php";
+
 
 
 //Enrutador

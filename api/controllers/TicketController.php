@@ -313,7 +313,58 @@ if (!empty($_FILES['imagenes']['name'])) {
         ";
         $model->enlace->executeSQL_DML($sqlUpdate);
 
-     
+// =====================================================
+// 🔔 NOTIFICACIÓN AUTOMÁTICA: CAMBIO DE ESTADO
+// =====================================================
+
+try {
+    require_once __DIR__ . "/../models/NotificacionModel.php";
+    $notif = new NotificacionModel();
+
+    // Obtener nombre del estado
+    $estadoNuevoNombre = $model->enlace->ExecuteSQL("
+        SELECT nombre FROM estados_ticket WHERE id = $nuevoEstado LIMIT 1
+    ")[0]->nombre ?? "Estado actualizado";
+
+    $mensaje = "El ticket #$ticketId cambió a $estadoNuevoNombre";
+
+    // Obtener solicitante
+    $solicitanteId = intval($ticket["basicos"]->solicitante_id);
+
+    // Obtener técnico asignado (si existe)
+    $rowTec = $model->enlace->ExecuteSQL("
+        SELECT tecnico_id 
+        FROM asignaciones 
+        WHERE ticket_id = $ticketId AND vigente = 1
+        LIMIT 1
+    ");
+
+    $destinatarios = [];
+
+    if (!empty($rowTec)) {
+        $destinatarios[] = intval($rowTec[0]->tecnico_id); // Técnico
+        $destinatarios[] = $solicitanteId;                 // Usuario solicitante
+    } else {
+        // Si no hay técnico → solo solicitante
+        $destinatarios[] = $solicitanteId;
+    }
+
+    // Crear una notificación para cada destinatario
+    foreach ($destinatarios as $destId) {
+        $notif->create([
+            "tipo" => "cambio_estado",
+            "mensaje" => $mensaje,
+            "destinatario_id" => $destId,
+            "remitente_id" => $usuarioId,
+            "referencia_ticket" => $ticketId
+        ]);
+    }
+
+} catch (Throwable $e) {
+    error_log("ERROR creando notificación de cambio de estado: " . $e->getMessage());
+}
+
+
         $response->toJSON([
             "success" => true,
             "ticket_id" => $ticketId,
