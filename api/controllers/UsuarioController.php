@@ -13,8 +13,6 @@ class usuario
     }
 
     // POST /usuario/login
-
-    // POST http://localhost:81/proyecto/api/usuario/login
     public function login()
     {
         $request = new Request();
@@ -29,11 +27,34 @@ class usuario
         }
 
         $user = $user[0];
-// /* if (!password_verify($data->contrasena, $user->contrasena_hash)) { */ despues no borrar se necesita cuando se lean las encriptadas 
-if ($data->contrasena !== $user->contrasena_hash) {
+
+        // VALIDAR CONTRASEÑA
+        if ($data->contrasena !== $user->contrasena_hash) {
             return $response->toJSON(null, "Contraseña incorrecta");
         }
 
+        // ==========================================
+        //   🔔 CREAR NOTIFICACIÓN DE INICIO DE SESIÓN
+        // ==========================================
+        try {
+            require_once __DIR__ . "/../models/NotificacionModel.php";
+            $notifModel = new NotificacionModel();
+
+            $notifModel->create([
+                "tipo" => "login",
+                "mensaje" => "El usuario {$user->nombre} inició sesión",
+                "destinatario_id" => $user->id,
+                "remitente_id" => null,
+                "referencia_ticket" => null
+            ]);
+
+        } catch (Throwable $e) {
+            error_log("ERROR creando notificación de login: " . $e->getMessage());
+        }
+
+        // ==========================================
+        //       🔐 GENERAR TOKEN JWT
+        // ==========================================
         $payload = [
             'id' => $user->id,
             'correo' => $user->correo,
@@ -55,6 +76,6 @@ if ($data->contrasena !== $user->contrasena_hash) {
             ]
         ];
 
-        $response->toJSON($result, "Inicio de sesión exitoso");
+        return $response->toJSON($result, "Inicio de sesión exitoso");
     }
 }
