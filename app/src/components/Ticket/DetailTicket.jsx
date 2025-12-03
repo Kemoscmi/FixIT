@@ -127,7 +127,6 @@ export function DetailTicket() {
         setImagenes([]);
         setObservaciones("");
 
-        toast.success("Estado actualizado");
       } else {
         toast.error("No se pudo actualizar el estado");
       }
