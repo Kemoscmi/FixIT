@@ -14,7 +14,9 @@
   },
 
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "yes": "Yes",
+    "no": "No"
   },
 
   "tickets": {
@@ -78,7 +80,36 @@
       "stateUpdated": "State updated successfully",
       "stateUpdateFail": "State update failed",
 
-      "confirm": "Confirm"
+      "confirm": "Confirm",
+      "createdOn": "Created on",
+
+      "slaFormulas": {
+        "maxTitle": "Maximum allowed time formula",
+        "maxText": "(Deadline − Creation date) ÷ 60 = allowed minutes",
+        "realTitle": "Real time formula",
+        "realText": "(Response/resolution date − Creation date) ÷ 60 = real minutes",
+        "remainingTitle": "Remaining time formula",
+        "remainingText": "(Deadline − Current date) ÷ 60 = remaining minutes → ÷ 60 = remaining hours"
+      },
+
+      "updateDialog": {
+        "title": "Update ticket status",
+        "description": "Status flow is automatic. Add observations and images.",
+        "currentState": "Current status",
+        "nextState": "Next allowed status",
+        "nextStateNotAvailable": "Not available",
+        "evidence": "Evidence",
+        "updatingState": "Updating state...",
+        "updateSuccess": "State updated successfully"
+      },
+
+      "errors": {
+        "noMoreStates": "No more statuses available.",
+        "needObservations": "You must add observations.",
+        "needImage": "You must upload at least one image.",
+        "updateFailed": "Could not update status.",
+        "updateError": "Error while updating status."
+      }
     },
 
     "create": {
@@ -124,6 +155,22 @@
       "errorLoading": "Error loading tickets",
       "empty": "No tickets found."
     }
+  },
+
+  "assignmentsManual": {
+    "button": "Manual assignment",
+    "title": "Manual assignment",
+    "description": "Select a technician and add a justification.",
+    "technicianLabel": "Technician",
+    "technicianPlaceholder": "Select a technician",
+    "justificationLabel": "Justification",
+    "success": "Manual assignment completed",
+    "selectTechnician": "Select a technician",
+    "requireJustification": "You must add a justification",
+    "errorLoadTechs": "Error loading technicians",
+    "errorAssign": "Manual assignment failed",
+    "errorAssignGeneric": "Error in manual assignment",
+    "workloadLabel": "Workload"
   },
 
   "categories": {
@@ -203,7 +250,9 @@
       "email": "Email",
       "phone": "Phone",
       "workload": "Workload",
-      "specialties": "Specialties"
+      "specialties": "Specialties",
+      "available": "Available",
+      "busy": "Busy"
     },
 
     "detail": {
@@ -258,24 +307,108 @@
   "assignmentsView": {
     "titleAdmin": "General Assignments",
     "titleTech": "My Weekly Assignments",
-    "description": "Weekly calendar view (Monday to Sunday), with daily grouping.",
+    "description": "Weekly calendar view (Monday to Sunday), grouped by day.",
     "weekRange": "Week from {{start}} to {{end}}",
-
+    "buttonAuto": "Automatic Assignment",
     "filterWeek": "Filter by week:",
     "noAssignments": "— No assignments —",
-
+    "viewDetail": "View detail",
     "ticketCategory": "Category:",
-    "sla": "SLA:",
-    "slaExpired": "Expired",
-    "slaInProgress": "In progress",
+    "errors": {
+      "load": "Error loading assignments."
+    }
+  },
 
-    "btnViewDetail": "View detail"
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+
+  "months": {
+    "short": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dec"
+    }
+  },
+
+  "sla": {
+    "expired": "Expired",
+    "inProgress": "In progress"
   },
 
   "assignments": {
     "title": "Assignments",
     "assigned": "Assigned",
     "unassigned": "Unassigned"
+  },
+
+  "assignmentsAuto": {
+    "title": "Automatic Assignment",
+    "description": "Review and filter pending tickets. Then run the automatic algorithm based on priority, SLA, specialty and workload.",
+
+    "filters": {
+      "title": "Filters",
+      "priority": "Priority",
+      "category": "Category",
+      "all": "All",
+      "high": "High (1)",
+      "medium": "Medium (2)",
+      "low": "Low (3)"
+    },
+
+    "table": {
+      "title": "Pending Tickets ({{count}})",
+      "id": "ID",
+      "titleColumn": "Title",
+      "category": "Category",
+      "priority": "Priority",
+      "slaRemaining": "SLA Remaining",
+      "actions": "Actions",
+      "viewDetail": "View detail",
+      "noTickets": "No pending tickets with those filters."
+    },
+
+    "sla": {
+      "na": "N/A",
+      "expired": "Expired {{min}} min ago",
+      "remaining": "{{min}} min"
+    },
+
+    "buttons": {
+      "back": "← Go back",
+      "run": "Run Automatic Assignment",
+      "processing": "Processing..."
+    },
+
+    "results": {
+      "title": "Autotriage Results — {{count}} tickets assigned",
+      "assignedTech": "Assigned technician",
+      "score": "Score",
+      "rule": "Applied rule",
+      "justification": "Justification",
+      "assigned": "Assigned"
+    },
+
+    "errors": {
+      "loadPendings": "Error loading pending tickets.",
+      "runAuto": "Error running automatic assignment.",
+      "runFail": "Automatic assignment could not be completed."
+    }
   },
 
   "placeholders": {
@@ -316,18 +449,17 @@
   },
 
   "notifications": {
-  "title": "Notifications",
-  "empty": "No notifications",
-  "markAll": "Mark all",
-  "viewHistory": "View history",
-  "viewTicket": "View ticket",
-  "markRead": "Mark as read",
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markAll": "Mark all",
+    "viewHistory": "View history",
+    "viewTicket": "View ticket",
+    "markRead": "Mark as read",
 
-  "newMessage": "New notification",
+    "newMessage": "New notification",
 
-  "login": "User {{user}} logged in",
-  "ticketStateChanged": "Ticket #{{id}} changed to {{state}}"
-
+    "login": "User {{user}} logged in",
+    "ticketStateChanged": "Ticket #{{id}} changed to {{state}}"
   },
 
   "principal": {
@@ -388,36 +520,35 @@
     }
   },
 
-  
   "notificationsHistory": {
-  "title": "Activity history",
+    "title": "Activity history",
 
-  "filters": {
-    "date": "Date filter",
-    "all": "All",
-    "today": "Today",
-    "last7": "Last 7 days",
-    "last30": "Last 30 days",
-    "thisMonth": "This month",
-    "thisYear": "This year",
-
-    "type": "Type filter",
-    "types": {
+    "filters": {
+      "date": "Date filter",
       "all": "All",
-      "stateChanges": "State changes",
-      "logins": "Logins"
-    }
-  },
+      "today": "Today",
+      "last7": "Last 7 days",
+      "last30": "Last 30 days",
+      "thisMonth": "This month",
+      "thisYear": "This year",
 
-  "empty": "No activity registered.",
-  "loading": "Loading...",
+      "type": "Type filter",
+      "types": {
+        "all": "All",
+        "stateChanges": "State changes",
+        "logins": "Logins"
+      }
+    },
 
-  "states": {
-    "read": "Read",
-    "unread": "Unread"
-  },
+    "empty": "No activity registered.",
+    "loading": "Loading...",
 
-  "by": "Performed by:",
-  "viewTicket": "View ticket"
-}
+    "states": {
+      "read": "Read",
+      "unread": "Unread"
+    },
+
+    "by": "Performed by:",
+    "viewTicket": "View ticket"
+  }
 }

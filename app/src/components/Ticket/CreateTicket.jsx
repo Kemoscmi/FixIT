@@ -249,11 +249,11 @@ export function CreateTicket() {
                   onValueChange={(val) => field.onChange(parseInt(val))}
                 >
                   <SelectTrigger className="bg-white border border-gray-300">
-                    <SelectValue
-                      placeholder={t("tickets.create.priorityPlaceholder")}
-                    />
+                    <SelectValue placeholder={t("tickets.create.priorityPlaceholder")} />
                   </SelectTrigger>
-                  <SelectContent>
+
+                  {/* FIX aplicado aquí */}
+                  <SelectContent className="z-[9999] bg-white border shadow-xl rounded-lg">
                     {prioridades.map((p) => (
                       <SelectItem key={p.id} value={String(p.id)}>
                         {p.nombre}
@@ -264,6 +264,7 @@ export function CreateTicket() {
               )}
             />
           </div>
+
 
           {/* ETIQUETAS */}
           <div>
@@ -355,6 +356,6 @@ export function CreateTicket() {
       </div>
     </div>
   );
-}
+} 
 
 

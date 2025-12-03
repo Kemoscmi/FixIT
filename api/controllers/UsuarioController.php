@@ -3,7 +3,6 @@ use Firebase\JWT\JWT;
 
 class usuario
 {
-    // GET /usuario
     public function index()
     {
         $model = new UsuarioModel();
@@ -13,8 +12,6 @@ class usuario
     }
 
     // POST /usuario/login
-
-    // POST http://localhost:81/proyecto/api/usuario/login
     public function login()
     {
         $request = new Request();
@@ -29,11 +26,13 @@ class usuario
         }
 
         $user = $user[0];
-// /* if (!password_verify($data->contrasena, $user->contrasena_hash)) { */ despues no borrar se necesita cuando se lean las encriptadas 
-if ($data->contrasena !== $user->contrasena_hash) {
+
+        // VALIDAR CONTRASEÑA
+        if ($data->contrasena !== $user->contrasena_hash) {
             return $response->toJSON(null, "Contraseña incorrecta");
         }
 
+        // CREAR JWT
         $payload = [
             'id' => $user->id,
             'correo' => $user->correo,
@@ -54,6 +53,22 @@ if ($data->contrasena !== $user->contrasena_hash) {
                 'rol' => $user->rol
             ]
         ];
+
+        // ==========================================================
+        // CREAR NOTIFICACIÓN DE INICIO DE SESIÓN
+        // ==========================================================
+        require_once "models/NotificacionModel.php";
+        $notiModel = new NotificacionModel();
+
+        $mensaje = "El usuario {$user->nombre} inició sesión";
+        
+        $notiModel->create([
+            "tipo" => "login",
+            "mensaje" => $mensaje,
+            "destinatario_id" => $user->id, 
+            "remitente_id" => $user->id,
+            "referencia_ticket" => "NULL"
+        ]);
 
         $response->toJSON($result, "Inicio de sesión exitoso");
     }
