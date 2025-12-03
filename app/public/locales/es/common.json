@@ -30,9 +30,9 @@
       "createdAt": "Fecha de creación",
       "category": "Categoría",
       "assignedTechnician": "Técnico asignado"
+    },
 
-      },
-      "list": {
+    "list": {
       "myTickets": "Mis Tickets",
       "create": "Crear Ticket",
       "empty": "No se encontraron tickets disponibles.",
@@ -40,159 +40,154 @@
     },
 
     "detail": {
-    "ticket": "Ticket",
-    "error": "Error al obtener el ticket",
-    "notFound": "Ticket no encontrado",
-    "noData": "No hay datos para mostrar",
-    "unknownDate": "fecha desconocida",
+      "ticket": "Ticket",
+      "error": "Error al obtener el ticket",
+      "notFound": "Ticket no encontrado",
+      "noData": "No hay datos para mostrar",
+      "unknownDate": "fecha desconocida",
 
-    "requester": "Solicitante",
-    "resolutionDays": "Días de resolución",
+      "requester": "Solicitante",
+      "resolutionDays": "Días de resolución",
 
-    "slaMonitor": "Monitoreo SLA",
-    "slaResp": "Horas restantes para respuesta",
-    "slaResol": "Horas restantes para resolución",
-    "slaRespMet": "Cumplió SLA de respuesta",
-    "slaResolMet": "Cumplió SLA de resolución",
+      "slaMonitor": "Monitoreo SLA",
+      "slaResp": "Horas restantes para respuesta",
+      "slaResol": "Horas restantes para resolución",
+      "slaRespMet": "Cumplió SLA de respuesta",
+      "slaResolMet": "Cumplió SLA de resolución",
 
-    "history": "Historial de Estados",
-    "noObservations": "Sin observaciones",
-    "noHistory": "Sin historial registrado",
+      "history": "Historial de Estados",
+      "noObservations": "Sin observaciones",
+      "noHistory": "Sin historial registrado",
 
-    "rating": "Valoración del Cliente",
-    "score": "Puntaje",
-    "comment": "Comentario",
-    "noComment": "Sin comentario",
+      "rating": "Valoración del Cliente",
+      "score": "Puntaje",
+      "comment": "Comentario",
+      "noComment": "Sin comentario",
 
-    "updateState": "Actualizar estado",
-    "updateStateDesc": "Selecciona un nuevo estado y añade información opcional.",
-    "selectState": "Seleccione un estado",
+      "updateState": "Actualizar estado",
+      "updateStateDesc": "Selecciona un nuevo estado y añade información opcional.",
+      "selectState": "Seleccione un estado",
 
-    "observations": "Observaciones",
-    "observationsPlaceholder": "Escribe una observación...",
+      "observations": "Observaciones",
+      "observationsPlaceholder": "Escribe una observación...",
 
-    "images": "Imágenes",
-    "imagesHint": "Puedes subir capturas o evidencias.",
+      "images": "Imágenes",
+      "imagesHint": "Puedes subir capturas o evidencias.",
 
-    "mustSelectState": "Debes seleccionar un estado antes de confirmar",
-    "stateUpdated": "Estado actualizado correctamente",
-    "stateUpdateFail": "No se pudo actualizar el estado",
+      "mustSelectState": "Debes seleccionar un estado antes de confirmar",
+      "stateUpdated": "Estado actualizado correctamente",
+      "stateUpdateFail": "No se pudo actualizar el estado",
 
-    "confirm": "Confirmar"
-  },
-
-  "create": {
-  "title": "Crear Ticket",
-  "user": "Usuario solicitante",
-  "email": "Correo",
-  "titlePlaceholder": "Ingrese el título",
-  "priorityPlaceholder": "Seleccione una prioridad",
-  "tags": "Etiquetas",
-  "category": "Categoría asociada",
-  "selectTagFirst": "Seleccione una etiqueta…",
-  "date": "Fecha de creación",
-  "state": "Estado",
-  "defaultState": "Pendiente",
-  "descPlaceholder": "Describa el problema o solicitud...",
-  "save": "Guardar Ticket",
-
-  "noName": "Sin nombre",
-  "errorLoading": "Error al cargar datos",
-  "categoryError": "No se pudo cargar la categoría asociada",
-  "mustSelectTag": "Debe seleccionar una etiqueta antes de continuar",
-  "categoryMissing": "No se pudo obtener la categoría asociada",
-  "invalidTitle": "El título contiene caracteres inválidos",
-  "descTooShort": "La descripción debe contener al menos 5 caracteres",
-  "mustSelectPriority": "Debe seleccionar una prioridad",
-  "internalCategoryError": "Error interno: la categoría no se asignó",
-  "success": "Ticket creado correctamente",
-  "errorCreate": "Error al crear ticket",
-  "serverError": "Error en el servidor"
-},
-
-   "table": {
-    "titleList": "Listado General de Tickets",
-    "create": "Crear Ticket",
-    "title": "Título",
-    "createdAt": "Fecha de Creación",
-    "state": "Estado",
-    "priority": "Prioridad",
-    "actions": "Acciones",
-    "view": "Ver detalle",
-    "edit": "Editar ticket",
-    "delete": "Eliminar ticket",
-    "errorLoading": "Error al cargar tickets",
-    "empty": "No se encontraron tickets."
-  }
-
-
+      "confirm": "Confirmar"
     },
 
-  "categories": {
-  "titleList": "Categorías de Soporte",
-  "buttonNew": "Nueva Categoría",
-  "description": "Explora las distintas áreas de soporte técnico disponibles. Cada categoría incluye etiquetas, especialidades y tiempos de respuesta definidos.",
-  "noCategories": "No se encontraron categorías registradas.",
-   "viewDetail": "Ver detalle",
+    "create": {
+      "title": "Crear Ticket",
+      "user": "Usuario solicitante",
+      "email": "Correo",
+      "titlePlaceholder": "Ingrese el título",
+      "priorityPlaceholder": "Seleccione una prioridad",
+      "tags": "Etiquetas",
+      "category": "Categoría asociada",
+      "selectTagFirst": "Seleccione una etiqueta…",
+      "date": "Fecha de creación",
+      "state": "Estado",
+      "defaultState": "Pendiente",
+      "descPlaceholder": "Describa el problema o solicitud...",
+      "save": "Guardar Ticket",
 
-   "detail": {
-    "tags": "Etiquetas",
-    "noTags": "Sin etiquetas registradas.",
+      "noName": "Sin nombre",
+      "errorLoading": "Error al cargar datos",
+      "categoryError": "No se pudo cargar la categoría asociada",
+      "mustSelectTag": "Debe seleccionar una etiqueta antes de continuar",
+      "categoryMissing": "No se pudo obtener la categoría asociada",
+      "invalidTitle": "El título contiene caracteres inválidos",
+      "descTooShort": "La descripción debe contener al menos 5 caracteres",
+      "mustSelectPriority": "Debe seleccionar una prioridad",
+      "internalCategoryError": "Error interno: la categoría no se asignó",
+      "success": "Ticket creado correctamente",
+      "errorCreate": "Error al crear ticket",
+      "serverError": "Error en el servidor"
+    },
 
-    "specialties": "Especialidades",
-    "noSpecialties": "Sin especialidades registradas.",
-
-    "sla": "SLA",
-    "responseTime": "Tiempo máx. de respuesta",
-    "resolutionTime": "Tiempo máx. de resolución",
-    "noSla": "SLA no disponible.",
-
-    "back": "Volver al listado",
-    "edit": "Editar categoría",
-
-    "notFound": "Categoría no encontrada.",
-    "loading": "Cargando detalles..."
+    "table": {
+      "titleList": "Listado General de Tickets",
+      "create": "Crear Ticket",
+      "title": "Título",
+      "createdAt": "Fecha de Creación",
+      "state": "Estado",
+      "priority": "Prioridad",
+      "actions": "Acciones",
+      "view": "Ver detalle",
+      "edit": "Editar ticket",
+      "delete": "Eliminar ticket",
+      "errorLoading": "Error al cargar tickets",
+      "empty": "No se encontraron tickets."
+    }
   },
 
-  "form": {
-  "titleCreate": "Registrar Categoría",
-  "titleEdit": "Editar Categoría",
+  "categories": {
+    "titleList": "Categorías de Soporte",
+    "buttonNew": "Nueva Categoría",
+    "description": "Explora las distintas áreas de soporte técnico disponibles. Cada categoría incluye etiquetas, especialidades y tiempos de respuesta definidos.",
+    "noCategories": "No se encontraron categorías registradas.",
+    "viewDetail": "Ver detalle",
 
-  "name": "Nombre",
-  "description": "Descripción",
-  "placeholderName": "Nombre de la categoría",
-  "placeholderDescription": "Descripción",
+    "detail": {
+      "tags": "Etiquetas",
+      "noTags": "Sin etiquetas registradas.",
+      "specialties": "Especialidades",
+      "noSpecialties": "Sin especialidades registradas.",
+      "sla": "SLA",
+      "responseTime": "Tiempo máx. de respuesta",
+      "resolutionTime": "Tiempo máx. de resolución",
+      "noSla": "SLA no disponible.",
 
-  "slaAssign": "¿Cómo desea asignar el SLA?",
-  "slaExisting": "Usar SLA existente",
-  "slaNew": "Crear nuevo SLA",
-  "slaSelectExisting": "Seleccione un SLA ya registrado",
+      "back": "Volver al listado",
+      "edit": "Editar categoría",
 
-  "newSlaTitle": "Crear nuevo SLA",
-  "slaResponse": "Tiempo máximo de respuesta (min)",
-  "slaResolution": "Tiempo máximo de resolución (min)",
+      "notFound": "Categoría no encontrada.",
+      "loading": "Cargando detalles..."
+    },
 
-  "tags": "Etiquetas",
-  "specialties": "Especialidades",
+    "form": {
+      "titleCreate": "Registrar Categoría",
+      "titleEdit": "Editar Categoría",
 
-  "back": "Volver",
-  "save": "Guardar",
-  "update": "Actualizar",
+      "name": "Nombre",
+      "description": "Descripción",
+      "placeholderName": "Nombre de la categoría",
+      "placeholderDescription": "Descripción",
 
-  "requiredName": "El nombre es obligatorio",
-  "slaResponseGreaterZero": "El tiempo de respuesta debe ser mayor a 0",
-  "slaResolutionGreater": "El tiempo de resolución debe ser mayor que el tiempo de respuesta",
+      "slaAssign": "¿Cómo desea asignar el SLA?",
+      "slaExisting": "Usar SLA existente",
+      "slaNew": "Crear nuevo SLA",
+      "slaSelectExisting": "Seleccione un SLA ya registrado",
 
-  "loading": "Cargando formulario...",
+      "newSlaTitle": "Crear nuevo SLA",
+      "slaResponse": "Tiempo máximo de respuesta (min)",
+      "slaResolution": "Tiempo máximo de resolución (min)",
 
-   "errors": {
-      "required": "Este campo es obligatorio.",
-      "slaRequired": "Debe seleccionar un SLA existente o crear uno nuevo.",
-      "slaResponseGreaterZero": "El tiempo de respuesta debe ser mayor a 0.",
-      "slaResolutionGreater": "El tiempo de resolución debe ser mayor que el de respuesta."
+      "tags": "Etiquetas",
+      "specialties": "Especialidades",
+
+      "back": "Volver",
+      "save": "Guardar",
+      "update": "Actualizar",
+
+      "requiredName": "El nombre es obligatorio",
+      "slaResponseGreaterZero": "El tiempo de respuesta debe ser mayor a 0",
+      "slaResolutionGreater": "El tiempo de resolución debe ser mayor que el tiempo de respuesta",
+
+      "loading": "Cargando formulario...",
+
+      "errors": {
+        "required": "Este campo es obligatorio.",
+        "slaRequired": "Debe seleccionar un SLA existente o crear uno nuevo.",
+        "slaResponseGreaterZero": "El tiempo de respuesta debe ser mayor a 0.",
+        "slaResolutionGreater": "El tiempo de resolución debe ser mayor que el de respuesta."
+      }
     }
-}
-
   },
 
   "technicians": {
@@ -202,85 +197,80 @@
     "noTechnicians": "No se encontraron técnicos registrados.",
     "titleCreate": "Registrar Técnico",
     "titleEdit": "Editar Técnico",
+
     "fields": {
       "name": "Nombre",
       "email": "Correo electrónico",
       "phone": "Teléfono",
       "workload": "Carga de trabajo",
-      "specialties": "Especialidades",
-      "available": "Disponible",
-      "busy": "Ocupado"
- 
+      "specialties": "Especialidades"
     },
 
     "detail": {
-    "email": "Correo",
-    "phone": "Teléfono",
-    "workload": "Carga de trabajo",
-    "availability": "Disponibilidad",
-    "specialties": "Especialidades",
-    "back": "Volver al listado",
-    "edit": "Editar técnico",
-    "noWorkload": "No asignado"
-  },
+      "email": "Correo",
+      "phone": "Teléfono",
+      "workload": "Carga de trabajo",
+      "availability": "Disponibilidad",
+      "specialties": "Especialidades",
+      "back": "Volver al listado",
+      "edit": "Editar técnico",
+      "noWorkload": "No asignado"
+    },
 
-   "form": {
-    "titleCreate": "Registrar Técnico",
-    "titleEdit": "Editar Técnico",
+    "form": {
+      "titleCreate": "Registrar Técnico",
+      "titleEdit": "Editar Técnico",
 
-    "name": "Nombre",
-    "lastname": "Apellido",
-    "email": "Correo",
-    "password": "Contraseña",
-    "phone": "Teléfono",
-    "notes": "Observaciones",
-    "specialties": "Especialidades",
-    "workload": "Carga actual",
-    "availability": "Disponibilidad",
+      "name": "Nombre",
+      "lastname": "Apellido",
+      "email": "Correo",
+      "password": "Contraseña",
+      "phone": "Teléfono",
+      "notes": "Observaciones",
+      "specialties": "Especialidades",
+      "workload": "Carga actual",
+      "availability": "Disponibilidad",
 
-    "available": "Disponible",
-    "busy": "Ocupado",
+      "available": "Disponible",
+      "busy": "Ocupado",
 
-    "back": "Volver",
-    "save": "Guardar",
-    "update": "Actualizar",
+      "back": "Volver",
+      "save": "Guardar",
+      "update": "Actualizar",
 
-    "placeholderName": "Nombre",
-    "placeholderLastname": "Apellido",
-    "placeholderEmail": "Correo",
-    "placeholderPassword": "Contraseña",
-    "placeholderPhone": "Teléfono",
-    "placeholderNotes": "Observaciones",
+      "placeholderName": "Nombre",
+      "placeholderLastname": "Apellido",
+      "placeholderEmail": "Correo",
+      "placeholderPassword": "Contraseña",
+      "placeholderPhone": "Teléfono",
+      "placeholderNotes": "Observaciones",
 
-    "errors": {
-      "nameLetters": "El nombre solo puede contener letras.",
-      "lastnameLetters": "El apellido solo puede contener letras.",
-      "required": "Este campo es obligatorio.",
-      "emailDomain": "El correo debe terminar en @fixit.cr.",
-      "numbersOnly": "Este campo solo acepta números."
+      "errors": {
+        "nameLetters": "El nombre solo puede contener letras.",
+        "lastnameLetters": "El apellido solo puede contener letras.",
+        "required": "Este campo es obligatorio.",
+        "emailDomain": "El correo debe terminar en @fixit.cr.",
+        "numbersOnly": "Este campo solo acepta números."
+      }
     }
-  }
   },
-
 
   "assignmentsView": {
-  "titleAdmin": "Asignaciones Generales",
-  "titleTech": "Mis Asignaciones Semanales",
-  "description": "Vista tipo calendario semanal (lunes a domingo), con agrupación diaria.",
-  "weekRange": "Semana del {{start}} al {{end}}",
+    "titleAdmin": "Asignaciones Generales",
+    "titleTech": "Mis Asignaciones Semanales",
+    "description": "Vista tipo calendario semanal (lunes a domingo), con agrupación diaria.",
+    "weekRange": "Semana del {{start}} al {{end}}",
 
-  "filterWeek": "Filtrar por semana:",
+    "filterWeek": "Filtrar por semana:",
+    "noAssignments": "— Sin asignaciones —",
 
-  "noAssignments": "— Sin asignaciones —",
+    "ticketCategory": "Categoría:",
+    "sla": "SLA:",
+    "slaExpired": "Vencido",
+    "slaInProgress": "En curso",
 
-  "ticketCategory": "Categoría:",
-  "sla": "SLA:",
-  "slaExpired": "Vencido",
-  "slaInProgress": "En curso",
-
-  "btnViewDetail": "Ver detalle"
-},
-
+    "btnViewDetail": "Ver detalle"
+  },
 
   "assignments": {
     "title": "Asignaciones",
@@ -325,7 +315,21 @@
     "loadError": "Error al cargar datos"
   },
 
-   "principal": {
+  "notifications": {
+   "title": "Notificaciones",
+  "empty": "No hay notificaciones",
+  "markAll": "Marcar todas",
+  "viewHistory": "Ver historial",
+  "viewTicket": "Ver ticket",
+  "markRead": "Marcar leída",
+
+  "newMessage": "Nueva notificación",
+
+  "login": "El usuario {{user}} inició sesión",
+  "ticketStateChanged": "El ticket #{{id}} cambió a {{state}}"
+  },
+
+  "principal": {
     "welcome": "Bienvenido a FixIT",
     "subtitle": "Panel general de seguimiento y gestión de incidencias técnicas.",
 
@@ -382,8 +386,39 @@
       "phone": "+506 2450 0000",
       "rights": "Todos los derechos reservados"
     }
-  }
+  },
 
   
+  "notificationsHistory": {
+  "title": "Historial de actividad",
+
+  "filters": {
+    "date": "Filtro por fecha",
+    "all": "Todo",
+    "today": "Hoy",
+    "last7": "Últimos 7 días",
+    "last30": "Últimos 30 días",
+    "thisMonth": "Este mes",
+    "thisYear": "Este año",
+
+    "type": "Filtro por tipo",
+    "types": {
+      "all": "Todos",
+      "stateChanges": "Cambios de estado",
+      "logins": "Inicios de sesión"
+    }
+  },
+
+  "empty": "No hay actividad registrada.",
+  "loading": "Cargando...",
+
+  "states": {
+    "read": "Leída",
+    "unread": "No leída"
+  },
+
+  "by": "Realizado por:",
+  "viewTicket": "Ver ticket"
 }
 
+}
