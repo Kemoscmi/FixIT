@@ -5,7 +5,6 @@ import useAuth from "../../auth/store/auth.store";
 import toast from "react-hot-toast";
 import { useI18n } from "@/hooks/useI18n";
 
-// Traducción dinámica solo para mostrar (NO para guardar)
 const translateDynamicMessage = (rawMessage, t) => {
   if (!rawMessage) return rawMessage;
 
@@ -44,7 +43,7 @@ export function NotificationProvider({ children }) {
   const sinLeer = notificaciones.filter(n => n.estado === "no_leida").length;
 
   // =====================================================
-  // Cargar notificaciones (OPTIMIZADO)
+  // Cargar notificaciones 
   // =====================================================
   const loadNotificaciones = useCallback(async () => {
     if (!user?.id) return;
@@ -65,7 +64,8 @@ export function NotificationProvider({ children }) {
       .filter(n => n.estado === "no_leida")
       .forEach(n => {
         toast(`🔔 ${translateDynamicMessage(n.mensaje, t)}`, {
-          duration: 3500,
+          duration: 2000,
+          position: "top-right",
           style: {
             background: "#1e3a8a",
             color: "white",
@@ -81,7 +81,7 @@ export function NotificationProvider({ children }) {
   }, [user?.id]); 
 
   // =====================================================
-  // Mark read
+  // leida
   // =====================================================
   const marcarLeida = async (id) => {
     pendingReadRef.current.add(id);

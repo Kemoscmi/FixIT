@@ -1,58 +1,33 @@
-// ============================================================
-//  COMPONENTE: AsignacionesView.jsx
-// ------------------------------------------------------------
-// Este componente muestra las asignaciones semanales del técnico o administrador
-// en forma de calendario (lunes a domingo). Permite filtrar por semana,
-// calcular el avance del SLA de cada ticket y ver detalles individuales.
-// ============================================================
+import React, { useEffect, useState } from "react";
+import AsignacionService from "../../services/AsignacionService";
 
-//  Importaciones principales de React
-import React, { useEffect, useState } from "react"; // useState y useEffect son hooks
-import AsignacionService from "../../services/AsignacionService"; // servicio que obtiene las asignaciones desde la API
-
-//  Componentes UI reutilizables (diseño de tarjeta, botones, badges, etc.)
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-// Navegación interna y autenticación del usuario
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../auth/store/auth.store"; // almacén de datos del usuario autenticado
+import useAuth from "../../auth/store/auth.store";
 
-//  Componentes de estado visual
-import { LoadingGrid } from "../ui/custom/LoadingGrid"; // muestra carga animada
-import { ErrorAlert } from "../ui/custom/ErrorAlert"; // muestra errores
+import { LoadingGrid } from "../ui/custom/LoadingGrid";
+import { ErrorAlert } from "../ui/custom/ErrorAlert";
 
-// ============================================================
-// Componente principal: AsignacionesView
-// ============================================================
+import { useI18n } from "@/hooks/useI18n";
+
 export default function AsignacionesView() {
 
-  //  Hook para redirigir entre vistas
+  const { t } = useI18n();
   const navigate = useNavigate();
-
-  // Extrae los datos del usuario autenticado
   const { user } = useAuth();
 
-  // ============================================================
-  // Estados internos del componente
-  // ============================================================
   const [data, setData] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState("");
 
-  // 🔵 Estado para ejecutar asignación automática
- 
-
-  // Extrae rol e ID
   const rolId = user?.rol_id;
   const userId = user?.id;
 
-  // ============================================================
-  //  Colores de estado
-  // ============================================================
   const estadoColors = {
     Pendiente: "border-yellow-400 bg-yellow-50 text-yellow-800",
     Asignado: "border-blue-400 bg-blue-50 text-blue-800",
@@ -97,17 +72,15 @@ export default function AsignacionesView() {
 
         setData(all);
         setFiltered(all);
-      } catch  {
-        setError("Error al cargar las asignaciones.");
+      } catch {
+        setError(t("assignmentsView.errors.load"));
       } finally {
         setLoading(false);
       }
     };
 
     if (rolId && userId) fetchData();
-  }, [rolId, userId]);
-
- 
+  }, [rolId, userId, t]);
 
   // ============================================================
   // Filtro por semana
@@ -131,6 +104,7 @@ export default function AsignacionesView() {
     const filteredByWeek = data.filter((a) => {
       if (!a.fecha_asignacion) return false;
       const fecha = new Date(a.fecha_asignacion + "T00:00:00");
+
       return (
         fecha.getTime() >= firstWeekStart.setHours(0, 0, 0, 0) &&
         fecha.getTime() <= lastWeekEnd.setHours(23, 59, 59, 999)
@@ -161,16 +135,27 @@ export default function AsignacionesView() {
         return monday;
       })();
 
+  // ============================================================
+  // Traducción de días y meses
+  // ============================================================
   const diasSemana = Array.from({ length: 7 }).map((_, i) => {
     const fecha = new Date(baseDate);
     fecha.setDate(baseDate.getDate() + i);
+
+    const weekdayIndex = fecha.getDay();
+    const weekdayMap = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+    const weekdayKey = weekdayMap[weekdayIndex];
+
+    const monthIndex = fecha.getMonth();
+    const monthMap = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+    const monthKey = monthMap[monthIndex];
+
     const fechaISO = fecha.toLocaleDateString("sv-SE");
+
     return {
-      nombre: fecha.toLocaleDateString("es-CR", { weekday: "long" }),
+      nombre: t(`days.${weekdayKey}`),
       fechaISO,
-      fechaMostrar: `${fecha.getDate()} ${fecha.toLocaleString("es-CR", {
-        month: "short",
-      })}`,
+      fechaMostrar: `${fecha.getDate()} ${t(`months.short.${monthKey}`)}`
     };
   });
 
@@ -178,6 +163,7 @@ export default function AsignacionesView() {
     const fecha = asignacion.fecha_asignacion
       ? new Date(asignacion.fecha_asignacion).toISOString().split("T")[0]
       : "Sin fecha";
+
     if (!acc[fecha]) acc[fecha] = [];
     acc[fecha].push(asignacion);
     return acc;
@@ -192,36 +178,31 @@ export default function AsignacionesView() {
   return (
     <div className="max-w-7xl mx-auto p-6">
 
-    
-      {/* Título */}
       <h1 className="text-3xl font-bold mb-2 text-blue-900">
-        {rolId === 1 ? "Asignaciones Generales" : "Mis Asignaciones Semanales"}
+        {rolId === 1 ? t("assignmentsView.titleAdmin") : t("assignmentsView.titleTech")}
       </h1>
 
       <p className="text-gray-600 mb-2">
-        Vista tipo calendario semanal (lunes a domingo), con agrupación diaria.
+        {t("assignmentsView.description")}
       </p>
 
       <p className="text-sm text-gray-700 italic mb-6">
-        Semana del <b>{inicioSemana}</b> al <b>{finSemana}</b>
+        {t("assignmentsView.weekRange", { start: inicioSemana, end: finSemana })}
       </p>
 
-      {/* 🔵 Botón + Filtro */}
       <div className="flex items-center gap-4 mb-8">
+        
+        <Button
+          onClick={() => navigate("/asignaciones/autotriage")}
+          className="bg-indigo-600 text-white hover:bg-indigo-700"
+        >
+          {t("assignmentsView.buttonAuto")}
+        </Button>
 
-        {/* 🔵 Botón ASIGNACIÓN AUTOMÁTICA */}
-      <Button
-  onClick={() => navigate("/asignaciones/autotriage")}
-  className="bg-indigo-600 text-white hover:bg-indigo-700"
->
-  Asignación Automática
-</Button>
-
-
-        {/* Filtro */}
         <label className="text-sm font-medium text-gray-700">
-          Filtrar por semana:
+          {t("assignmentsView.filterWeek")}
         </label>
+
         <input
           type="week"
           value={selectedWeek}
@@ -230,7 +211,7 @@ export default function AsignacionesView() {
         />
       </div>
 
-      {/* Calendario */}
+      {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
         {diasSemana.map((dia) => {
           const asignacionesDelDia = asignacionesPorFecha[dia.fechaISO] || [];
@@ -248,6 +229,7 @@ export default function AsignacionesView() {
               </CardHeader>
 
               <CardContent className="space-y-3 bg-white rounded-b-xl min-h-[160px] p-4">
+
                 {asignacionesDelDia.length > 0 ? (
                   asignacionesDelDia.map((a, idx) => {
                     const parseToLocalDate = (str) => {
@@ -266,7 +248,8 @@ export default function AsignacionesView() {
                     if (slaProgress < 0) slaProgress = 0;
                     if (slaProgress > 100) slaProgress = 100;
 
-                    const slaStatus = ahora > fechaLimite ? "Vencido" : "En curso";
+                    const slaStatus =
+                      ahora > fechaLimite ? t("sla.expired") : t("sla.inProgress");
 
                     return (
                       <div
@@ -280,16 +263,13 @@ export default function AsignacionesView() {
                             <p className="font-semibold text-gray-900 text-sm">
                               #{a.ticket_id} — {a.titulo}
                             </p>
+
                             <p className="text-xs text-gray-600">
-                              Categoría: <strong>{a.categoria}</strong>
+                              {t("assignmentsView.ticketCategory")}{" "}
+                              <strong>{a.categoria}</strong>
                             </p>
-                            <p
-                              className={`text-xs font-medium ${
-                                slaStatus === "Vencido"
-                                  ? "text-black-600"
-                                  : "text-gray-500"
-                              }`}
-                            >
+
+                            <p className="text-xs text-gray-500 font-medium">
                               SLA: {slaStatus} ({Math.round(slaProgress)}%)
                             </p>
                           </div>
@@ -307,15 +287,17 @@ export default function AsignacionesView() {
                         <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-2">
                           <div
                             className={`h-2 rounded-full transition-all duration-300 ${
-                              slaStatus === "Vencido"
+                              slaStatus === t("sla.expired")
                                 ? "bg-red-600"
                                 : "bg-green-500"
                             }`}
                             style={{
                               width: `${
-                                slaStatus === "Vencido" ? 100 : slaProgress
+                                slaStatus === t("sla.expired")
+                                  ? 100
+                                  : slaProgress
                               }%`,
-                              opacity: slaStatus === "Vencido" ? 1 : 0.9,
+                              opacity: slaStatus === t("sla.expired") ? 1 : 0.9,
                             }}
                           ></div>
                         </div>
@@ -326,22 +308,25 @@ export default function AsignacionesView() {
                             className="bg-blue-600 text-white hover:bg-blue-700 text-xs"
                             onClick={() => navigate(a.ver_detalle)}
                           >
-                            Ver detalle
+                            {t("assignmentsView.viewDetail")}
                           </Button>
                         </div>
+
                       </div>
                     );
                   })
                 ) : (
                   <p className="text-sm text-gray-400 text-center italic mt-8">
-                    — Sin asignaciones —
+                    {t("assignmentsView.noAssignments")}
                   </p>
                 )}
+
               </CardContent>
             </Card>
           );
         })}
       </div>
+
     </div>
   );
 }

@@ -14,7 +14,9 @@
   },
 
   "common": {
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "yes": "Sí",
+    "no": "No"
   },
 
   "tickets": {
@@ -78,7 +80,37 @@
       "stateUpdated": "Estado actualizado correctamente",
       "stateUpdateFail": "No se pudo actualizar el estado",
 
-      "confirm": "Confirmar"
+      "confirm": "Confirmar",
+      "createdOn": "Creado el",
+
+      "slaFormulas": {
+        "maxTitle": "Fórmula Tiempo Máximo Permitido",
+        "maxText": "(Fecha límite − Fecha de creación) ÷ 60 = minutos permitidos",
+        "realTitle": "Fórmula Tiempo Real",
+        "realText": "(Fecha de respuesta/resolución − Fecha de creación) ÷ 60 = minutos reales",
+        "remainingTitle": "Fórmula Horas Restantes",
+        "remainingText": "(Fecha límite − Fecha actual) ÷ 60 = minutos restantes → ÷ 60 = horas restantes"
+      },
+
+      "updateDialog": {
+        "title": "Actualizar estado del ticket",
+        "description": "El flujo de estado es automático. Agregue observaciones e imágenes.",
+        "currentState": "Estado actual",
+        "nextState": "Siguiente estado permitido",
+        "nextStateNotAvailable": "No disponible",
+        "evidence": "Evidencia",
+        "updatingState": "Actualizando estado...",
+        "updateSuccess": "Estado actualizado correctamente"
+
+      },
+
+      "errors": {
+        "noMoreStates": "No hay más estados disponibles.",
+        "needObservations": "Debes agregar observaciones.",
+        "needImage": "Debes subir mínimo una imagen.",
+        "updateFailed": "No se pudo actualizar el estado.",
+        "updateError": "Error en la actualización."
+      }
     },
 
     "create": {
@@ -124,6 +156,22 @@
       "errorLoading": "Error al cargar tickets",
       "empty": "No se encontraron tickets."
     }
+  },
+
+  "assignmentsManual": {
+    "button": "Asignación manual",
+    "title": "Asignación manual",
+    "description": "Seleccione un técnico y agregue una justificación.",
+    "technicianLabel": "Técnico",
+    "technicianPlaceholder": "Seleccione un técnico",
+    "justificationLabel": "Justificación",
+    "success": "Asignación manual realizada",
+    "selectTechnician": "Seleccione un técnico",
+    "requireJustification": "Debe agregar justificación",
+    "errorLoadTechs": "Error cargando técnicos",
+    "errorAssign": "No se pudo asignar manualmente",
+    "errorAssignGeneric": "Error en asignación manual",
+    "workloadLabel": "Carga"
   },
 
   "categories": {
@@ -203,7 +251,9 @@
       "email": "Correo electrónico",
       "phone": "Teléfono",
       "workload": "Carga de trabajo",
-      "specialties": "Especialidades"
+      "specialties": "Especialidades",
+      "available": "Disponible",
+    "busy": "Ocupado"
     },
 
     "detail": {
@@ -260,22 +310,106 @@
     "titleTech": "Mis Asignaciones Semanales",
     "description": "Vista tipo calendario semanal (lunes a domingo), con agrupación diaria.",
     "weekRange": "Semana del {{start}} al {{end}}",
-
+    "buttonAuto": "Asignación Automática",
     "filterWeek": "Filtrar por semana:",
     "noAssignments": "— Sin asignaciones —",
-
+    "viewDetail": "Ver detalle",
     "ticketCategory": "Categoría:",
-    "sla": "SLA:",
-    "slaExpired": "Vencido",
-    "slaInProgress": "En curso",
+    "errors": {
+      "load": "Error al cargar las asignaciones."
+    }
+  },
 
-    "btnViewDetail": "Ver detalle"
+  "days": {
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo"
+  },
+
+  "months": {
+    "short": {
+      "jan": "ene",
+      "feb": "feb",
+      "mar": "mar",
+      "apr": "abr",
+      "may": "may",
+      "jun": "jun",
+      "jul": "jul",
+      "aug": "ago",
+      "sep": "sep",
+      "oct": "oct",
+      "nov": "nov",
+      "dec": "dic"
+    }
+  },
+
+  "sla": {
+    "expired": "Vencido",
+    "inProgress": "En curso"
   },
 
   "assignments": {
     "title": "Asignaciones",
     "assigned": "Asignado",
     "unassigned": "Sin asignar"
+  },
+
+  "assignmentsAuto": {
+    "title": "Asignación Automática",
+    "description": "Revisa y filtra los tickets pendientes. Luego ejecuta el algoritmo automático según prioridad, SLA, especialidad y carga laboral.",
+
+    "filters": {
+      "title": "Filtros",
+      "priority": "Prioridad",
+      "category": "Categoría",
+      "all": "Todas",
+      "high": "Alta (1)",
+      "medium": "Media (2)",
+      "low": "Baja (3)"
+    },
+
+    "table": {
+      "title": "Tickets Pendientes ({{count}})",
+      "id": "ID",
+      "titleColumn": "Título",
+      "category": "Categoría",
+      "priority": "Prioridad",
+      "slaRemaining": "SLA Restante",
+      "actions": "Acciones",
+      "viewDetail": "Ver detalle",
+      "noTickets": "No hay tickets pendientes con esos filtros."
+    },
+
+    "sla": {
+      "na": "N/A",
+      "expired": "Vencido hace {{min}} min",
+      "remaining": "{{min}} min"
+    },
+
+    "buttons": {
+      "back": "← Volver atrás",
+      "run": "Ejecutar Asignación Automática",
+      "processing": "Procesando..."
+    },
+
+    "results": {
+      "title": "Resultados del Autotriage — {{count}} tickets asignados",
+      "assignedTech": "Técnico asignado",
+      "score": "Puntaje",
+      "rule": "Regla aplicada",
+      "justification": "Justificación",
+      "assigned": "Asignado"
+    },
+
+    "errors": {
+      "loadPendings": "Error cargando los tickets pendientes.",
+      "runAuto": "Error al procesar la asignación automática.",
+      "runFail": "No se pudo completar la asignación."
+    }
   },
 
   "placeholders": {
@@ -316,17 +450,17 @@
   },
 
   "notifications": {
-   "title": "Notificaciones",
-  "empty": "No hay notificaciones",
-  "markAll": "Marcar todas",
-  "viewHistory": "Ver historial",
-  "viewTicket": "Ver ticket",
-  "markRead": "Marcar leída",
+    "title": "Notificaciones",
+    "empty": "No hay notificaciones",
+    "markAll": "Marcar todas",
+    "viewHistory": "Ver historial",
+    "viewTicket": "Ver ticket",
+    "markRead": "Marcar leída",
 
-  "newMessage": "Nueva notificación",
+    "newMessage": "Nueva notificación",
 
-  "login": "El usuario {{user}} inició sesión",
-  "ticketStateChanged": "El ticket #{{id}} cambió a {{state}}"
+    "login": "El usuario {{user}} inició sesión",
+    "ticketStateChanged": "El ticket #{{id}} cambió a {{state}}"
   },
 
   "principal": {
@@ -353,7 +487,6 @@
     "systemStatus": {
       "title": "Estado general del sistema",
       "operational": "Actualmente el sistema se encuentra operativo",
-      "operationalStatus": "operativo",
       "resolved": "Se han resuelto {{count}} incidencias en las últimas 48 horas",
       "sla": "promedio de cumplimiento SLA del {{percent}}%"
     },
@@ -388,37 +521,35 @@
     }
   },
 
-  
   "notificationsHistory": {
-  "title": "Historial de actividad",
+    "title": "Historial de actividad",
 
-  "filters": {
-    "date": "Filtro por fecha",
-    "all": "Todo",
-    "today": "Hoy",
-    "last7": "Últimos 7 días",
-    "last30": "Últimos 30 días",
-    "thisMonth": "Este mes",
-    "thisYear": "Este año",
+    "filters": {
+      "date": "Filtro por fecha",
+      "all": "Todo",
+      "today": "Hoy",
+      "last7": "Últimos 7 días",
+      "last30": "Últimos 30 días",
+      "thisMonth": "Este mes",
+      "thisYear": "Este año",
 
-    "type": "Filtro por tipo",
-    "types": {
-      "all": "Todos",
-      "stateChanges": "Cambios de estado",
-      "logins": "Inicios de sesión"
-    }
-  },
+      "type": "Filtro por tipo",
+      "types": {
+        "all": "Todos",
+        "stateChanges": "Cambios de estado",
+        "logins": "Inicios de sesión"
+      }
+    },
 
-  "empty": "No hay actividad registrada.",
-  "loading": "Cargando...",
+    "empty": "No hay actividad registrada.",
+    "loading": "Cargando...",
 
-  "states": {
-    "read": "Leída",
-    "unread": "No leída"
-  },
+    "states": {
+      "read": "Leída",
+      "unread": "No leída"
+    },
 
-  "by": "Realizado por:",
-  "viewTicket": "Ver ticket"
-}
-
+    "by": "Realizado por:",
+    "viewTicket": "Ver ticket"
+  }
 }
