@@ -111,7 +111,7 @@
         "updateError": "Error while updating status."
       }
     },
-
+ 
     "create": {
       "title": "Create Ticket",
       "user": "Requester",
@@ -455,6 +455,17 @@
     "viewHistory": "View history",
     "viewTicket": "View ticket",
     "markRead": "Mark as read",
+    "byDate": "By date",
+    "byCategory": "By category",
+    "byStatus": "By status",
+    "none": "No notifications found.",
+    "unread": "Unread",
+    "read": "Read",
+
+    "stateChanges": "State changes",
+    "logins": "Logins",
+
+
 
     "newMessage": "New notification",
 

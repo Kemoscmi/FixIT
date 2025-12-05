@@ -12,6 +12,8 @@ import { Layers, LogIn, CheckCircle, ExternalLink, Calendar } from "lucide-react
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/hooks/useI18n";
 import { useLocaleDate } from "@/hooks/useLocaleDate";
+import { useNotification } from "../../components/Notificaciones/useNotification";
+
 
 export default function HistorialNotificaciones() {
 
@@ -22,6 +24,8 @@ export default function HistorialNotificaciones() {
     const [historial, setHistorial] = useState([]);
     const [filtrado, setFiltrado] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const { marcarLeida } = useNotification();
 
     const [filtroFecha, setFiltroFecha] = useState("todo");
     const [filtroTipo, setFiltroTipo] = useState("todos");
@@ -206,6 +210,37 @@ export default function HistorialNotificaciones() {
                                                         ? t("notificationsHistory.states.unread")
                                                         : t("notificationsHistory.states.read")}
                                                 </span>
+
+                                                {n.estado === "no_leida" && (
+                                                    <button
+                                                        onClick={async () => {
+                                                            await marcarLeida(n.id);
+
+                                                            setHistorial(prev =>
+                                                                prev.map(([fecha, items]) => [
+                                                                    fecha,
+                                                                    items.map(item =>
+                                                                        item.id === n.id ? { ...item, estado: "leida" } : item
+                                                                    )
+                                                                ])
+                                                            );
+
+                                                            setFiltrado(prev =>
+                                                                prev.map(([fecha, items]) => [
+                                                                    fecha,
+                                                                    items.map(item =>
+                                                                        item.id === n.id ? { ...item, estado: "leida" } : item
+                                                                    )
+                                                                ])
+                                                            );
+                                                        }}
+                                                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-semibold"
+                                                    >
+                                                        <CheckCircle size={14} />
+                                                        {t("notifications.markRead")}
+                                                    </button>
+                                                )}
+
 
                                                 {n.referencia_ticket && (
                                                     <button
