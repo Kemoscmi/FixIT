@@ -211,6 +211,8 @@ class AsignacionModel
     $best = null;
     $bestScore = -999999;
 
+
+    // AQUIIII SE USA EL “Aplica correctamente prioridad, SLA, carga y especialidad para el puntaje.”
     foreach ($tecnicos as $tec) {
         $puntaje = ($ticket->prioridad * 1000)
                  - $ticket->horas_restantes
