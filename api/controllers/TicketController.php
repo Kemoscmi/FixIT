@@ -215,8 +215,8 @@ class TicketController
                 return;
             }
         }
-
-        //  Registrar el cambio en historial_estados
+ 
+        // 🔹 Registrar el cambio en historial_estados
         $sqlHist = "
             INSERT INTO historial_estados (ticket_id, estado_id, usuario_id, fecha, observaciones)
             VALUES ($ticketId, $nuevoEstado, $usuarioId, NOW(), '" . addslashes($observaciones) . "')
@@ -269,8 +269,9 @@ if (!empty($_FILES['imagenes']['name'])) {
         ";
         $model->enlace->executeSQL_DML($sqlUpdate);
 
+// =====================================================
 //  NOTIFICACIÓN AUTOMÁTICA: CAMBIO DE ESTADO
-
+// =====================================================
 
 try {
     require_once __DIR__ . "/../models/NotificacionModel.php";
@@ -302,6 +303,15 @@ try {
     } else {
         // Si no hay técnico → solo solicitante
         $destinatarios[] = $solicitanteId;
+    }
+
+    // Agregar admin si él realizó el cambio de estado
+    $usuarioRol = $model->enlace->ExecuteSQL("
+        SELECT rol_id FROM usuarios WHERE id = $usuarioId LIMIT 1
+    ");
+
+    if (!empty($usuarioRol) && intval($usuarioRol[0]->rol_id) === 1) {
+        $destinatarios[] = $usuarioId;
     }
 
     // Crear una notificación para cada destinatario

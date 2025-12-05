@@ -456,6 +456,15 @@
     "viewHistory": "Ver historial",
     "viewTicket": "Ver ticket",
     "markRead": "Marcar leída",
+    "byDate": "Por fecha",
+    "byCategory": "Por categoría",
+    "byStatus": "Por estado",
+    "none": "No hay notificaciones.",
+    "unread": "No leídas",
+    "read": "Leídas",
+
+    "stateChanges": "Cambios de estado",
+    "logins": "Inicios de sesión",
 
     "newMessage": "Nueva notificación",
 
