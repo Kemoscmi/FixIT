@@ -50,16 +50,19 @@ export function NotificationProvider({ children }) {
 
     const data = await NotificationService.getByUser(user.id);
 
+    //Optimismo para que no se traiga no leidas falsas
     const filtered = data.map(n =>
       pendingReadRef.current.has(n.id)
         ? { ...n, estado: "leida" }
         : n
     );
 
+    //Detecta nuevas notis
     const prev = prevRef.current;
 
     const nuevas = filtered.filter(n => !prev.some(old => old.id === n.id));
 
+    //Toast solo si es no leida
     nuevas
       .filter(n => n.estado === "no_leida")
       .forEach(n => {
@@ -75,8 +78,8 @@ export function NotificationProvider({ children }) {
         });
       });
 
-    prevRef.current = filtered;
-    setNotificaciones(filtered);
+    prevRef.current = filtered; //Aca usamos el antes y despues, actualiza el estado anterior
+    setNotificaciones(filtered); //Y esto guarda totalmente 
     setLoading(false);
   }, [user?.id]); 
 
@@ -84,14 +87,16 @@ export function NotificationProvider({ children }) {
   // leida
   // =====================================================
   const marcarLeida = async (id) => {
-    pendingReadRef.current.add(id);
+    pendingReadRef.current.add(id); //Optimismo local
 
+    //Carga la ui rapido
     setNotificaciones(prev =>
       prev.map(n =>
         n.id === id ? { ...n, estado: "leida" } : n
       )
     );
 
+    //Sincroniza con back
     await NotificationService.markAsRead(id, user.id);
 
     setTimeout(() => {

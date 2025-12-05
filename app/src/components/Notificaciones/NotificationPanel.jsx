@@ -41,7 +41,7 @@ export default function NotificationPanel() {
     const panelRef = useRef(null);
     const navigate = useNavigate();
 
-    // *** NUEVO: Vista seleccionada ***
+    // Vista seleccionada ***
     const [vista, setVista] = useState("fecha");
 
     // Cerrar al click afuera

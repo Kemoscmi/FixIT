@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { NotificationService } from "../../services/NotificationService";
 import useAuth from "../../auth/store/auth.store";
-import {
-    format,
-    isToday,
-    isThisMonth,
-    isThisYear,
-    subDays
-} from "date-fns";
+import { format, isToday, isThisMonth, isThisYear, subDays } from "date-fns";
 import { Layers, LogIn, CheckCircle, ExternalLink, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/hooks/useI18n";
@@ -131,27 +125,24 @@ export default function HistorialNotificaciones() {
                 <div className="flex gap-2">
                     <button
                         onClick={() => setFiltroTipo("todos")}
-                        className={`px-3 py-2 rounded-lg text-sm border shadow-sm ${
-                            filtroTipo === "todos" ? "bg-indigo-600 text-white" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                        }`}
+                        className={`px-3 py-2 rounded-lg text-sm border shadow-sm ${filtroTipo === "todos" ? "bg-indigo-600 text-white" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                            }`}
                     >
                         {t("notificationsHistory.filters.types.all")}
                     </button>
 
                     <button
                         onClick={() => setFiltroTipo("cambio_estado")}
-                        className={`px-3 py-2 rounded-lg text-sm border shadow-sm ${
-                            filtroTipo === "cambio_estado" ? "bg-blue-600 text-white" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                        }`}
+                        className={`px-3 py-2 rounded-lg text-sm border shadow-sm ${filtroTipo === "cambio_estado" ? "bg-blue-600 text-white" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                            }`}
                     >
                         {t("notificationsHistory.filters.types.stateChanges")}
                     </button>
 
                     <button
                         onClick={() => setFiltroTipo("login")}
-                        className={`px-3 py-2 rounded-lg text-sm border shadow-sm ${
-                            filtroTipo === "login" ? "bg-green-600 text-white" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                        }`}
+                        className={`px-3 py-2 rounded-lg text-sm border shadow-sm ${filtroTipo === "login" ? "bg-green-600 text-white" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                            }`}
                     >
                         {t("notificationsHistory.filters.types.logins")}
                     </button>
@@ -201,11 +192,10 @@ export default function HistorialNotificaciones() {
                                             </p>
 
                                             <div className="flex gap-4 mt-2">
-                                                <span className={`text-xs px-2 py-1 rounded-full ${
-                                                    n.estado === "no_leida"
+                                                <span className={`text-xs px-2 py-1 rounded-full ${n.estado === "no_leida"
                                                         ? "bg-blue-100 text-blue-600"
                                                         : "bg-gray-200 text-gray-600"
-                                                }`}>
+                                                    }`}>
                                                     {n.estado === "no_leida"
                                                         ? t("notificationsHistory.states.unread")
                                                         : t("notificationsHistory.states.read")}
