@@ -10,25 +10,7 @@
 
 class TicketController
 {
-    // ============================================================
-    // PRUEBA EN POSTMAN (LISTADO POR ROL)
-    // ============================================================
-    // Aquí se detallan ejemplos de cómo probar este controlador en Postman.
-    // Se utiliza el método GET con diferentes parámetros (rol_id y user_id)
-    // para obtener el listado de tickets según el tipo de usuario:
-    //   - rol_id = 1  → Administrador (ve todos los tickets)
-    //   - rol_id = 2  → Técnico (ve solo sus tickets asignados vigentes)
-    //   - rol_id = 3  → Cliente (ve solo sus propios tickets creados)
-    //
-    // Ejemplos:
-    // GET -> http://localhost:81/Proyecto/api/TicketController?rol_id=1&user_id=1
-    // GET -> http://localhost:81/Proyecto/api/TicketController?rol_id=2&user_id=3
-    // GET -> http://localhost:81/Proyecto/api/TicketController?rol_id=3&user_id=4
-    //
-    // El resultado esperado es una lista de tickets con 4 campos:
-    // id, titulo, fecha_creacion y estado.
-    // ============================================================
-
+  
     public function index()
     {
         // Se crea un nuevo objeto Response, encargado de devolver las respuestas en formato JSON
@@ -84,23 +66,6 @@ class TicketController
             handleException($e);
         }
     }
-
-    // ============================================================
-    // PRUEBA EN POSTMAN (DETALLE DE TICKET)
-    // ============================================================
-    // Este método obtiene la información completa de un ticket por su ID.
-    // Ejemplos de prueba:
-    // GET -> http://localhost:81/Proyecto/api/TicketController/1?rol_id=1&user_id=1   (Administrador)
-    // GET -> http://localhost:81/Proyecto/api/TicketController/1?rol_id=2&user_id=2   (Técnico asignado)
-    // GET -> http://localhost:81/Proyecto/api/TicketController/1?rol_id=3&user_id=4   (Cliente solicitante)
-    //
-    // Autorización:
-    //  - Admin   → Puede acceder a cualquier ticket.
-    //  - Técnico → Solo si el ticket está asignado a él y la asignación está vigente.
-    //  - Cliente → Solo si es el solicitante del ticket.
-    //
-    // Devuelve: toda la información (datos básicos, SLA, historial e imágenes, valoraciones).
-    // ============================================================
 
     public function get($id)
     {
@@ -167,16 +132,7 @@ class TicketController
         }
     }
 
-    // ============================================================
-    // TICKETS RECIENTES
-    // ============================================================
-    // Método para obtener los tickets más recientes del sistema.
-    // Se puede probar con:
-    // GET -> http://localhost:81/Proyecto/api/TicketController/recientes
-    //
-    // No requiere rol ni parámetros. Retorna los últimos registros
-    // con su información principal.
-    // ============================================================
+
     public function recientes()
     {
         $response = new Response();
@@ -210,23 +166,23 @@ class TicketController
     try {
         header('Content-Type: application/json; charset=utf-8');
 
-        // 🔹 Captura de datos enviados por POST
+        //  Captura de datos enviados por POST
         $ticketId   = isset($_POST['ticket_id']) ? intval($_POST['ticket_id']) : 0;
         $nuevoEstado = isset($_POST['nuevo_estado_id']) ? intval($_POST['nuevo_estado_id']) : 0;
         $usuarioId   = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : 0;
         $observaciones = isset($_POST['observaciones']) ? trim($_POST['observaciones']) : "";
 
-        // 🔹 Validación de datos obligatorios
-        if (!$ticketId || !$nuevoEstado || !$usuarioId || $observaciones === "") {
+        //  Validación de datos obligatorios
+        if (!$ticketId || !$nuevoEstado || !$usuarioId ) {
             http_response_code(400);
-            $response->toJSON(null, "Debe enviar: ticket_id, nuevo_estado_id, usuario_id y observaciones.", 400);
+            $response->toJSON(null, "Debe enviar: ticket_id, nuevo_estado_id, usuario_id", 400);
             return;
         }
 
-        // 🔹 Cargar modelo
+        //  Cargar modelo
         $model = new TicketModel();
 
-        // 🔹 Obtener datos del ticket actual
+        //  Obtener datos del ticket actual
         $ticket = $model->getById($ticketId);
         if (!$ticket) {
             http_response_code(404);
@@ -236,14 +192,14 @@ class TicketController
 
         $estadoActual = intval($ticket["basicos"]->estado_id);
 
-        // 🔹 Validación del flujo correcto (no saltarse estados)
+        // VALIDACIONNNNNNNNNNN  PARAAAAAAAAAAA QUE NO SE SALTEEEEEEE ESTADOSSSSSSSSSSSS Validación del flujo correcto 
         if ($nuevoEstado !== $estadoActual + 1) {
             http_response_code(400);
             $response->toJSON(null, "Flujo inválido: no puede saltarse etapas.", 400);
             return;
         }
 
-        // 🔹 Validar que el ticket tenga técnico asignado (excepto pasar de Pendiente → Asignado)
+        //  Validar que el ticket tenga técnico asignado (excepto pasar de Pendiente → Asignado)
         if ($estadoActual > 1) {
             $sqlAsig = "
                 SELECT 1 FROM asignaciones 
@@ -267,8 +223,8 @@ class TicketController
         ";
         $historialId = $model->enlace->executeSQL_DML_last($sqlHist);
 
-        // 🔹 Procesar imagen (si existe)
-        // 🔹 Procesar imágenes (si existen)
+      
+        //  Procesar imágenes (si existen)
 if (!empty($_FILES['imagenes']['name'])) {
     $uploadDir = "../uploads/estados/";
 

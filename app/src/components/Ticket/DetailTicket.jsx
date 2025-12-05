@@ -67,6 +67,7 @@ export function DetailTicket() {
   const [tecnicos, setTecnicos] = useState([]);
   const [tecnicoId, setTecnicoId] = useState("");
   const [justManual, setJustManual] = useState("");
+const [imgPreview, setImgPreview] = useState(null);
 
   useEffect(() => {
     const fetchTicket = async () => {
@@ -96,17 +97,19 @@ export function DetailTicket() {
 
   const { basicos, sla, historial, valoracion } = data;
 
-  const estadoColors = {
-    Pendiente: "bg-blue-50 text-blue-800 border-blue-200",
-    Asignado: "bg-sky-100 text-sky-800 border-sky-300",
-    "En Proceso": "bg-indigo-100 text-indigo-800 border-indigo-300",
-    Resuelto: "bg-emerald-100 text-emerald-800 border-emerald-300",
-    Cerrado: "bg-rose-100 text-rose-800 border-rose-300",
-  };
+//colores de los estados 
+ const estadoColors = {
+  Pendiente: "bg-blue-600 text-white border-blue-800",
+  Asignado: "bg-sky-600 text-white border-sky-800",
+  "En Proceso": "bg-indigo-600 text-white border-indigo-800",
+  Resuelto: "bg-emerald-600 text-white border-emerald-800",
+  Cerrado: "bg-rose-600 text-white border-rose-800",
+};
 
-  // ----------------------------------------------------------
-  // Próximo estado según flujo
-  // ----------------------------------------------------------
+
+  //ESTE es el metodo para obligue la sistema a seguir este flujo
+  //se hace en el frontend porque el frontend es el que guia el flujo de todo 
+
   const getNextState = (estadoActual) => {
     const flujo = {
       Pendiente: { id: 2, nombre: "Asignado" },
@@ -119,22 +122,15 @@ export function DetailTicket() {
     return flujo[estadoActual] || null;
   };
 
-  // ----------------------------------------------------------
-  // Actualizar estado 
-  // ----------------------------------------------------------
+  // Actualizar estado  
+
   const handleActualizarEstado = async () => {
   const siguiente = getNextState(basicos.estado);
 
-  if (!siguiente) {
-    return toast.error("⚠️ " + t("tickets.detail.errors.noMoreStates"));
-  }
-  if (!observaciones.trim()) {
-    return toast.error("⚠️ " + t("tickets.detail.errors.needObservations"));
-  }
-  if (imagenes.length === 0) {
-    return toast.error("⚠️ " + t("tickets.detail.errors.needImage"));
-  }
 
+  if (!siguiente) {
+    return toast.error( t("tickets.detail.errors.noMoreStates"));
+  }
   setOpenModal(false);
 
 toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
@@ -167,9 +163,8 @@ toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
 };
 
 
-  // ----------------------------------------------------------
   // Cargar técnicos para asignación manual
-  // ----------------------------------------------------------
+
   const cargarTecnicos = async () => {
     try {
       const res = await AsignacionService.getTecnicosByTicket(basicos.id);
@@ -180,9 +175,8 @@ toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
     }
   };
 
-  // ----------------------------------------------------------
   // Asignación manual
-  // ----------------------------------------------------------
+
   const handleAsignacionManual = async () => {
     if (!tecnicoId) {
       return toast.error(t("assignmentsManual.selectTechnician"));
@@ -214,9 +208,8 @@ toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
     }
   };
 
-  // ----------------------------------------------------------
   // RENDER
-  // ----------------------------------------------------------
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-100 py-12">
       <div className="max-w-5xl mx-auto bg-white/70 backdrop-blur-md shadow-xl rounded-2xl overflow-hidden border border-blue-100">
@@ -243,14 +236,15 @@ toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
 
           {/* Estado + fecha */}
           <div className="flex justify-between items-center">
-            <Badge
-              className={`${
-                estadoColors[basicos?.estado] ||
-                "bg-gray-200 text-gray-700 border-gray-300"
-              } border font-semibold text-base px-4 py-1.5`}
-            >
-              {basicos?.estado}
-            </Badge>
+           <Badge
+  className={`
+    ${estadoColors[basicos?.estado] || "bg-gray-200 text-gray-700 border-gray-300"}
+    border-2 font-bold text-lg px-5 py-2 rounded-full shadow-md tracking-wide
+  `}
+>
+  {basicos?.estado}
+</Badge>
+
 
             <p className="text-gray-500 text-sm">
               {basicos?.fecha_creacion
@@ -389,12 +383,14 @@ toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
                               key={idx}
                               className="border rounded-lg overflow-hidden hover:scale-105 transition-transform"
                             >
-                              <img
-                                src={`http://localhost:81/Proyecto/${img.ruta}`}
-                                alt={img.descripcion || "Evidencia"}
-                                onError={(e) => (e.target.src = "/no-image.png")}
-                                className="object-cover w-full h-28"
-                              />
+                             <img
+  src={`http://localhost:81/Proyecto/${img.ruta}`}
+  alt={img.descripcion || "Evidencia"}
+  onError={(e) => (e.target.src = "/no-image.png")}
+  onClick={() => setImgPreview(`http://localhost:81/Proyecto/${img.ruta}`)}
+  className="object-cover w-full h-28 cursor-pointer hover:scale-105 transition-transform rounded-lg"
+/>
+
                             </div>
                           ))}
                         </div>
@@ -547,9 +543,9 @@ toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
               </Dialog>
             )}
 
-            {/* ACTUALIZAR ESTADO – oculto para clientes */}
-            {rolId !== 3 && (
-              <Dialog open={openModal} onOpenChange={setOpenModal}>
+            {/* ACTUALIZAR ESTADO – oculto para clientes OCULTAR ACTUALIZAR ESTADOOOOOOOOOOO SI ESTA PENDIENTEEE*/}
+           {rolId !== 3 && basicos?.estado !== "Pendiente" && basicos?.estado !== "Cerrado" && (
+  <Dialog open={openModal} onOpenChange={setOpenModal}>
                 <DialogTrigger asChild>
                   <Button className="bg-gradient-to-r from-blue-700 to-blue-900 text-white flex items-center gap-2 hover:scale-105 transition-all shadow">
                     <RefreshCcw className="w-4 h-4" />
@@ -630,6 +626,19 @@ toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
           </div>
         </div>
       </div>
+      {imgPreview && (
+  <div
+    onClick={() => setImgPreview(null)}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] cursor-pointer"
+  >
+    <img
+      src={imgPreview}
+      className="max-w-[90%] max-h-[90%] rounded-lg shadow-2xl transition-transform duration-300 hover:scale-105"
+      alt="preview"
+    />
+  </div>
+)}
+
     </div>
   );
 }
