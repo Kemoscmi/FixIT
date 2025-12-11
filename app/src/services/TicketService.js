@@ -212,8 +212,19 @@ class TicketService {
       throw error; // Reenvía el error al componente
     }
   }
+addValoracion(data) {
+    return axios.post(`${BASE_URL}/valoracion/create`, data)  // Usar el endpoint correcto para crear una valoración
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error al registrar la valoración:', error);
+            throw new Error('Error al registrar valoración');
+        });
+}
 
 }
+
+
+
 
 // ============================================================
 //  Exportación

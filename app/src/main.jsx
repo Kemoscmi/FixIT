@@ -38,6 +38,12 @@ import AsignacionesAuto from './components/Asignaciones/AsignacionesAuto';
 //Notificaciones 
 import { NotificationProvider } from "./components/Notificaciones/NotificationProvider";
 import HistorialNotificaciones from './components/Notificaciones/HistorialNotificaciones';
+                   
+// Módulo Valoraciones
+import ListValoraciones from './components/Valoraciones/ListValoraciones';
+// En tu archivo main.jsx o index.js
+import DetailValoracion from './components/Valoraciones/DetailValoracion';  // Correcta importación sin {}
+
 
 
 // Autenticación
@@ -78,7 +84,10 @@ const rutas = createBrowserRouter([
           //Notiiiss
           { path: 'historial', element: <HistorialNotificaciones /> },
 
-          // Página 404
+            // Módulo de valoraciones
+          { path: 'valoraciones', element: <ListValoraciones /> },
+          { path: 'valoracion/:id', element: <DetailValoracion /> },
+
           { path: '*', element: <PageNotFound /> },
         ],
       },
