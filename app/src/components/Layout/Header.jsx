@@ -18,6 +18,7 @@ import {
   User,
   Home,
   Users2,
+  Star,
 } from "lucide-react";
 
 import {
@@ -74,13 +75,16 @@ export default function Header() {
     ...(isAdmin || isTecnico
       ? [{ title: t("navbar.assignments"), href: "/asignaciones", icon: <ClipboardList className="h-4 w-4" /> }]
       : []),
+  
+
   ];
 
   const mantItems = [
     { title: t("navbar.tickets"), href: "/tickets/table", icon: <Wrench className="h-4 w-4" /> },
     { title: t("navbar.users"), href: "/usuarios", icon: <Users className="h-4 w-4" /> },
     { title: t("navbar.technicians"), href: "/tecnicos", icon: <Users2 className="h-4 w-4" /> },
-    { title: t("navbar.categories"), href: "/categorias", icon: <Layers className="h-4 w-4" /> },
+    { title: t("navbar.categories"), href: "/categorias", icon: <Layers className="h-4 w-4" /> }
+
   ];
 
   const guestItems = [

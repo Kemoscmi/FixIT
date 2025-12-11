@@ -29,7 +29,7 @@ require_once "models/EtiquetaModel.php";
 require_once "models/EspecialidadModel.php";
 require_once "models/SlaModel.php";
 require_once "models/NotificacionModel.php";
-
+require_once "models/ValoracionModel.php";
 
 
     
@@ -44,7 +44,7 @@ require_once "controllers/EtiquetaController.php";
 require_once "controllers/EspecialidadController.php";
 require_once "controllers/SLAController.php";
 require_once "controllers/NotificacionController.php";
-
+require_once "controllers/ValoracionController.php";
 
 
 //Enrutador

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import TicketService from "../../services/TicketService";
+import TicketService from "../../services/TicketService";  // Usa el import default
 import useAuthStore from "../../auth/store/auth.store";
 import toast from "react-hot-toast";
 import AsignacionService from "../../services/AsignacionService";
@@ -68,22 +68,36 @@ export function DetailTicket() {
   const [tecnicoId, setTecnicoId] = useState("");
   const [justManual, setJustManual] = useState("");
 const [imgPreview, setImgPreview] = useState(null);
+const [puntaje, setPuntaje] = useState(1); // Estado para el puntaje de la valoración
+const [comentario, setComentario] = useState(""); // Estado para el comentario
+const [hasRated, setHasRated] = useState(false); // Estado para verificar si ya ha valorado
 
-  useEffect(() => {
+
+useEffect(() => {
     const fetchTicket = async () => {
-      try {
-        const res = await TicketService.getTicketById(id, { rolId, userId });
-        setData(res.data?.data || {});
-      } catch (err) {
-        console.error("Error al obtener ticket:", err);
-        setError(t("tickets.detail.error"));
-      } finally {
-        setLoading(false);
-      }
+        try {
+            const res = await TicketService.getTicketById(id, { rolId, userId });
+            setData(res.data?.data || {});
+
+            // Verificar si el ticket ya tiene una valoración del usuario
+            const existingRating = res.data?.data?.valoracion;
+            if (existingRating && existingRating.usuario_id === userId) {
+                setHasRated(true); // El usuario ya valoró este ticket
+                toast.error(t("tickets.detail.alreadyRated")); // Mostrar un mensaje de error
+            }
+        } catch (err) {
+            console.error("Error al obtener ticket:", err);
+            setError(t("tickets.detail.error"));
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (id && rolId && userId) fetchTicket();
-  }, [id, rolId, userId, t]);
+}, [id, rolId, userId, t]);
+
+
+
 
   if (loading) return <LoadingGrid />;
   if (error) return <ErrorAlert title={t("tickets.detail.error")} message={error} />;
@@ -105,6 +119,39 @@ const [imgPreview, setImgPreview] = useState(null);
   Resuelto: "bg-emerald-600 text-white border-emerald-800",
   Cerrado: "bg-rose-600 text-white border-rose-800",
 };
+const handleValoracion = async () => {
+    if (hasRated) {
+        return toast.error(t("tickets.detail.alreadyRated"));
+    }
+
+    if (puntaje < 1 || puntaje > 5) {
+        return toast.error("El puntaje debe estar entre 1 y 5.");
+    }
+
+    try {
+        const valoracionData = {
+            ticket_id: basicos.id,
+            usuario_id: userId,
+            puntaje,
+            comentario,
+        };
+
+        // Llamar al servicio para registrar la valoración
+        const res = await TicketService.addValoracion(valoracionData);
+        if (res.data?.success) {
+            toast.success("Valoración registrada correctamente.");
+            // Refrescar el ticket para obtener la nueva valoración
+            const refreshed = await TicketService.getTicketById(id, { rolId, userId });
+            setData(refreshed.data?.data || {});
+        } else {
+            toast.error("Hubo un error al registrar la valoración.");
+        }
+    } catch (err) {
+        console.error(err);
+        toast.error("Error al registrar la valoración.");
+    }
+};
+
 
 
   //ESTE es el metodo para obligue la sistema a seguir este flujo
@@ -638,6 +685,49 @@ toast.loading(t("tickets.detail.updateDialog.updatingState"), { id: "upd" });
     />
   </div>
 )}
+
+{/* Solo mostrar la valoración si el ticket no ha sido valorado y el estado es "Cerrado" */}
+{basicos?.estado === "Cerrado" && (!valoracion || valoracion.puntaje === 0) && (
+  <div className="bg-yellow-50 rounded-lg p-6 shadow-inner border border-yellow-100 mt-6">
+    <h3 className="text-xl font-semibold text-yellow-700 mb-3 flex items-center gap-2">
+      <Star className="text-yellow-500" /> Valoración del Ticket
+    </h3>
+    
+    {/* Campo para puntaje */}
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700">Puntaje (1-5)</label>
+      <Select value={puntaje} onValueChange={(value) => setPuntaje(parseInt(value))}>
+        <SelectTrigger>
+          <SelectValue placeholder="Selecciona un puntaje" />
+        </SelectTrigger>
+        <SelectContent>
+          {[1, 2, 3, 4, 5].map((score) => (
+            <SelectItem key={score} value={score.toString()}>
+              {score}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+    
+    {/* Campo para comentario opcional */}
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700">Comentario (Opcional)</label>
+      <textarea
+        rows={3}
+        value={comentario}
+        onChange={(e) => setComentario(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-sm"
+      />
+    </div>
+    
+    {/* Botón para enviar valoración */}
+    <Button onClick={handleValoracion} className="mt-4">Enviar Valoración</Button>
+  </div>
+)}
+
+
+
 
     </div>
   );

@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; 
 import { useNavigate } from "react-router-dom";
 import TicketService from "../../services/TicketService";
 import { ListCardTickets } from "./ListCardTickets";
 import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { EmptyState } from "../ui/custom/EmptyState";
-import { ErrorAlert } from "../ui/custom/ErrorAlert";
+import { ErrorAlert } from "../ui/custom/ErrorAlert"; 
 import useAuthStore from "../../auth/store/auth.store";
 
 // UI components
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Star } from "lucide-react";
 
 // ⭐ i18n
 import { useI18n } from "@/hooks/useI18n";
@@ -32,6 +32,10 @@ export function ListTickets() {
     user?.rol === "Cliente" ||
     rolId === 1 ||
     rolId === 3;
+
+  // Determina si puede ver las valoraciones
+const canSeeValorations = true;  // Hacemos que todos puedan ver el botón
+
 
   useEffect(() => {
     if (!rolId || !userId) return;
@@ -81,11 +85,24 @@ export function ListTickets() {
               {t("tickets.list.create")}
             </Button>
           )}
+          
+          {/* Botón de valoraciones visible solo para admin o técnico */}
+          {canSeeValorations && (
+            <Button
+              onClick={() => navigate("/valoraciones")}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Star className="w-4 h-4" />
+              {t("tickets.list.valorations")}
+            </Button>
+          )}
         </div>
+        
 
         <EmptyState message={t("tickets.list.empty")} />
       </div>
     );
+    
 
   // Vista principal con listado
   return (
@@ -103,6 +120,17 @@ export function ListTickets() {
           >
             <Plus className="w-4 h-4" />
             {t("tickets.list.create")}
+          </Button>
+        )}
+
+        {/* Botón de valoraciones visible solo para admin o técnico */}
+        {canSeeValorations && (
+          <Button
+            onClick={() => navigate("/valoraciones")}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Star className="w-4 h-4" />
+            {t("Valoraciones")}
           </Button>
         )}
       </div>
