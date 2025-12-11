@@ -61,8 +61,8 @@ class UsuarioService {
       });
   }
 
-  //  Crear nuevo usuario
-  createUsuario(usuarioData) {
+  // Crear nuevo usuario
+   createUsuario(usuarioData) {
     return axios
       .post(BASE_URL, usuarioData)
       .then((response) => response.data)
@@ -79,6 +79,51 @@ class UsuarioService {
         }
       });
   }
+
+  // Actualizar usuario
+  updateUsuario(id, usuarioData) {
+    return axios
+      .put(`${BASE_URL}/update/${id}`, usuarioData)
+      .then((response) => response.data)
+      .catch((error) => {
+        if (error.response) {
+          console.error("Error al actualizar usuario:", error.response.data);
+          throw new Error(error.response.data.message || "Error al actualizar usuario");
+        }
+      });
+  }
+  // Método para verificar si el correo ya existe
+  checkEmail(correo) {
+    return axios
+      .post(`${BASE_URL}/checkEmail`, { correo })
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error("Error al verificar el correo:", error.response.data);
+        throw new Error(error.response.data.message || "Error al verificar el correo");
+      });
+  }
+
+
+
+  requestPasswordReset(data) {
+  return axios
+    .post(`${BASE_URL}/request-password-reset`, data)
+    .then((response) => response.data)
+    .catch((error) => {
+      throw new Error(error.response.data.message || "Error al solicitar restablecimiento");
+    });
+}
+
+
+resetPassword(data) {
+  return axios
+    .post(`${BASE_URL}/reset-password`, data)
+    .then((response) => response.data)
+    .catch((error) => {
+      throw new Error(error.response.data.message || "Error al restablecer la contraseña");
+    });
+}
+
 }
 
 export default new UsuarioService();

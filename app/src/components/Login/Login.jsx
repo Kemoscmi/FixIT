@@ -1,32 +1,8 @@
-//  Login.jsx
-// -------------------------------------------------------------
-//  Este componente representa la pantalla de inicio de sesión
-// del sistema FixIT.
-//
-// Su función principal es permitir al usuario ingresar sus credenciales
-// (correo y contraseña) para autenticarse en el sistema. Al hacerlo,
-// se conecta con el *store global de autenticación* (Zustand) para
-// enviar los datos al backend, validar la sesión y guardar la información
-// del usuario y su token.
-//
-// Si el login es exitoso → redirige automáticamente al panel principal.
-// Si falla → muestra un mensaje de error claro y manejado en interfaz.
-//
-// En resumen:
-//  Maneja el formulario de inicio de sesión.
-//  Se comunica con el backend a través de useAuth().
-//  Redirige al usuario autenticado.
-// -------------------------------------------------------------
-
-import { useState } from "react";              //  Manejo de estados locales (inputs, errores, etc.)
-import { useNavigate } from "react-router-dom"; //  Permite redirigir al usuario a otra ruta
-import useAuth from "../../auth/store/auth.store"; //  Hook global de autenticación (Zustand)
+import { useState } from "react";              // Manejo de estados locales (inputs, errores, etc.)
+import { useNavigate } from "react-router-dom"; // Permite redirigir al usuario a otra ruta
+import useAuth from "../../auth/store/auth.store"; // Hook global de autenticación (Zustand)
 
 export default function Login() {
-  // -------------------------------------------------------------
-  //  Definición de estados locales
-  // -------------------------------------------------------------
-  // Estos controlan los valores del formulario y los mensajes visibles
   const [correo, setCorreo] = useState("");        // Guarda el correo electrónico ingresado
   const [contrasena, setContrasena] = useState(""); // Guarda la contraseña ingresada
   const [error, setError] = useState("");           // Muestra mensajes de error (login incorrecto, etc.)
@@ -35,42 +11,29 @@ export default function Login() {
   const navigate = useNavigate();
 
   // Extraemos las funciones del store global de autenticación
-  // login → función para enviar credenciales al backend
-  // loading → estado que indica si se está procesando el login
   const { login, loading } = useAuth();
 
-  // -------------------------------------------------------------
-  //  Manejador del formulario de inicio de sesión
-  // -------------------------------------------------------------
-  // Esta función se ejecuta cuando el usuario hace clic en “Entrar”.
-  // Previene el comportamiento por defecto del formulario (recargar la página),
-  // llama al método login() del store global, y según la respuesta:
-  //   Redirige al panel principal (dashboard o home interno)
-  //   Muestra un mensaje de error en pantalla
   const handleSubmit = async (e) => {
     e.preventDefault(); // Evita el refresh de la página al enviar el formulario
     const result = await login(correo, contrasena); // Envía credenciales al backend
 
     if (result.success) {
-      //  Si las credenciales son correctas, redirige al home interno
+      // Si las credenciales son correctas, redirige al home interno
       navigate("/Principal");
     } else {
-      //  Si el login falla, muestra un mensaje 
+      // Si el login falla, muestra un mensaje 
       setError("Credenciales incorrectas o error de conexión");
     }
   };
 
-  // -------------------------------------------------------------
-  //  Render del formulario
-  // -------------------------------------------------------------
-  // Aquí se estructura visualmente el formulario de inicio de sesión,
-  // incluyendo campos, botón y mensajes visuales de error o carga.
+  // Función para redirigir al formulario de restablecimiento de contraseña
+  const handlePasswordReset = () => {
+    navigate("request-password-reset");  // Redirige a la página de solicitud de restablecimiento
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      {/* Contenedor principal */}
       <div className="card w-full max-w-md shadow-md p-6 bg-white rounded-lg">
-        
-        {/* Título principal */}
         <h2 className="text-2xl font-bold mb-4 text-center text-blue-700">
           Iniciar sesión
         </h2>
@@ -84,7 +47,6 @@ export default function Login() {
 
         {/* Formulario de ingreso */}
         <form onSubmit={handleSubmit}>
-          {/* Campo: Correo electrónico */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
               Correo electrónico
@@ -99,7 +61,6 @@ export default function Login() {
             />
           </div>
 
-          {/* Campo: Contraseña */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700">
               Contraseña
@@ -128,13 +89,15 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Enlace adicional */}
-        <p className="text-sm text-gray-600 mt-4 text-center">
-          ¿No tienes una cuenta?{" "}
-          <a href="#" className="text-blue-600 hover:underline">
-            Contáctanos
-          </a>
-        </p>
+        {/* Enlace para solicitar restablecimiento de contraseña */}
+        <div className="mt-4">
+          <button
+            onClick={handlePasswordReset} // Usa navigate aquí
+            className="text-blue-600 hover:underline text-sm text-center block"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -133,7 +133,7 @@ export default function Header() {
               <NotificationBell />
             </div>
 
-            {/* USUARIO */}
+            {/* USUARIO */} 
             <MenubarMenu>
               <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-yellow-300 transition">
                 <User className="h-4 w-4" /> {userName}

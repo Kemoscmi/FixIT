@@ -19,6 +19,15 @@ import { ListTecnico } from './components/Tecnico/ListTecnico';
 import { DetailTecnico } from './components/Tecnico/DetailTecnico';
 import { FormTecnico } from './components/Tecnico/FormTecnico';
 
+// Módulo Usuarios
+import { ListUsuarios } from './components/Usuarios/ListUsuarios'; 
+import { DetailUsuario } from './components/Usuarios/DetailUsuario'; 
+import { FormCreateUsuario } from './components/Usuarios/FormCreateUsuario'; 
+import { FormEditUsuario } from './components/Usuarios/FormEditUsuario'; 
+import { RequestPasswordReset } from "./components/Usuarios/RequestPasswordReset";
+import { ResetPassword } from "./components/Usuarios/ResetPassword";
+
+
 // Módulo Categorías
 import { ListCategoria } from './components/Categoria/ListCategoria';
 import { DetailCategoria } from './components/Categoria/DetailCategoria';
@@ -54,8 +63,17 @@ const rutas = createBrowserRouter([
           { path: 'Principal', element: <Principal /> },
 
           // Técnicos
-          { path: 'tecnicos', element: <ListTecnico /> },
+          { path: 'tecnicos', element: <ListTecnico /> }, 
           { path: 'tecnico/:id', element: <DetailTecnico /> },
+
+          // Usuarios
+          { path: 'usuarios', element: <ListUsuarios /> },  // Lista de usuarios
+          { path: "usuario/detail/:id", element: <DetailUsuario /> }, // Lista de usuarios
+          { path: 'usuario/create', element: <FormCreateUsuario /> },  // Crear nuevo usuario
+          { path: 'usuario/edit/:id', element: <FormEditUsuario /> },  // Editar usuario por ID
+          { path: "request-password-reset", element: <RequestPasswordReset /> }, // Lista de usuarios
+          { path: "reset-password/:token", element: <ResetPassword  /> }, // Lista de usuarios
+
 
           // Categorías
           { path: 'categorias', element: <ListCategoria /> },
